@@ -1,0 +1,174 @@
+---
+title: "Results"
+subtitle: "Complete comparison across all methods"
+---
+
+```{ojs}
+//| echo: false
+metrics = FileAttachment("_data/combined_metrics.json").json()
+```
+
+## Validation era (2006-2015)
+
+All results below are from the **rolling pseudo-real-time validation** with 120 monthly forecast origins.
+
+### Summary table
+
+```{ojs}
+//| echo: false
+viewof resultMetric = Inputs.radio(
+  ["rmse", "mae", "mase"],
+  {label: "Metric", value: "rmse"}
+)
+```
+
+```{ojs}
+//| echo: false
+{
+  const mk = `avg_${resultMetric}`;
+  const horizons = [1, 3, 6, 12];
+
+  const rows = metrics.methods.map(m => {
+    const row = {Method: m.display_name, Category: m.category};
+    for (const h of horizons) {
+      row[`h=${h}`] = m.summary[String(h)]?.[mk]?.toFixed(3) || "—";
+    }
+    return row;
+  });
+
+  return Inputs.table(rows, {
+    sort: "h=12",
+    columns: ["Method", "Category", ...horizons.map(h => `h=${h}`)],
+    width: {Method: 180, Category: 90}
+  });
+}
+```
+
+### Heatmap
+
+```{ojs}
+//| echo: false
+//| label: fig-heatmap
+//| fig-cap: "Performance heatmap — all methods, variables, and horizons. Darker green = better (lower error)."
+
+{
+  const mk = resultMetric;
+  const vars = ["cpi", "industrial_production", "retail_sales", "unemployment"];
+  const horizons = [1, 3, 6, 12];
+
+  const data = metrics.methods.flatMap(m =>
+    vars.flatMap(v =>
+      horizons.map(h => {
+        const val = m.metrics[v]?.[String(h)]?.[mk];
+        return {
+          method: m.display_name,
+          variable: v.replace(/_/g, " "),
+          horizon: h,
+          value: val || null,
+          label: `h=${h}`
+        };
+      })
+    )
+  ).filter(d => d.value != null);
+
+  // Compute cell key for faceting
+  const cells = data.map(d => ({
+    ...d,
+    cell: `${d.variable} h=${d.horizon}`
+  }));
+
+  return Plot.plot({
+    height: 350,
+    marginLeft: 180,
+    marginBottom: 50,
+    padding: 0.05,
+    x: {
+      label: null,
+      domain: vars.flatMap(v => horizons.map(h => `${v.replace(/_/g, " ")} h=${h}`)),
+      tickRotate: -45,
+      tickSize: 0
+    },
+    y: {
+      label: null,
+      domain: metrics.methods.map(m => m.display_name).reverse()
+    },
+    color: {
+      scheme: "greens",
+      reverse: true,
+      label: mk.toUpperCase(),
+      legend: true
+    },
+    marks: [
+      Plot.cell(cells, {
+        x: "cell",
+        y: "method",
+        fill: "value",
+        tip: true,
+        title: d => `${d.method}\n${d.variable} h=${d.horizon}\n${mk}: ${d.value.toFixed(4)}`
+      })
+    ]
+  });
+}
+```
+
+
+### Per-variable breakdown
+
+```{ojs}
+//| echo: false
+viewof detailVar = Inputs.select(
+  ["cpi", "industrial_production", "retail_sales", "unemployment"],
+  {label: "Variable", format: v => v.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
+)
+```
+
+```{ojs}
+//| echo: false
+//| label: fig-detail-bars
+//| fig-cap: "Method comparison for the selected variable across horizons."
+
+{
+  const mk = resultMetric;
+  const horizons = [1, 3, 6, 12];
+
+  const data = metrics.methods.flatMap(m =>
+    horizons.map(h => ({
+      method: m.display_name,
+      horizon: `h=${h}`,
+      value: m.metrics[detailVar]?.[String(h)]?.[mk] || 0
+    }))
+  );
+
+  return Plot.plot({
+    height: 350,
+    marginLeft: 60,
+    marginBottom: 50,
+    x: {label: null},
+    y: {label: mk.toUpperCase(), grid: true},
+    fx: {label: null},
+    color: {legend: true},
+    marks: [
+      Plot.barY(data, Plot.groupX({y: "identity"}, {
+        x: "method",
+        y: "value",
+        fill: "method",
+        fx: "horizon",
+        tip: true
+      }))
+    ]
+  });
+}
+```
+
+
+## Key findings
+
+1. **ARIMA is the benchmark to beat** — best classical method at all horizons
+2. **Zero-shot Chronos-2 is competitive at h=1** but deteriorates at longer horizons
+3. **Seasonal naive is the weakest** — naive seasonality doesn't capture the dynamics well
+4. **Random walk remains a strong baseline** especially at h=12
+
+::: {.callout-note}
+## Test era results
+Test era (2016+) results with subperiod analysis (pre-COVID, COVID, post-COVID) will appear here after Phase 5 evaluation.
+:::

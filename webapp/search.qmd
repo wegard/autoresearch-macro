@@ -1,0 +1,133 @@
+---
+title: "Search Loop"
+subtitle: "LLM-guided exploration of the forecasting pipeline"
+---
+
+```{ojs}
+//| echo: false
+// Try to load search trajectory (may not exist yet)
+searchData = {
+  try {
+    return await FileAttachment("_data/search_trajectory.json").json();
+  } catch(e) {
+    return [];
+  }
+}
+```
+
+## How the search works
+
+The outer loop uses **Claude** (Sonnet) to propose pipeline configurations. Each iteration:
+
+```
+┌─────────────────────────────────────────┐
+│  Claude reads: program.md + history     │
+│  → proposes config as JSON              │
+├─────────────────────────────────────────┤
+│  Quick eval (20 origins, ~30s)          │
+│  → if worse: reject immediately         │
+├─────────────────────────────────────────┤
+│  Full eval (120 origins, ~3min)         │
+│  → if better: ACCEPT, update best       │
+│  → if worse: REJECT                     │
+├─────────────────────────────────────────┤
+│  Log iteration, save state, continue    │
+└─────────────────────────────────────────┘
+```
+
+The agent receives domain knowledge (Norway is an oil economy, CPI responds to exchange rates, etc.) and adapts its proposals based on what worked in previous iterations.
+
+## Search trajectory
+
+```{ojs}
+//| echo: false
+{
+  if (searchData.length === 0) {
+    return html`
+      <div class="chart-container" style="text-align:center; padding:3rem;">
+        <p style="font-size:1.2rem; color:#666;">No search results yet.</p>
+        <p style="color:#999;">Run the search loop to see the trajectory here:</p>
+        <code style="background:#f8f9fa; padding:0.5rem 1rem; border-radius:4px;">
+          uv run python src/search.py --max-iterations 10
+        </code>
+      </div>
+    `;
+  }
+
+  const data = searchData.map(d => ({
+    iteration: d.iteration,
+    score: d.full_score || d.quick_score,
+    status: d.status,
+    description: d.description,
+    runtime: d.runtime_seconds
+  })).filter(d => d.score != null);
+
+  // Running best
+  let best = Infinity;
+  const bestLine = data.filter(d => d.status === "accepted").map(d => {
+    best = Math.min(best, d.score);
+    return {iteration: d.iteration, score: best};
+  });
+
+  return Plot.plot({
+    height: 400,
+    marginLeft: 60,
+    x: {label: "Iteration"},
+    y: {label: "Score (avg MASE)", grid: true},
+    marks: [
+      // All attempts
+      Plot.dot(data, {
+        x: "iteration", y: "score",
+        fill: d => d.status === "accepted" ? "#2ecc71" : d.status === "rejected" ? "#e74c3c" : "#f39c12",
+        r: 5,
+        tip: true,
+        title: d => `Iter ${d.iteration}\nScore: ${d.score.toFixed(4)}\nStatus: ${d.status}\n${d.description}`
+      }),
+      // Best frontier
+      Plot.line(bestLine, {
+        x: "iteration", y: "score",
+        stroke: "#2ecc71", strokeWidth: 2, curve: "step-after"
+      }),
+    ]
+  });
+}
+```
+
+**Legend:** [Accepted]{style="color:#2ecc71;font-weight:bold"} | [Rejected]{style="color:#e74c3c;font-weight:bold"} | [Error]{style="color:#f39c12;font-weight:bold"}. Green line shows the best score achieved so far.
+
+
+## Iteration log
+
+```{ojs}
+//| echo: false
+{
+  if (searchData.length === 0) {
+    return html`<p style="color:#999;">No iterations to display.</p>`;
+  }
+
+  return Inputs.table(searchData.map(d => ({
+    "#": d.iteration,
+    Status: d.status,
+    "Quick Score": d.quick_score?.toFixed(4) || "—",
+    "Full Score": d.full_score?.toFixed(4) || "—",
+    "Time (s)": d.runtime_seconds?.toFixed(1) || "—",
+    Description: d.description
+  })), {
+    rows: 20,
+    sort: "#",
+    reverse: true
+  });
+}
+```
+
+
+## What the agent discovers
+
+::: {.callout-note}
+This section will be populated after running the search experiment. Key analyses:
+
+- Which covariates appear most frequently in accepted configs?
+- What transformations does the agent prefer?
+- Does the agent converge or keep exploring?
+- Are the discovered configurations economically interpretable?
+:::

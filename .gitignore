@@ -1,0 +1,17 @@
+data/*
+!data/.gitkeep
+results/*
+!results/.gitkeep
+__pycache__/
+*.egg-info/
+.venv/
+.env
+.pytest_cache/
+AutogluonModels/
+.ruff_cache/
+webapp/_site/
+webapp/.quarto/
+webapp/_data/*.json
+!webapp/_data/prepare_results.py
+.claude/
+reference/autoresearch/

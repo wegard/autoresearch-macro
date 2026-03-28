@@ -1,0 +1,208 @@
+---
+title: "Baselines"
+subtitle: "What classical methods achieve on Norwegian macro data"
+---
+
+```{ojs}
+//| echo: false
+metrics = FileAttachment("_data/combined_metrics.json").json()
+```
+
+## Method overview
+
+We evaluate five classical baselines on the validation era (2006-2015, 120 monthly rolling forecast origins):
+
+| Method | Description |
+|--------|-------------|
+| **Random Walk** | Forecast = last observed value. The simplest possible baseline. |
+| **Seasonal Naive** | Forecast = same month from previous year. |
+| **AR(p)** | Autoregressive model with BIC lag selection, direct h-step forecast. |
+| **ARIMA** | Auto-selected ARIMA(p,d,q) with AIC-optimal order per origin. |
+| **ETS** | Exponential smoothing with automatic trend/seasonal selection. |
+
+Plus the **Chronos-2** foundation model (zero-shot, no covariates, no fine-tuning).
+
+
+## Performance comparison
+
+```{ojs}
+//| echo: false
+viewof selectedMetric = Inputs.radio(
+  ["rmse", "mae", "mase"],
+  {label: "Metric", value: "rmse"}
+)
+```
+
+```{ojs}
+//| echo: false
+//| label: fig-comparison
+//| fig-cap: "Performance across methods and horizons. Lower is better."
+
+{
+  const metricKey = `avg_${selectedMetric}`;
+  const data = metrics.methods.flatMap(m =>
+    Object.entries(m.summary).map(([h, s]) => ({
+      method: m.display_name,
+      horizon: +h,
+      value: s[metricKey],
+      category: m.category
+    }))
+  );
+
+  const categoryColors = {
+    "naive": "#95a5a6",
+    "classical": "#2ecc71",
+    "foundation": "#9b59b6"
+  };
+
+  return Plot.plot({
+    height: 400,
+    marginLeft: 60,
+    marginBottom: 45,
+    x: {
+      label: "Forecast horizon (months)",
+      ticks: [1, 3, 6, 12]
+    },
+    y: {
+      label: selectedMetric.toUpperCase(),
+      grid: true
+    },
+    color: {
+      domain: metrics.methods.map(m => m.display_name),
+      range: metrics.methods.map(m => ({
+        "naive": "#bdc3c7",
+        "classical": "#27ae60",
+        "foundation": "#8e44ad"
+      })[m.category] || "#999")
+    },
+    marks: [
+      Plot.line(data, {
+        x: "horizon", y: "value", stroke: "method",
+        strokeWidth: 2, curve: "monotone-x"
+      }),
+      Plot.dot(data, {
+        x: "horizon", y: "value", fill: "method",
+        r: 4, tip: true
+      })
+    ]
+  });
+}
+```
+
+
+## Detailed results by variable
+
+```{ojs}
+//| echo: false
+viewof selectedVariable = Inputs.select(
+  ["cpi", "industrial_production", "retail_sales", "unemployment"],
+  {label: "Target variable", value: "cpi", format: v => v.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
+)
+```
+
+```{ojs}
+//| echo: false
+//| label: fig-variable-detail
+//| fig-cap: "Method comparison for the selected variable."
+
+{
+  const mk = selectedMetric;
+  const data = metrics.methods.flatMap(m => {
+    const varMetrics = m.metrics[selectedVariable] || {};
+    return Object.entries(varMetrics).map(([h, vals]) => ({
+      method: m.display_name,
+      horizon: +h,
+      value: vals[mk],
+      category: m.category
+    }));
+  });
+
+  return Plot.plot({
+    height: 380,
+    marginLeft: 60,
+    marginBottom: 45,
+    x: {
+      label: "Forecast horizon (months)",
+      ticks: [1, 3, 6, 12]
+    },
+    y: {
+      label: mk.toUpperCase(),
+      grid: true
+    },
+    marks: [
+      Plot.line(data, {
+        x: "horizon", y: "value", stroke: "method",
+        strokeWidth: 2, curve: "monotone-x"
+      }),
+      Plot.dot(data, {
+        x: "horizon", y: "value", fill: "method",
+        r: 4, tip: true
+      })
+    ]
+  });
+}
+```
+
+
+## Relative to random walk
+
+How much does each method improve over the naive random walk baseline? A ratio below 1.0 means the method is better.
+
+```{ojs}
+//| echo: false
+//| label: fig-relative
+//| fig-cap: "RMSE relative to Random Walk. Values below 1.0 (dashed line) indicate improvement."
+
+{
+  const rw = metrics.methods.find(m => m.name === "random_walk");
+  const others = metrics.methods.filter(m => m.name !== "random_walk");
+
+  const data = others.flatMap(m =>
+    Object.entries(m.summary).map(([h, s]) => {
+      const rwVal = rw.summary[h]?.avg_rmse || 1;
+      return {
+        method: m.display_name,
+        horizon: +h,
+        ratio: s.avg_rmse / rwVal
+      };
+    })
+  );
+
+  return Plot.plot({
+    height: 380,
+    marginLeft: 60,
+    marginBottom: 45,
+    x: {
+      label: "Forecast horizon (months)",
+      ticks: [1, 3, 6, 12]
+    },
+    y: {
+      label: "RMSE ratio (vs Random Walk)",
+      grid: true,
+      domain: [0.8, 1.3]
+    },
+    marks: [
+      Plot.ruleY([1.0], {stroke: "#999", strokeDasharray: "6,4", strokeWidth: 1.5}),
+      Plot.line(data, {
+        x: "horizon", y: "ratio", stroke: "method",
+        strokeWidth: 2, curve: "monotone-x"
+      }),
+      Plot.dot(data, {
+        x: "horizon", y: "ratio", fill: "method",
+        r: 4, tip: true
+      }),
+      Plot.text([{x: 12, y: 1.0, text: "Random Walk"}], {
+        x: "x", y: "y", text: "text", dy: -10, fontSize: 9, fill: "#999"
+      })
+    ]
+  });
+}
+```
+
+
+## Key takeaways
+
+1. **ARIMA is the best classical baseline** — consistently lowest average RMSE across horizons
+2. **Random walk is surprisingly hard to beat** at long horizons (h=12), where AR and ETS actually perform worse
+3. **Zero-shot Chronos-2 does not beat ARIMA** — it's competitive at h=1 but falls behind at longer horizons
+4. **The gap is the opportunity** — this is exactly what the agentic search aims to close through covariate selection, transformations, and fine-tuning

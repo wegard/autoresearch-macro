@@ -1,0 +1,112 @@
+/* Autoresearch Macro — custom styles */
+
+:root {
+  --color-accept: #2ecc71;
+  --color-reject: #e74c3c;
+  --color-ssb: #3498db;
+  --color-fred: #e74c3c;
+  --color-nb: #2c3e50;
+  --color-chronos: #9b59b6;
+  --color-baseline: #95a5a6;
+}
+
+/* Hero section */
+.hero-container {
+  text-align: center;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.hero-container h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.hero-container .lead {
+  font-size: 1.2rem;
+  color: #666;
+  max-width: 700px;
+  margin: 0 auto 2rem;
+}
+
+/* Stat cards */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.stat-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.2rem;
+  text-align: center;
+  border: 1px solid #e9ecef;
+}
+
+.stat-card .number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  line-height: 1.1;
+}
+
+.stat-card .label {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-top: 0.3rem;
+}
+
+/* Chart containers */
+.chart-container {
+  margin: 1.5rem 0;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #fff;
+}
+
+.chart-container .chart-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+/* D3 tooltip */
+.d3-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  pointer-events: none;
+  z-index: 1000;
+  line-height: 1.4;
+}
+
+/* Method badges */
+.method-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.method-badge.best { background: #d4edda; color: #155724; }
+.method-badge.worse { background: #f8d7da; color: #721c24; }
+
+/* Responsive charts */
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* OJS inputs styling */
+.ojs-input {
+  margin: 0.5rem 0;
+}

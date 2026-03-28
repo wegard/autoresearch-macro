@@ -1,0 +1,56 @@
+# Search space for the agentic outer loop.
+# Defines valid parameter ranges that the search agent can explore.
+
+covariates:
+  # Pool of available covariates (from panel.covariates())
+  pool:
+    - house_prices
+    - credit
+    - exports
+    - imports
+    - nok_eur
+    - nok_usd
+    - policy_rate
+    - brent_crude
+    - sp500
+    - fed_funds
+    - us_cpi
+    - vix
+    - global_epu
+    - euro_area_gdp
+  min_selected: 0
+  max_selected: 10
+
+transforms:
+  # Available transformation functions
+  options:
+    - none
+    - log_diff
+    - pct_change_12
+    - pct_change_1
+    - standardize_60
+    - ma_3
+    - ma_6
+
+context_length:
+  # Lookback window in months (null = use all available data)
+  values: [null, 24, 36, 48, 64, 96, 128]
+
+fine_tune:
+  enabled: [false, true]
+
+fine_tune_steps:
+  values: [50, 100, 200, 500]
+  only_if: fine_tune
+
+learning_rate:
+  min: 0.00001
+  max: 0.001
+  log_scale: true
+  only_if: fine_tune
+
+grouping:
+  options: [univariate, all_targets]
+
+num_samples:
+  values: [10, 20, 50]

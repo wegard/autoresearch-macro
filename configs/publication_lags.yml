@@ -1,0 +1,25 @@
+# Publication lags in days after end of reference period.
+# These are approximate — refine based on actual SSB release calendars.
+# See PREPARE-SPEC.md §2.3 for details.
+
+# Norwegian series
+cpi: 10                      # ~10 days after month end
+unemployment: 30             # ~1 month lag
+industrial_production: 40    # ~40 days
+retail_sales: 30
+house_prices: 45             # quarterly, ~45 day lag after quarter end
+credit: 40
+exports: 40
+imports: 40
+policy_rate: 0               # known in real time
+nok_eur: 1                   # next business day
+nok_usd: 1
+
+# Global series
+brent_crude: 1
+sp500: 1
+fed_funds: 1
+us_cpi: 15
+vix: 1
+global_epu: 30
+euro_area_gdp: 90            # ~3 months lag for quarterly GDP

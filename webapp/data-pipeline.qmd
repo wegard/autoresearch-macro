@@ -1,0 +1,184 @@
+---
+title: "The Data"
+subtitle: "18 macro variables with pseudo-real-time discipline"
+---
+
+```{ojs}
+//| echo: false
+variables = FileAttachment("_data/variable_metadata.json").json()
+panel = FileAttachment("_data/panel_timeseries.json").json()
+```
+
+## Data sources
+
+The panel combines Norwegian national statistics, central bank data, and global macro indicators. Every variable has a **publication lag** — the delay between the end of the reference month and when the data actually becomes available.
+
+```{ojs}
+//| echo: false
+//| label: fig-variables
+//| fig-cap: "Variable coverage and publication lags. Color indicates data source."
+
+{
+  const sourceColors = {
+    "SSB": "#3498db",
+    "FRED": "#e74c3c",
+    "Norges Bank": "#2c3e50"
+  };
+
+  const data = variables.map(v => ({
+    name: v.display_name,
+    source: v.source,
+    lag: v.publication_lag_days,
+    is_target: v.is_target,
+    first: v.first_available ? new Date(v.first_available) : null,
+    description: v.description
+  })).filter(d => d.first);
+
+  return Plot.plot({
+    height: 500,
+    marginLeft: 170,
+    marginRight: 60,
+    x: {
+      type: "utc",
+      label: "Date range",
+      domain: [new Date("1947-01-01"), new Date("2026-06-01")]
+    },
+    y: {
+      label: null,
+      domain: data.map(d => d.name).reverse()
+    },
+    marks: [
+      // Bars from first_available to now
+      Plot.barX(data, {
+        x1: "first",
+        x2: new Date("2026-03-31"),
+        y: "name",
+        fill: d => sourceColors[d.source] || "#999",
+        fillOpacity: 0.7,
+        tip: true,
+        title: d => `${d.name}\n${d.source}\nLag: ${d.lag} days\n${d.description}`
+      }),
+      // Target indicators
+      Plot.text(data.filter(d => d.is_target), {
+        x: new Date("2026-05-01"),
+        y: "name",
+        text: d => "target",
+        fontSize: 9,
+        fill: "#e74c3c",
+        fontWeight: "bold"
+      }),
+      // Validation era
+      Plot.ruleX([new Date("2006-01-01")], {stroke: "#2ecc71", strokeWidth: 1.5, strokeDasharray: "4,4"}),
+      Plot.ruleX([new Date("2016-01-01")], {stroke: "#e74c3c", strokeWidth: 1.5, strokeDasharray: "4,4"}),
+      // Labels
+      Plot.text([{x: new Date("2006-01-01"), text: "Validation start"}], {
+        x: "x", text: "text", dy: -10, fontSize: 9, fill: "#2ecc71"
+      }),
+      Plot.text([{x: new Date("2016-01-01"), text: "Test start"}], {
+        x: "x", text: "text", dy: -10, fontSize: 9, fill: "#e74c3c"
+      })
+    ]
+  });
+}
+```
+
+**Legend:** [SSB]{style="color:#3498db;font-weight:bold"} (Statistics Norway) | [FRED]{style="color:#e74c3c;font-weight:bold"} (US Federal Reserve) | [Norges Bank]{style="color:#2c3e50;font-weight:bold"} (Norwegian Central Bank)
+
+
+## Pseudo-real-time discipline
+
+At each forecast origin, we only use data that would have been **actually available** on that date. This means applying publication lags: CPI is available 10 days after month-end, unemployment after 30 days, Euro area GDP after 90 days.
+
+Use the slider below to explore which data is visible at any given forecast origin.
+
+```{ojs}
+//| echo: false
+viewof originDate = Inputs.date({
+  label: "Forecast origin",
+  min: "2006-01-01",
+  max: "2025-12-31",
+  value: "2015-06-15"
+})
+```
+
+```{ojs}
+//| echo: false
+//| label: fig-realtime
+//| fig-cap: "Data available at the selected forecast origin, respecting publication lags."
+
+{
+  const origin = new Date(originDate);
+
+  const lagData = variables.map(v => {
+    const lagMs = v.publication_lag_days * 24 * 60 * 60 * 1000;
+    const cutoff = new Date(origin.getTime() - lagMs);
+    return {
+      name: v.display_name,
+      lag_days: v.publication_lag_days,
+      cutoff: cutoff,
+      source: v.source,
+      months_available: Math.max(0, Math.round((cutoff.getTime() - new Date("1990-01-01").getTime()) / (30.44 * 24 * 60 * 60 * 1000)))
+    };
+  });
+
+  return Plot.plot({
+    height: 480,
+    marginLeft: 170,
+    marginRight: 80,
+    x: {
+      type: "utc",
+      label: "Last available observation",
+      domain: [new Date("2004-01-01"), new Date(origin.getTime() + 30 * 24 * 60 * 60 * 1000)]
+    },
+    y: {
+      label: null,
+      domain: lagData.map(d => d.name).reverse()
+    },
+    marks: [
+      // Origin line
+      Plot.ruleX([origin], {stroke: "#e74c3c", strokeWidth: 2}),
+      Plot.text([{x: origin, text: "Forecast origin"}], {
+        x: "x", text: "text", dy: -10, fontSize: 10, fill: "#e74c3c", fontWeight: "bold"
+      }),
+      // Cutoff dots
+      Plot.dot(lagData, {
+        x: "cutoff",
+        y: "name",
+        fill: d => d.lag_days <= 1 ? "#2ecc71" : d.lag_days <= 30 ? "#f39c12" : "#e74c3c",
+        r: 6,
+        tip: true,
+        title: d => `${d.name}\nLag: ${d.lag_days} days\nLast obs: ${d.cutoff.toISOString().slice(0, 10)}`
+      }),
+      // Lag labels
+      Plot.text(lagData, {
+        x: "cutoff",
+        y: "name",
+        text: d => `${d.lag_days}d`,
+        dx: 15,
+        fontSize: 9,
+        fill: "#666"
+      })
+    ]
+  });
+}
+```
+
+**Color key:** [Fast (0-1 day)]{style="color:#2ecc71;font-weight:bold"} | [Medium (2-30 days)]{style="color:#f39c12;font-weight:bold"} | [Slow (31+ days)]{style="color:#e74c3c;font-weight:bold"}
+
+
+## Variable details
+
+```{ojs}
+//| echo: false
+Inputs.table(variables.map(v => ({
+  Variable: v.display_name,
+  Source: v.source,
+  "Lag (days)": v.publication_lag_days,
+  Target: v.is_target ? "Yes" : "",
+  Description: v.description
+})), {
+  sort: "Source",
+  rows: 20,
+  width: {Variable: 150, Source: 100, "Lag (days)": 80, Target: 50, Description: 300}
+})
+```

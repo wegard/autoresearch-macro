@@ -1,0 +1,252 @@
+\documentclass[12pt,a4paper]{article}
+
+% --- Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{appendix}
+
+\geometry{margin=1in}
+\onehalfspacing
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!60!black,
+    citecolor=blue!60!black,
+    urlcolor=blue!60!black,
+}
+
+% --- Custom commands ---
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
+\newcommand{\vegard}[1]{\textcolor{blue}{\textbf{[VL: #1]}}}
+\newcommand{\leif}[1]{\textcolor{orange}{\textbf{[LAT: #1]}}}
+
+% --- Title ---
+\title{Automated Feature Engineering for Macroeconomic Forecasting\\with Foundation Models\thanks{We thank \todo{acknowledgments}. The views expressed are those of the authors.}}
+
+\author{
+    Vegard H.\ Larsen\thanks{BI Norwegian Business School. Email: \href{mailto:vegard.h.larsen@bi.no}{vegard.h.larsen@bi.no}}
+    \and
+    Leif Anders Thorsrud\thanks{BI Norwegian Business School. Email: \todo{leif.email}}
+}
+
+\date{\today \\ \medskip \small\textit{Preliminary and incomplete}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\todo{Write abstract.}
+
+We study whether an agentic search procedure can improve pseudo-real-time forecasts of the Norwegian macroeconomy by selecting data representations, covariates, and fine-tuning settings for time series foundation models. Rather than allowing unrestricted model rewriting, the agent searches over data transformations, target groupings, covariates, context windows, and fine-tuning settings using rolling forecast-origin validation. We compare against zero-shot foundation models, manually fine-tuned models, and standard macro forecasting baselines. The main contribution is a decomposition of forecast gains into three sources: the foundation model itself, economy-specific adaptation, and autonomous search over the forecasting pipeline.
+
+\bigskip
+\noindent\textbf{Keywords:} macroeconomic forecasting, foundation models, automated machine learning, time series, Norway
+
+\noindent\textbf{JEL codes:} C53, C55, E37
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+% ===================================================================
+\section{Introduction}
+\label{sec:introduction}
+% ===================================================================
+
+\todo{Write introduction.}
+
+% ===================================================================
+\section{Related literature}
+\label{sec:literature}
+% ===================================================================
+
+This paper sits at the intersection of three research strands: high-dimensional macroeconomic forecasting, time series foundation models, and automated machine learning via agentic search. We review each in turn, highlighting how our contribution---an agent-guided search over data representations and fine-tuning configurations for a foundation model, evaluated in pseudo-real-time on Norwegian macro data---addresses gaps that cut across all three.
+
+\subsection{Macroeconomic forecasting}
+\label{sec:lit_macro}
+
+\paragraph{Factor models and high-dimensional data.}
+The central challenge in macroeconomic forecasting has been balancing the desire to exploit large information sets against the statistical curse of dimensionality. The breakthrough came with dynamic factor models (DFMs) and diffusion indexes, which compress the co-movement of hundreds of series into a small number of latent factors \citep{stock2002macroeconomic,stock2002forecasting}. \citet{forni2005generalized} provided an alternative using spectral density methods. These approaches remain the standard benchmark for data-rich macro forecasting. An alternative strategy retains explicit variables but applies Bayesian shrinkage: \citet{banbura2010large} showed that large Bayesian VARs with Minnesota-type priors can match or exceed factor model performance. \citet{koop2013large} extended this to time-varying parameters with dynamic model averaging, allowing the forecasting apparatus to adapt to structural breaks.
+
+\paragraph{Machine learning for macro forecasting.}
+More recently, machine learning methods have entered macroeconomics as a way to capture non-linearities and complex interactions. \citet{coulombe2022machine} provide an exhaustive decomposition of ML forecasting gains, finding that non-linearity---particularly via Random Forests---is the primary source of improvement, especially during periods of financial stress and elevated uncertainty. \citet{babii2024econometrics} formalize the econometric foundations of combining ML with mixed-frequency panel data, emphasizing the necessity of time-series-appropriate cross-validation.
+
+\paragraph{Mixed-frequency data, publication lags, and nowcasting.}
+Real-time macroeconomic forecasting must contend with the ``ragged edge'' problem: indicators are published at different frequencies and with varying delays. Mixed-Data Sampling (MIDAS) regressions \citep{ghysels2004predicting} address this by using distributed lag polynomials to align high-frequency predictors with low-frequency targets. \citet{giannone2008nowcasting} bridge DFMs with Kalman filtering to nowcast GDP amid asynchronous data releases. Our pseudo-real-time evaluation protocol---where each forecast origin sees only data that would have been published by that date---builds directly on this literature.
+
+\paragraph{Forecasting the Norwegian economy.}
+Forecasting a small, open, commodity-exporting economy introduces specific challenges: exposure to global oil price shocks, exchange rate volatility, and collinear domestic indicators. \citet{bjornland2019dutch} analyze the specific macro dynamics of Norway as a commodity exporter. \citet{aastveit2023inflation} identify how inflation expectations amplify the pass-through of oil price shocks in Norway. On the data side, \citet{aastveit2024nowcasting} demonstrate the value of alternative high-frequency sources by nowcasting Norwegian consumption with debit card transaction data. \citet{larsen2021components} uses textual analysis to extract uncertainty components from Norwegian newspaper text, finding significant predictive content for the business cycle---a finding that motivates our interest in automated discovery of non-standard predictors.
+
+\paragraph{Evaluation methodology.}
+Rigorous pseudo-out-of-sample evaluation with expanding or rolling windows is the accepted standard for validating macro forecasting models \citep{clark2013advances}. Statistical comparison of competing forecasts relies on the \citet{diebold2002comparing} test. The literature has increasingly shifted from pure point forecasts to density and probabilistic evaluation \citep{lenza2023quantile}, a direction that our use of pinball loss and quantile forecasts from Chronos-2 follows.
+
+\subsection{Foundation models for time series}
+\label{sec:lit_tsfm}
+
+\paragraph{From local models to pre-trained foundations.}
+The success of large language models in NLP has inspired a parallel revolution in time series analysis. Traditional local models (ARIMA, exponential smoothing, single-task LSTMs) are constrained by their reliance on single-series training and inability to transfer knowledge across domains. Time series foundation models (TSFMs) are pre-trained on massive, heterogeneous corpora to enable zero-shot and few-shot inference on unseen series.
+
+\paragraph{Chronos and Chronos-2.}
+Amazon's Chronos \citep{ansari2024chronos} treats forecasting as a language modeling problem: continuous values are scaled and quantized into discrete tokens, then processed through a T5 encoder-decoder trained via cross-entropy loss. The successor, Chronos-2 \citep{ansari2025chronos2}, introduces a group attention mechanism that alternates between time attention (within a single series) and group attention (across arbitrary-sized groups of series). This enables in-context learning from covariates---both past-only and known-future indicators---without requiring architectural changes. Chronos-2 significantly outperforms prior models on benchmarks involving covariates \citep{ansari2025chronos2}, making it a natural backbone for our macro forecasting pipeline, where the agent's task is to discover which covariates and transformations to present to the model.
+
+\paragraph{Alternative architectures.}
+Google's TimesFM \citep{das2024decoder} uses a decoder-only architecture with patch-level tokenization to expand the effective context window; its recent in-context fine-tuning variant adapts via few-shot examples in the prompt without modifying model weights \citep{das2025incontext}. Lag-Llama \citep{rasul2023lagllama} focuses on univariate probabilistic forecasting using a LLaMA-based decoder that explicitly incorporates lagged features. The MOIRAI family \citep{woo2024unified} pioneered any-variate universal forecasting, though MOIRAI 2.0 \citep{liu2025moirai2} dropped multivariate support due to data quality limitations in pre-training corpora. A distinct sub-field involves reprogramming textual LLMs for numerical tasks: Time-LLM \citep{jin2024timellm} and PromptCast \citep{xue2023promptcast} freeze LLM weights and map numerical patches into the language model's semantic token space, leveraging its reasoning capabilities.
+
+\paragraph{Pre-training data and benchmarking.}
+The efficacy of TSFMs depends critically on pre-training data composition. Models are trained on massive compilations (e.g., the LOTSA corpus), raising concerns about test-set contamination. \citet{aksu2024benchmarking} highlight that multi-purpose use of datasets across training and zero-shot evaluation complicates fair comparison. Chronos-2 mitigates this through heavy use of synthetic data generated via Gaussian processes \citep{ansari2024chronos,ansari2025chronos2}.
+
+\paragraph{Zero-shot versus fine-tuning.}
+The tension between zero-shot inference and task-specific fine-tuning is central to applied TSFM work. While zero-shot capabilities are increasingly impressive, fine-tuning on domain-specific data often yields superior results for mission-critical applications \citep{rasul2023lagllama}. Our research directly interrogates this tradeoff: we decompose forecast gains into the foundation model itself (zero-shot), economy-specific fine-tuning, and the additional value of agent-guided search over the configuration space.
+
+\subsection{Automated machine learning and feature engineering}
+\label{sec:lit_automl}
+
+\paragraph{Traditional AutoML.}
+Automated machine learning seeks to minimize human intervention in model selection and hyperparameter optimization. Frameworks such as Auto-sklearn \citep{feurer2015automl,feurer2020autosklearn} and AutoGluon \citep{erickson2020autogluon} employ Bayesian optimization, meta-learning, and successive halving to navigate configuration spaces efficiently. For time series specifically, AutoGluon-TimeSeries \citep{shchur2023autogluon} extends these ideas to probabilistic forecasting. Automated Feature Engineering (AutoFE) tools generate lag variables, rolling statistics, and calendar features, and combining AutoFE with AutoML consistently outperforms isolated AutoML \citep{dewinter2025automated}. Neural Architecture Search (NAS) has also been applied to time series forecasting \citep{deng2024optimizing,levchenko2024chain}. However, all these systems operate within rigidly defined search spaces and cannot reason about novel configurations or incorporate unstructured domain knowledge.
+
+\paragraph{LLM-guided agentic search.}
+The paradigm has shifted toward ``agentic search,'' where LLMs serve not as predictive engines but as meta-optimizers that read code, reason about results, and autonomously modify experimental configurations. The AI Scientist \citep{lu2024aiscientist} and its v2 iteration \citep{yamada2025ai} demonstrated end-to-end automated scientific discovery using progressive tree search. \citet{cheng2026agentic} advocate reframing time series forecasting from a single-pass computation to an iterative, agent-driven reasoning process encompassing perception, planning, action, and reflection. \citet{dong2025dataforge} validate the use of LLMs for autonomous data cleaning and feature engineering.
+
+\paragraph{Karpathy's autoresearch framework.}
+The most directly relevant precedent for our approach is Karpathy's ``autoresearch'' framework \citep{karpathy2026autoresearch}. It enforces a strict ratchet loop governed by three components: an immutable data preparation script (\texttt{prepare.py}), a fully mutable training sandbox (\texttt{train.py}) that the agent rewrites, and a natural-language specification (\texttt{program.md}) that provides constraints and optimization objectives. The agent proposes code modifications, runs a fixed-budget training cycle, evaluates against a deterministic metric, and either commits the improvement or reverts. This architecture ensures reproducibility and fair cross-experiment comparison. It has been adopted across disciplines \citep{oconnell2026signal,weidener2026rethinking,liu2026autoresearchclaw}, though not yet applied to macroeconomic forecasting.
+
+\paragraph{Our contribution.}
+We adapt this agentic search framework to macroeconomics by constraining the search agent to operate over data representations, covariate selection, and fine-tuning configurations for Chronos-2---never over model architecture. The evaluation is pseudo-real-time with proper publication-lag handling, and the search is governed by rolling forecast-origin validation loss. This allows us to cleanly decompose forecast improvements into three sources: the foundation model, economy-specific adaptation, and autonomous search. To our knowledge, no prior work has systematically applied agentic search to the rigorous pseudo-out-of-sample environments demanded by the macro forecasting literature.
+
+% ===================================================================
+\section{Methodology}
+\label{sec:methodology}
+% ===================================================================
+
+\subsection{Foundation model: Chronos-2}
+\label{sec:chronos}
+
+\todo{Describe Chronos-2 architecture, covariate handling via group attention, fine-tuning with LoRA.}
+
+\subsection{Agentic search loop}
+\label{sec:search}
+
+\todo{Describe the outer-loop search procedure. Search space, accept/reject logic, compute budget.}
+
+\subsection{Search space}
+\label{sec:search_space}
+
+\todo{Enumerate search dimensions: covariates, transformations, lags, hyperparameters, grouping.}
+
+% ===================================================================
+\section{Data and evaluation protocol}
+\label{sec:data}
+% ===================================================================
+
+\subsection{Norwegian macroeconomic panel}
+\label{sec:panel}
+
+\todo{Describe data sources, variable selection, frequency.}
+
+\subsection{Pseudo-real-time discipline}
+\label{sec:realtime}
+
+\todo{Describe publication lag handling, vintage treatment.}
+
+\subsection{Evaluation design}
+\label{sec:evaluation}
+
+\todo{Rolling expanding-window validation. Forecast origins. Horizons. Metrics.}
+
+\subsection{Baselines}
+\label{sec:baselines}
+
+\todo{List all baseline methods: naïve, ARIMA/ETS, VAR/BVAR, factor model, zero-shot Chronos-2, manual Chronos-2.}
+
+% ===================================================================
+\section{Results}
+\label{sec:results}
+% ===================================================================
+
+\subsection{Baseline performance}
+\label{sec:results_baselines}
+
+\subsection{Manual fine-tuning}
+\label{sec:results_manual}
+
+\subsection{Agentic search}
+\label{sec:results_agentic}
+
+\subsection{Ablation: decomposing forecast gains}
+\label{sec:ablation}
+
+\todo{Three-way decomposition: foundation model vs fine-tuning vs agentic search.}
+
+\subsection{Subperiod analysis}
+\label{sec:subperiods}
+
+\todo{Pre-2016, 2016-19, COVID, post-Ukraine.}
+
+\subsection{What does the agent discover?}
+\label{sec:agent_analysis}
+
+\todo{Analyze the agent's search trajectory. Which covariates? Which transformations? Economically interpretable?}
+
+% ===================================================================
+\section{Discussion}
+\label{sec:discussion}
+% ===================================================================
+
+\todo{Implications. Limitations. What this means for macro forecasting practice.}
+
+% ===================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+% ===================================================================
+
+\todo{Write conclusion.}
+
+% ===================================================================
+\newpage
+\bibliographystyle{aer}
+\bibliography{references}
+
+% ===================================================================
+\newpage
+\begin{appendices}
+
+\section{Data sources and publication lags}
+\label{app:data}
+
+\todo{Full variable catalog with sources, sample periods, publication lags.}
+
+\section{Search space details}
+\label{app:search_space}
+
+\todo{Full enumeration of search dimensions and ranges.}
+
+\section{Additional results}
+\label{app:additional_results}
+
+\todo{Horizon-specific tables, variable-level results, robustness checks.}
+
+\section{Agent experiment log}
+\label{app:experiment_log}
+
+\todo{Summary of agent search trajectory ---iterations, configs tried, acceptance rate.}
+
+\end{appendices}
+
+\end{document}

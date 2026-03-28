@@ -1,0 +1,31 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "Autoresearch Macro"
+  description: "Agentic search over forecasting pipelines for the Norwegian macroeconomy"
+  navbar:
+    background: dark
+    left:
+      - href: index.qmd
+        text: Home
+      - href: data-pipeline.qmd
+        text: Data
+      - href: baselines.qmd
+        text: Baselines
+      - href: foundation-model.qmd
+        text: Chronos-2
+      - href: search.qmd
+        text: Search Loop
+      - href: results.qmd
+        text: Results
+
+format:
+  html:
+    theme:
+      light: flatly
+    css: styles.css
+    toc: true
+    code-fold: true
+    code-tools: true

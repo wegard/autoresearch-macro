@@ -1,0 +1,134 @@
+---
+title: ""
+format:
+  html:
+    toc: false
+---
+
+::: {.hero-container}
+# Autoresearch Macro
+
+::: {.lead}
+Can an LLM-guided search discover better macroeconomic forecasting pipelines than classical methods? We test agentic search over covariate selection, data transformations, and fine-tuning for Chronos-2 on Norwegian macro data.
+:::
+:::
+
+::: {.stat-grid}
+::: {.stat-card}
+::: {.number}
+18
+:::
+::: {.label}
+Variables
+:::
+:::
+::: {.stat-card}
+::: {.number}
+120
+:::
+::: {.label}
+Forecast origins
+:::
+:::
+::: {.stat-card}
+::: {.number}
+6
+:::
+::: {.label}
+Methods compared
+:::
+:::
+::: {.stat-card}
+::: {.number}
+4
+:::
+::: {.label}
+Horizons (1-12m)
+:::
+:::
+:::
+
+## The challenge
+
+Zero-shot Chronos-2 — a pretrained time series foundation model — does not beat ARIMA on Norwegian macroeconomic data under proper pseudo-real-time evaluation. The question is whether automated pipeline search can close this gap.
+
+```{ojs}
+//| echo: false
+metrics = FileAttachment("_data/combined_metrics.json").json()
+```
+
+```{ojs}
+//| echo: false
+//| label: fig-headline
+//| fig-cap: "Average RMSE across all target variables (CPI, industrial production, retail sales, unemployment) on the validation era (2006-2015)."
+
+Plot = import("https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm")
+
+{
+  const methods = metrics.methods.filter(m =>
+    ["random_walk", "arima", "chronos2_zs"].includes(m.name)
+  );
+
+  const data = methods.flatMap(m =>
+    Object.entries(m.summary).map(([h, s]) => ({
+      method: m.display_name,
+      horizon: +h,
+      rmse: s.avg_rmse,
+      category: m.category
+    }))
+  );
+
+  return Plot.plot({
+    height: 350,
+    marginLeft: 60,
+    marginBottom: 45,
+    x: {
+      label: "Forecast horizon (months ahead)",
+      ticks: [1, 3, 6, 12]
+    },
+    y: {
+      label: "Average RMSE",
+      grid: true,
+      domain: [0.8, 3.2]
+    },
+    color: {
+      domain: ["Random Walk", "ARIMA", "Chronos-2 (zero-shot)"],
+      range: ["#95a5a6", "#2ecc71", "#9b59b6"]
+    },
+    marks: [
+      Plot.line(data, {
+        x: "horizon", y: "rmse", stroke: "method",
+        strokeWidth: 2.5, curve: "monotone-x"
+      }),
+      Plot.dot(data, {
+        x: "horizon", y: "rmse", fill: "method",
+        r: 5, tip: true
+      }),
+      Plot.text(data.filter(d => d.horizon === 12), {
+        x: "horizon", y: "rmse", text: "method",
+        dx: 10, textAnchor: "start", fontSize: 11
+      })
+    ]
+  });
+}
+```
+
+## How it works
+
+1. **Data pipeline** — 18 Norwegian and global macro series with pseudo-real-time publication lag discipline
+2. **Classical baselines** — Random walk, AR, ARIMA, ETS evaluated on rolling 120-origin validation
+3. **Foundation model** — Chronos-2 (bolt-small, 20M params) via AutoGluon
+4. **Agentic search** — Claude proposes covariate/transform/fine-tuning configs, evaluated and accepted/rejected iteratively
+
+::: {.callout-note}
+## Project status
+The infrastructure is complete. The first search experiment is pending. See [EXPERIMENT-1.md](../EXPERIMENT-1.md) for how to run it.
+:::
+
+## Explore the results
+
+- [**The Data**](data-pipeline.qmd) — Variables, sources, and the pseudo-real-time mechanism
+- [**Baselines**](baselines.qmd) — What classical methods achieve
+- [**Chronos-2**](foundation-model.qmd) — Zero-shot and fine-tuned foundation model results
+- [**Search Loop**](search.qmd) — The LLM-guided search trajectory and discoveries
+- [**Full Results**](results.qmd) — Complete comparison tables

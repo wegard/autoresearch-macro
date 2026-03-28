@@ -1,0 +1,156 @@
+---
+title: "Chronos-2"
+subtitle: "From zero-shot to agent-tuned foundation model forecasting"
+---
+
+```{ojs}
+//| echo: false
+metrics = FileAttachment("_data/combined_metrics.json").json()
+```
+
+## What is Chronos-2?
+
+Chronos-2 is a **time series foundation model** by Amazon, pretrained on billions of time series observations from diverse domains. It produces probabilistic forecasts by tokenizing time series values and using a transformer architecture.
+
+We use **Chronos-2 Bolt Small** (~20M parameters) via AutoGluon TimeSeries, which provides a clean interface for both zero-shot inference and fine-tuning.
+
+### The pipeline the agent controls
+
+```
+Available data (at forecast origin)
+    ↓
+Covariate selection ← agent chooses
+    ↓
+Data transformations ← agent chooses (log_diff, pct_change, etc.)
+    ↓
+Context window ← agent sets length
+    ↓
+Chronos-2 model (architecture FIXED)
+    ↓
+Fine-tuning settings ← agent chooses (on/off, LR, steps)
+    ↓
+Probabilistic forecast → point forecast (mean)
+```
+
+## Zero-shot performance
+
+With no covariates and no fine-tuning, Chronos-2 relies purely on the shape of each target series to forecast:
+
+```{ojs}
+//| echo: false
+//| label: fig-zs-vs-arima
+//| fig-cap: "Zero-shot Chronos-2 vs ARIMA across target variables (RMSE, validation era)."
+
+{
+  const selected = metrics.methods.filter(m =>
+    ["arima", "chronos2_zs"].includes(m.name)
+  );
+
+  const vars = ["cpi", "industrial_production", "retail_sales", "unemployment"];
+  const data = selected.flatMap(m =>
+    vars.flatMap(v =>
+      Object.entries(m.metrics[v] || {}).map(([h, vals]) => ({
+        method: m.display_name,
+        variable: v.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
+        horizon: +h,
+        rmse: vals.rmse
+      }))
+    )
+  );
+
+  return Plot.plot({
+    height: 400,
+    marginLeft: 60,
+    marginBottom: 50,
+    facet: {data, x: "variable"},
+    x: {label: "Horizon", ticks: [1, 3, 6, 12]},
+    y: {label: "RMSE", grid: true},
+    fx: {label: null},
+    marks: [
+      Plot.line(data, {
+        x: "horizon", y: "rmse", stroke: "method",
+        strokeWidth: 2, fx: "variable", curve: "monotone-x"
+      }),
+      Plot.dot(data, {
+        x: "horizon", y: "rmse", fill: "method",
+        r: 3, fx: "variable", tip: true
+      })
+    ]
+  });
+}
+```
+
+**Observation:** Chronos-2 zero-shot is competitive with ARIMA at h=1 for most variables, but degrades at longer horizons. This suggests the model captures short-term dynamics but lacks the economy-specific knowledge needed for multi-step forecasting.
+
+## The foundation model ladder
+
+The research tests a three-way decomposition of forecast improvement:
+
+1. **Foundation model effect:** Does Chronos-2 zero-shot beat classical methods?
+2. **Fine-tuning effect:** Does economy-specific training improve over zero-shot?
+3. **Agentic search effect:** Does LLM-guided search beat manual pipeline choices?
+
+```{ojs}
+//| echo: false
+//| label: fig-ladder
+//| fig-cap: "Average RMSE at h=12 — the foundation model ladder. Lower is better."
+
+{
+  // Build the ladder data from available methods
+  const horizonKey = "12";
+  const ladderMethods = [
+    {name: "random_walk", label: "Naive\n(Random Walk)", step: 0},
+    {name: "arima", label: "Classical\n(ARIMA)", step: 1},
+    {name: "chronos2_zs", label: "Chronos-2\n(Zero-shot)", step: 2},
+  ];
+
+  const data = ladderMethods.map(lm => {
+    const m = metrics.methods.find(mm => mm.name === lm.name);
+    return {
+      label: lm.label,
+      step: lm.step,
+      rmse: m ? (m.summary[horizonKey]?.avg_rmse || 0) : 0
+    };
+  }).filter(d => d.rmse > 0);
+
+  return Plot.plot({
+    height: 300,
+    marginLeft: 60,
+    marginBottom: 80,
+    x: {label: null, domain: data.map(d => d.label), padding: 0.3},
+    y: {label: "Average RMSE (h=12)", grid: true, domain: [0, 3.5]},
+    marks: [
+      Plot.barY(data, {
+        x: "label", y: "rmse",
+        fill: d => ["#95a5a6", "#2ecc71", "#9b59b6"][d.step],
+        tip: true
+      }),
+      Plot.text(data, {
+        x: "label", y: "rmse", text: d => d.rmse.toFixed(2),
+        dy: -10, fontSize: 13, fontWeight: "bold"
+      })
+    ]
+  });
+}
+```
+
+::: {.callout-tip}
+## What comes next
+The bars for **Fine-tuned** and **Agent-tuned** Chronos-2 will appear here once those experiments are run. The search loop (`search.py`) automates the agent-tuned experiments.
+:::
+
+## Search space
+
+The agent can explore these dimensions:
+
+| Dimension | Range | Notes |
+|-----------|-------|-------|
+| Covariates | 0-10 from 14 available | Oil, FX, rates, global macro |
+| Transforms | 7 options per variable | log_diff, pct_change, standardize, MA |
+| Context length | 24-128 months or unlimited | How far back to look |
+| Fine-tuning | On/off | Economy-specific training |
+| Learning rate | 1e-5 to 1e-3 | If fine-tuning |
+| Fine-tune steps | 50-500 | If fine-tuning |
+| Grouping | Univariate or joint | One model per target vs shared |
+
+This creates a large combinatorial space that manual tuning cannot exhaustively explore.

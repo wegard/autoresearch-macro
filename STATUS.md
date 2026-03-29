@@ -1,6 +1,6 @@
 # STATUS.md — Autoresearch Macro
 
-**Stage:** Phase 3 complete (first search experiment), Phase 4 analysis next
+**Stage:** Phase 3 complete (50 iterations), Phase 4 analysis next
 **Target:** TBD
 **Collaborators:** Leif Anders Thorsrud
 **Last updated:** 2026-03-29
@@ -9,38 +9,36 @@
 
 Not yet written.
 
-## What's built
+## Search experiment results (50 iterations, avg MASE)
 
-### Data pipeline (Phase 0) — done
-- `src/prepare.py` (1237 lines) — SSB, FRED, Norges Bank downloads with pseudo-real-time discipline
-- 18 variables, 951 months (1947-01 to 2026-03)
-- 36 tests in `tests/test_prepare.py`
+| Iter | Config change | MASE | vs Baseline |
+|------|--------------|------|-------------|
+| 0 | Baseline (univariate, all context) | 1.9443 | — |
+| 9 | + context_length=96 | 1.8635 | -4.2% |
+| 15 | + brent_crude | 1.8472 | -5.0% |
+| 18 | + policy_rate | 1.8326 | -5.7% |
+| 27 | + us_cpi | 1.8158 | -6.6% |
+| 39 | + nok_eur | 1.8129 | -6.8% |
+| **45** | **+ LoRA fine-tune (100 steps, 5e-6)** | **1.8129** | **-6.8%** |
 
-### Evaluation harness — done
-- `src/evaluate.py` (451 lines) — ForecastResult, EvaluationResult, save/load, comparison tables
-- 11 tests in `tests/test_evaluate.py`
+**Best config:**
+```json
+{
+  "covariates": ["brent_crude", "policy_rate", "us_cpi", "nok_eur"],
+  "context_length": 96,
+  "fine_tune": true,
+  "fine_tune_steps": 100,
+  "fine_tune_lr": 5e-06
+}
+```
 
-### Baselines (Phase 1) — done
-- `src/baselines.py` (547 lines) — 5 methods: random walk, seasonal naive, AR(p), ARIMA, ETS
-- All evaluated on validation era (2006-2015, 120 monthly origins)
-
-### Chronos-2 scaffold — done
-- `src/train.py` — amazon/chronos-2 (120M params), AutoGluon "Chronos-2" key
-- Native covariate support, LoRA fine-tuning
-- 12 tests in `tests/test_train.py`
-
-### Search loop (Phase 3) — first experiment complete
-- `src/search.py` — LLM-guided outer loop with Claude API
-- **30 iterations completed, 4 accepted improvements, 6.6% improvement over baseline**
-- Best config: brent_crude + policy_rate + us_cpi, context_length=96
-- 16 tests in `tests/test_search.py`
-
-### Web dashboard — done
-- `webapp/` — Quarto + Observable Plot interactive site (6 pages)
-
-### Totals
-- **~5,000 lines** of Python (source + tests)
-- **90 tests**, all passing
+**Key findings:**
+- 4 covariates optimal: oil, monetary policy, global inflation, exchange rate
+- 96-month (8-year) context window is optimal
+- LoRA fine-tuning works with very conservative settings (100 steps, lr=5e-6)
+- Aggressive fine-tuning (500+ steps, lr>1e-5) consistently hurts
+- Transforms on covariates don't help — raw levels work best
+- The search converged by iteration ~45 — diminishing returns after
 
 ## Validation era results (2006-2015, average RMSE across targets)
 
@@ -53,40 +51,12 @@ Not yet written.
 | ETS | 1.186 | 1.561 | 2.022 | 2.890 |
 | Chronos-2 (120M) zero-shot | 1.171 | 1.542 | 1.989 | 2.820 |
 
-## Search experiment results (30 iterations, avg MASE)
-
-| Iter | Config | MASE | vs Baseline |
-|------|--------|------|-------------|
-| 0 | Baseline (univariate, all context) | 1.9443 | — |
-| 9 | + context_length=96 | 1.8635 | -4.2% |
-| 15 | + brent_crude | 1.8472 | -5.0% |
-| 18 | + policy_rate | 1.8326 | -5.7% |
-| **27** | **+ us_cpi** | **1.8158** | **-6.6%** |
-
-**Best config found by the agent:**
-```json
-{
-  "covariates": ["brent_crude", "policy_rate", "us_cpi"],
-  "context_length": 96,
-  "fine_tune": false
-}
-```
-
-**Key findings:**
-- Oil prices, monetary policy, and US inflation are the most informative covariates
-- 96-month (8-year) context window is optimal
-- Adding more covariates (exchange rates, credit, exports) hurts performance
-- Transforms on covariates don't help — raw levels work best
-- LoRA fine-tuning consistently degrades performance (overfits on small training data)
-- The discovered covariate set is economically interpretable
-
 ## Current to-dos
 
 - [ ] Run best config on test era (2016+) for final results
-- [ ] Run more search iterations (fine-tuning exploration)
-- [ ] Phase 4 ablation analysis (decompose gains)
-- [ ] Update webapp with search trajectory data
-- [ ] Discuss with Leif: results, next steps
+- [ ] Phase 4 ablation analysis (decompose gains by covariate, context, fine-tuning)
+- [ ] Regenerate forecast visualizations with best config
+- [ ] Discuss with Leif: results, next steps, paper outline
 
 ## Model: amazon/chronos-2 (120M)
 

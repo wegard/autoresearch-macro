@@ -4,7 +4,7 @@
 
 ## Current state
 
-First search experiment complete: 30 iterations, 4 accepted improvements, **6.6% improvement** over zero-shot baseline. The agent discovered that Chronos-2 (120M) forecasts Norwegian macro variables best with oil prices, the policy rate, and US inflation as covariates, using a 96-month context window.
+Search experiment complete: 50 iterations, 6 accepted improvements, **6.8% MASE improvement** over zero-shot baseline. Best config: covariates=[brent_crude, policy_rate, us_cpi, nok_eur], context_length=96, LoRA fine-tune (100 steps, 5e-6 lr).
 
 ## What happened
 
@@ -17,7 +17,7 @@ First search experiment complete: 30 iterations, 4 accepted improvements, **6.6%
   - Agent found best config: `covariates=[brent_crude, policy_rate, us_cpi], context_length=96`
   - MASE improved from 1.9443 (baseline) to 1.8158 (best), a 6.6% improvement
 
-## Search trajectory
+## Search trajectory (50 iterations, 6 accepted)
 
 | Iter | Config change | MASE | Status |
 |------|--------------|------|--------|
@@ -26,8 +26,10 @@ First search experiment complete: 30 iterations, 4 accepted improvements, **6.6%
 | 15 | + brent_crude | 1.8472 | accepted (-5.0%) |
 | 18 | + policy_rate | 1.8326 | accepted (-5.7%) |
 | 27 | + us_cpi | 1.8158 | accepted (-6.6%) |
+| 39 | + nok_eur | 1.8129 | accepted (-6.8%) |
+| 45 | + LoRA fine-tune (100 steps, 5e-6) | 1.8129 | accepted (-6.8%) |
 
-26 iterations rejected. Fine-tuning, transforms, exchange rates, and additional covariates all hurt.
+44 iterations rejected. Search converged by ~iter 45.
 
 ## Next steps
 

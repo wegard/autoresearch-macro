@@ -111,3 +111,24 @@
 - LoRA fine-tuning consistently degrades performance (overfits on first origin's data)
 - Iteration 30 was tantalizingly close: fine_tune with 100 steps at 5e-6 lr scored 1.8160 vs best 1.8158
 - The discovered covariate set is economically interpretable — exactly what a macro economist would expect for a small open oil-exporting economy
+
+## 2026-03-29 — Continued search (iterations 31-50)
+
+**Result:** Two additional accepted improvements. MASE improved from 1.8158 to 1.8129 (6.8% total improvement over baseline).
+
+**New accepted configs:**
+- Iter 39: Added nok_eur as 4th covariate (1.8158 → 1.8129). Earlier attempts with NOK/EUR had failed because they weren't combined with the right covariate set and context length.
+- Iter 45: LoRA fine-tuning accepted (100 steps, lr=5e-6). Very conservative settings were key — all previous fine-tuning attempts with 500+ steps or lr>1e-5 had hurt performance.
+
+**Search convergence:** By iteration ~45, the agent was mostly proposing configs that matched or slightly worsened the best. Iterations 46-50 showed no improvement, suggesting the search has approximately converged within the current search space.
+
+**Final best config:**
+```json
+{
+  "covariates": ["brent_crude", "policy_rate", "us_cpi", "nok_eur"],
+  "context_length": 96,
+  "fine_tune": true,
+  "fine_tune_steps": 100,
+  "fine_tune_lr": 5e-06
+}
+```

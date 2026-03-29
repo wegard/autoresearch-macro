@@ -64,13 +64,13 @@
 - [x] Define search space in configs/ (search_space.yml)
 - [x] Write program.md agent instructions
 - [x] Implement train.py scaffold (amazon/chronos-2, 120M)
-- [x] **Run search loop on validation era** — 30 iterations, 6.6% improvement
+- [x] **Run search loop on validation era** — 50 iterations, 6.8% MASE improvement
 - [x] Log all experiments for reproducibility (results/search_log.jsonl)
 - [x] Analyze: agent discovered brent_crude + policy_rate + us_cpi as optimal covariates
 - [ ] Compare against Phase 2 manual pipeline
 - [ ] Run more iterations (fine-tuning exploration)
 
-**Deliverable:** Agent-selected pipeline: `covariates=[brent_crude, policy_rate, us_cpi], context_length=96`. MASE improved from 1.94 to 1.82.
+**Deliverable:** Agent-selected pipeline: `covariates=[brent_crude, policy_rate, us_cpi, nok_eur], context_length=96, LoRA fine-tune (100 steps, 5e-6)`. MASE improved from 1.94 to 1.81 (6.8%).
 
 ---
 

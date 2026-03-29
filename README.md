@@ -2,7 +2,7 @@
 
 **Collaborators:** Vegard Larsen, Leif Anders Thorsrud
 **Started:** 2026-03-27
-**Status:** First search experiment complete (6.6% improvement)
+**Status:** Search experiment complete (50 iterations, 6.8% improvement)
 
 ## What
 
@@ -132,7 +132,7 @@ The formal study design is documented in [`METHODOLOGY.md`](METHODOLOGY.md). Thi
 | **ARIMA** | **1.164** | **1.504** | **1.910** | **2.641** |
 | Chronos-2 (120M) zero-shot | 1.171 | 1.542 | 1.989 | 2.820 |
 
-**Search experiment (30 iterations):** The LLM-guided search improved Chronos-2 by **6.6%** (MASE 1.94 → 1.82) by discovering that oil prices, the policy rate, and US inflation are the optimal covariates with a 96-month context window. Model: `amazon/chronos-2` (120M params).
+**Search experiment (50 iterations):** The LLM-guided search improved Chronos-2 by **6.8%** (MASE 1.94 → 1.81) by discovering that oil prices, the policy rate, US inflation, and the NOK/EUR exchange rate are the optimal covariates with a 96-month context window and light LoRA fine-tuning. Model: `amazon/chronos-2` (120M params).
 
 ## Links
 

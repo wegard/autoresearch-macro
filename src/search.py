@@ -24,6 +24,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
@@ -321,6 +322,48 @@ def run_and_evaluate(
         return None
 
 
+def propose_random_config(
+    available_covariates: list[str],
+) -> tuple[dict[str, Any], str]:
+    """Propose a random configuration from the search space.
+
+    Used as a baseline comparison for the LLM-guided search.
+    """
+    rng = np.random.default_rng()
+
+    # Random covariate subset (0-5 covariates)
+    n_covs = rng.integers(0, min(6, len(available_covariates) + 1))
+    covs = list(rng.choice(available_covariates, size=n_covs, replace=False)) if n_covs > 0 else []
+
+    # Random transforms on covariates
+    transform_options = ["none", "log_diff", "pct_change_1", "pct_change_12", "standardize_60", "ma_3"]
+    transforms = {}
+    for c in covs:
+        t = rng.choice(transform_options)
+        if t != "none":
+            transforms[c] = t
+
+    # Random context length
+    context_options = [None, 24, 36, 48, 64, 96, 128]
+    context_length = rng.choice(context_options)
+
+    # Random fine-tuning (low probability to keep fast)
+    fine_tune = bool(rng.random() < 0.2)
+    fine_tune_steps = int(rng.choice([100, 500, 1000]))
+    fine_tune_lr = float(10 ** rng.uniform(-6, -4))
+
+    config = {
+        "covariates": covs,
+        "transforms": transforms,
+        "context_length": int(context_length) if context_length is not None else None,
+        "fine_tune": fine_tune,
+        "fine_tune_steps": fine_tune_steps,
+        "fine_tune_lr": fine_tune_lr,
+    }
+    description = _summarize_config(config)
+    return config, description
+
+
 def reset_train_config() -> None:
     """Reset train.py config to defaults by removing override file."""
     if CURRENT_CONFIG_PATH.exists():
@@ -335,12 +378,14 @@ def reset_train_config() -> None:
 def search_loop(
     max_iterations: int | None = None,
     resume: bool = False,
+    mode: str = "llm",
 ) -> None:
-    """Run the LLM-guided search loop.
+    """Run the search loop.
 
     Args:
         max_iterations: Stop after this many iterations (None = run forever).
         resume: If True, resume from saved state.
+        mode: "llm" for LLM-guided search, "random" for random search baseline.
     """
     from prepare import load_panel
 
@@ -413,9 +458,12 @@ def search_loop(
         logger.info("ITERATION %d (best: %.4f)", iteration, state.best_score)
         logger.info("{'=' * 60}")
 
-        # 1. Propose config via LLM
+        # 1. Propose config
         try:
-            overrides, description = propose_config(state, available_covariates)
+            if mode == "random":
+                overrides, description = propose_random_config(available_covariates)
+            else:
+                overrides, description = propose_config(state, available_covariates)
         except Exception as e:
             logger.exception("Config proposal failed: %s", e)
             record = IterationRecord(
@@ -545,6 +593,10 @@ def main() -> None:
         "--status", action="store_true",
         help="Show current search status and exit",
     )
+    parser.add_argument(
+        "--mode", type=str, default="llm", choices=["llm", "random"],
+        help="Search mode: 'llm' (Claude-guided) or 'random' (random sampling baseline)",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -560,6 +612,7 @@ def main() -> None:
     search_loop(
         max_iterations=args.max_iterations,
         resume=args.resume,
+        mode=args.mode,
     )
 
 

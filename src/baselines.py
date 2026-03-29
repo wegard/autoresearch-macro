@@ -427,6 +427,155 @@ class ETSBaseline:
 
 
 # ---------------------------------------------------------------------------
+# Multivariate baselines
+# ---------------------------------------------------------------------------
+
+
+class VARBaseline:
+    """Vector Autoregression baseline with BIC lag selection.
+
+    Fits a VAR on the target variable plus selected covariates, producing
+    h-step-ahead forecasts via the fitted model. Uses the same covariate
+    pool available to Chronos-2 for fair comparison.
+    """
+
+    name = "var"
+
+    COVARIATES = ["brent_crude", "policy_rate", "us_cpi", "nok_eur"]
+
+    def __init__(self, max_lag: int = 6) -> None:
+        self.max_lag = max_lag
+
+    def forecast_origin(
+        self,
+        origin: ForecastOrigin,
+        target: str,
+        horizons: list[int],
+    ) -> dict[int, float]:
+        if target not in origin.available_data.columns:
+            return {}
+
+        from statsmodels.tsa.api import VAR as StatsVAR
+
+        # Build multivariate dataset: target + available covariates
+        cols = [target] + [c for c in self.COVARIATES if c in origin.available_data.columns]
+        data = origin.available_data[cols].dropna()
+        if len(data) < self.max_lag + 10:
+            return {}
+
+        max_h = max(horizons)
+
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                model = StatsVAR(data.values)
+                # Select lag by BIC, capped at max_lag
+                result = model.fit(maxlags=min(self.max_lag, len(data) // 3 - 1), ic="bic")
+                fc = result.forecast(data.values[-result.k_ar:], steps=max_h)
+        except Exception:
+            return {}
+
+        # Extract target variable forecasts (first column)
+        return {h: float(fc[h - 1, 0]) for h in horizons if h <= len(fc)}
+
+
+class FactorModelBaseline:
+    """Factor model baseline: PCA on covariates + direct regression.
+
+    Extracts principal components from the covariate panel and uses them
+    as regressors in direct h-step-ahead forecasting equations for each
+    target variable. Standard in the macro forecasting literature.
+    """
+
+    name = "factor"
+
+    def __init__(self, n_factors: int = 3, max_lag: int = 4) -> None:
+        self.n_factors = n_factors
+        self.max_lag = max_lag
+
+    def forecast_origin(
+        self,
+        origin: ForecastOrigin,
+        target: str,
+        horizons: list[int],
+    ) -> dict[int, float]:
+        if target not in origin.available_data.columns:
+            return {}
+
+        from sklearn.decomposition import PCA
+
+        # Get all non-target columns as covariates
+        cov_cols = [c for c in origin.available_data.columns if c != target]
+        if len(cov_cols) < self.n_factors:
+            return {}
+
+        # Build panel: target + covariates, drop rows with NaN
+        panel = origin.available_data[[target] + cov_cols].dropna()
+        if len(panel) < self.max_lag + self.n_factors + 10:
+            return {}
+
+        y_full = panel[target].values
+        X_cov = panel[cov_cols].values
+
+        # Standardize covariates before PCA
+        X_mean = X_cov.mean(axis=0)
+        X_std = X_cov.std(axis=0)
+        X_std[X_std == 0] = 1.0
+        X_norm = (X_cov - X_mean) / X_std
+
+        # Extract factors
+        n_components = min(self.n_factors, X_norm.shape[1], X_norm.shape[0])
+        pca = PCA(n_components=n_components)
+        factors = pca.fit_transform(X_norm)
+
+        result: dict[int, float] = {}
+        for h in horizons:
+            pred = self._direct_forecast(y_full, factors, h)
+            if pred is not None:
+                result[h] = pred
+        return result
+
+    def _direct_forecast(
+        self, y: np.ndarray, factors: np.ndarray, h: int
+    ) -> float | None:
+        """Direct h-step forecast: y_{t+h} = c + a*y_t + ... + b*F_t + e."""
+        n = len(y)
+        p = self.max_lag
+        n_f = factors.shape[1]
+
+        if n < p + h + 2:
+            return None
+
+        n_obs = n - p - h + 1
+        if n_obs < p + n_f + 2:
+            return None
+
+        # Build design matrix: intercept + p lags of y + current factors
+        k = 1 + p + n_f
+        X = np.ones((n_obs, k))
+        Y = np.zeros(n_obs)
+
+        for i in range(n_obs):
+            t = p - 1 + i
+            Y[i] = y[t + h]
+            for j in range(p):
+                X[i, 1 + j] = y[t - j]
+            X[i, 1 + p:] = factors[t, :]
+
+        try:
+            beta, _, _, _ = np.linalg.lstsq(X, Y, rcond=None)
+        except np.linalg.LinAlgError:
+            return None
+
+        # Predict using latest values
+        x_new = np.ones(k)
+        for j in range(p):
+            x_new[1 + j] = y[-(j + 1)]
+        x_new[1 + p:] = factors[-1, :]
+        return float(x_new @ beta)
+
+
+# ---------------------------------------------------------------------------
 # Runner
 # ---------------------------------------------------------------------------
 
@@ -436,6 +585,8 @@ AVAILABLE_METHODS: dict[str, BaselineMethod] = {
     "ar": AutoregressiveAR(),
     "arima": ARIMABaseline(),
     "ets": ETSBaseline(),
+    "var": VARBaseline(),
+    "factor": FactorModelBaseline(),
 }
 
 

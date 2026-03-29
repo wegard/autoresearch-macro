@@ -399,6 +399,169 @@ def relative_metrics(
 
 
 # ---------------------------------------------------------------------------
+# Diebold-Mariano test
+# ---------------------------------------------------------------------------
+
+
+def diebold_mariano(
+    forecasts_1: dict[str, pd.DataFrame],
+    forecasts_2: dict[str, pd.DataFrame],
+    origins: list[ForecastOrigin],
+    horizon: int,
+    variable: str,
+    loss: str = "squared",
+) -> dict[str, float]:
+    """Diebold-Mariano test for equal predictive ability.
+
+    Tests H0: E[d_t] = 0 where d_t = L(e1_t) - L(e2_t).
+    Negative DM statistic means method 1 is better.
+
+    Uses Newey-West HAC standard errors to account for serial
+    correlation in multi-step forecast errors.
+
+    Args:
+        forecasts_1: Point forecasts from method 1.
+        forecasts_2: Point forecasts from method 2.
+        origins: List of ForecastOrigin objects with actuals.
+        horizon: Forecast horizon to test.
+        variable: Target variable name.
+        loss: "squared" (MSE) or "absolute" (MAE).
+
+    Returns:
+        {"dm_stat": float, "p_value": float, "n": int}
+    """
+    from scipy import stats
+
+    # Collect loss differentials
+    d_list: list[float] = []
+    for origin in origins:
+        od = origin.origin_date
+        if variable not in origin.actuals:
+            continue
+        if horizon not in origin.actuals[variable].index:
+            continue
+
+        actual = origin.actuals[variable][horizon]
+
+        # Get forecasts at this origin
+        fc1 = forecasts_1.get(variable)
+        fc2 = forecasts_2.get(variable)
+        if fc1 is None or fc2 is None:
+            continue
+        if od not in fc1.index or od not in fc2.index:
+            continue
+        if horizon not in fc1.columns or horizon not in fc2.columns:
+            continue
+
+        f1 = fc1.loc[od, horizon]
+        f2 = fc2.loc[od, horizon]
+
+        if pd.isna(actual) or pd.isna(f1) or pd.isna(f2):
+            continue
+
+        e1 = actual - f1
+        e2 = actual - f2
+
+        if loss == "squared":
+            d_list.append(e1**2 - e2**2)
+        else:
+            d_list.append(abs(e1) - abs(e2))
+
+    if len(d_list) < 10:
+        return {"dm_stat": float("nan"), "p_value": float("nan"), "n": len(d_list)}
+
+    d = np.array(d_list)
+    n = len(d)
+    d_mean = np.mean(d)
+
+    # Newey-West HAC variance estimator
+    # Bandwidth = h - 1 (for h-step-ahead forecasts)
+    bandwidth = max(1, horizon - 1)
+    gamma_0 = np.mean((d - d_mean) ** 2)
+    gamma_sum = gamma_0
+    for k in range(1, bandwidth + 1):
+        weight = 1 - k / (bandwidth + 1)  # Bartlett kernel
+        gamma_k = np.mean((d[k:] - d_mean) * (d[:-k] - d_mean))
+        gamma_sum += 2 * weight * gamma_k
+
+    if gamma_sum <= 0:
+        return {"dm_stat": float("nan"), "p_value": float("nan"), "n": n}
+
+    dm_stat = d_mean / np.sqrt(gamma_sum / n)
+    p_value = 2 * (1 - stats.norm.cdf(abs(dm_stat)))
+
+    return {"dm_stat": float(dm_stat), "p_value": float(p_value), "n": n}
+
+
+def dm_test_table(
+    results_dir: Path,
+    era: str,
+    panel: MacroPanel,
+    reference_method: str = "random_walk",
+) -> pd.DataFrame:
+    """Run DM tests for all methods against a reference.
+
+    Returns a DataFrame with columns: variable, horizon, method, dm_stat, p_value.
+    """
+    from prepare import build_test_origins, build_validation_origins
+
+    if era == "test":
+        origins = build_test_origins(panel)
+    else:
+        origins = build_validation_origins(panel)
+
+    era_dir = results_dir / era
+    methods = sorted([d.name for d in era_dir.iterdir() if d.is_dir() and d.name != reference_method])
+
+    # Load reference forecasts
+    ref_parquet = era_dir / reference_method / "point_forecasts.parquet"
+    if not ref_parquet.exists():
+        return pd.DataFrame()
+    ref_fc = _load_point_forecasts(ref_parquet)
+
+    rows = []
+    for method_name in methods:
+        method_parquet = era_dir / method_name / "point_forecasts.parquet"
+        if not method_parquet.exists():
+            continue
+        method_fc = _load_point_forecasts(method_parquet)
+
+        for var in panel.targets():
+            for h in HORIZONS:
+                result = diebold_mariano(
+                    ref_fc, method_fc, origins, h, var, loss="squared"
+                )
+                rows.append({
+                    "variable": var,
+                    "horizon": h,
+                    "method": method_name,
+                    "reference": reference_method,
+                    "dm_stat": result["dm_stat"],
+                    "p_value": result["p_value"],
+                    "n": result["n"],
+                })
+
+    return pd.DataFrame(rows)
+
+
+def _load_point_forecasts(parquet_path: Path) -> dict[str, pd.DataFrame]:
+    """Load point forecasts from parquet into {variable: DataFrame} format."""
+    df = pd.read_parquet(parquet_path)
+    forecasts: dict[str, pd.DataFrame] = {}
+    for col in df.columns:
+        # Columns are like "cpi_h1", "cpi_h3", etc.
+        parts = col.rsplit("_h", 1)
+        if len(parts) != 2:
+            continue
+        var, h_str = parts
+        h = int(h_str)
+        if var not in forecasts:
+            forecasts[var] = pd.DataFrame(index=df.index)
+        forecasts[var][h] = df[col]
+    return forecasts
+
+
+# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 

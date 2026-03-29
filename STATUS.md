@@ -51,9 +51,24 @@ Not yet written.
 | ETS | 1.186 | 1.561 | 2.022 | 2.890 |
 | Chronos-2 (120M) zero-shot | 1.171 | 1.542 | 1.989 | 2.820 |
 
+## Test era results (2016+, average RMSE across targets)
+
+| Method | h=1 | h=3 | h=6 | h=12 |
+|--------|-----|-----|-----|------|
+| **Random walk** | **1.413** | **1.759** | **2.115** | **2.609** |
+| ARIMA | 1.450 | 1.797 | 2.284 | 2.815 |
+| Chronos-2 zero-shot | 1.463 | 1.772 | 2.212 | 2.790 |
+| Chronos-2 agent-tuned | 1.461 | 1.847 | 2.346 | 3.230 |
+
+**Key test-era findings:**
+- Random walk is the strongest method on the test era (regime changes favor the naive baseline)
+- Zero-shot Chronos-2 beats ARIMA at h=3, h=6, h=12 — the foundation model handles COVID/inflation shocks better than classical methods
+- Agent-tuned config does NOT generalize — covariates and fine-tuning that helped in 2006-2015 overfit to the validation era
+- Exception: unemployment forecasting improves with the agent-tuned config at all horizons
+
 ## Current to-dos
 
-- [ ] Run best config on test era (2016+) for final results
+- [x] Run best config on test era (2016+) for final results
 - [ ] Phase 4 ablation analysis (decompose gains by covariate, context, fine-tuning)
 - [ ] Regenerate forecast visualizations with best config
 - [ ] Discuss with Leif: results, next steps, paper outline

@@ -1,0 +1,10 @@
+{
+  "covariates": ["brent_crude", "policy_rate", "us_cpi", "nok_eur"],
+  "transforms": {},
+  "context_length": 96,
+  "fine_tune": true,
+  "fine_tune_steps": 100,
+  "fine_tune_lr": 5e-06,
+  "grouping": "univariate",
+  "num_samples": 20
+}

@@ -239,6 +239,18 @@ All data sources are publicly available and free:
 
 ---
 
+## 10. Key results
+
+### Validation era (2006-2015)
+
+The search improved Chronos-2 MASE by 6.8% (1.9443 → 1.8129) over 50 iterations. The best config uses 4 covariates (brent_crude, policy_rate, us_cpi, nok_eur), context_length=96, and light LoRA fine-tuning (100 steps, lr=5×10⁻⁶).
+
+### Test era (2016+)
+
+The agent-tuned config does not generalize. Zero-shot Chronos-2 is more robust to the test period's regime changes (COVID pandemic, inflation surge) and beats ARIMA at horizons 3, 6, and 12 months. The random walk is the strongest overall test-era method.
+
+This overfitting finding highlights a fundamental challenge: pipeline optimization on a fixed validation window may not transfer across structural breaks in macroeconomic data.
+
 ## Changelog
 
-- **2026-03-29:** Initial version. Documents the setup as of the first 30-iteration search experiment.
+- **2026-03-29:** Initial version. Documented setup as of the 50-iteration search experiment. Added test-era results showing validation-to-test overfitting.

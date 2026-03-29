@@ -33,11 +33,16 @@ Search experiment complete: 50 iterations, 6 accepted improvements, **6.8% MASE 
 
 ## Next steps
 
-1. Run best config on **test era** (2016+) for final out-of-sample results
-2. Consider more search iterations (fine-tuning with very few steps was close: 1.8160 vs 1.8158)
-3. Phase 4: ablation analysis — decompose the 6.6% gain into covariate vs context effects
-4. Update webapp with search trajectory visualization
-5. Discuss with Leif
+1. Phase 4: ablation analysis — decompose gains, analyze validation-to-test overfitting
+2. Regenerate forecast visualizations with test-era data
+3. Consider per-variable search (agent-tuned config helps unemployment but hurts others)
+4. Discuss with Leif: test-era overfitting, paper implications
+
+## Test era results (2016+)
+
+The agent-tuned config does NOT generalize to the test era. At h=12, it's the worst method (RMSE 3.23 vs random walk 2.61). The search overfit to validation-era patterns.
+
+However, zero-shot Chronos-2 beats ARIMA at h=3/6/12 on the test era — the foundation model handles regime changes (COVID, inflation) better than classical methods. Unemployment is the exception where the agent-tuned config is best at all horizons.
 
 ## Critical files
 

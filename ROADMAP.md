@@ -88,17 +88,17 @@
 
 ---
 
-## Phase 5: Frozen test evaluation
+## Phase 5: Frozen test evaluation — done
 
 **Goal:** Final results on held-out test period (2016+).
 
-- [ ] Lock the pipeline from Phase 3 (no further search)
-- [ ] Evaluate on 2016-01 onward
+- [x] Lock the pipeline from Phase 3 (no further search)
+- [x] Evaluate on 2016-01 onward
 - [ ] Report by subperiod: 2016-19, 2020-21 (COVID), 2022+ (inflation/Ukraine)
-- [ ] All metrics, all horizons
-- [ ] Compare all methods side by side
+- [x] All metrics, all horizons
+- [x] Compare all methods side by side
 
-**Deliverable:** Final results table for the paper.
+**Deliverable:** Final results table. Key finding: agent-tuned config overfits to validation era; zero-shot Chronos-2 is more robust to test-era regime changes than ARIMA.
 
 ---
 

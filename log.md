@@ -132,3 +132,23 @@
   "fine_tune_lr": 5e-06
 }
 ```
+
+## 2026-03-29 — Test era evaluation
+
+**Result:** The agent-tuned config does not generalize to the test era (2016+).
+
+**Test era RMSE (avg across targets):**
+
+| Method | h=1 | h=3 | h=6 | h=12 |
+|--------|-----|-----|-----|------|
+| Random walk | 1.413 | 1.759 | 2.115 | 2.609 |
+| ARIMA | 1.450 | 1.797 | 2.284 | 2.815 |
+| Chronos-2 zero-shot | 1.463 | 1.772 | 2.212 | 2.790 |
+| Chronos-2 agent-tuned | 1.461 | 1.847 | 2.346 | 3.230 |
+
+**Key findings:**
+- Random walk is the strongest method on the test era — regime changes (COVID, inflation) favor the naive baseline
+- Zero-shot Chronos-2 beats ARIMA at h=3/6/12, suggesting the foundation model is more robust to structural breaks
+- The agent-tuned config overfits: covariates and fine-tuning that helped in 2006-2015 hurt in 2016+
+- Exception: unemployment improves with agent-tuned config at all horizons (0.435 vs 0.475 RW at h=1)
+- The overfitting result is itself publishable — it demonstrates a fundamental limitation of validation-era pipeline search for macro forecasting in the presence of structural breaks

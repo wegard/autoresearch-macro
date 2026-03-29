@@ -132,7 +132,7 @@ The formal study design is documented in [`METHODOLOGY.md`](METHODOLOGY.md). Thi
 | **ARIMA** | **1.164** | **1.504** | **1.910** | **2.641** |
 | Chronos-2 (120M) zero-shot | 1.171 | 1.542 | 1.989 | 2.820 |
 
-**Search experiment (50 iterations):** The LLM-guided search improved Chronos-2 by **6.8%** (MASE 1.94 → 1.81) by discovering that oil prices, the policy rate, US inflation, and the NOK/EUR exchange rate are the optimal covariates with a 96-month context window and light LoRA fine-tuning. Model: `amazon/chronos-2` (120M params).
+**Search experiment (50 iterations):** The LLM-guided search improved validation-era Chronos-2 by **6.8%** (MASE 1.94 → 1.81) by discovering oil prices, policy rate, US inflation, and NOK/EUR as covariates. **Test era (2016+):** The agent-tuned config overfits — zero-shot Chronos-2 is more robust to regime changes (COVID, inflation) and beats ARIMA at longer horizons. Model: `amazon/chronos-2` (120M params).
 
 ## Links
 

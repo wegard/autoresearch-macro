@@ -40,12 +40,12 @@ fine_tune:
   enabled: [false, true]
 
 fine_tune_steps:
-  values: [50, 100, 200, 500]
+  values: [100, 500, 1000, 2000]
   only_if: fine_tune
 
-learning_rate:
-  min: 0.00001
-  max: 0.001
+fine_tune_lr:
+  min: 0.000001
+  max: 0.0001
   log_scale: true
   only_if: fine_tune
 

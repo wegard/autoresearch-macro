@@ -2,7 +2,7 @@
 
 **Collaborators:** Vegard Larsen, Leif Anders Thorsrud
 **Started:** 2026-03-27
-**Status:** Infrastructure complete, first search experiment pending
+**Status:** First search experiment complete (6.6% improvement)
 
 ## What
 
@@ -45,8 +45,9 @@ autoresearch-macro/
 │   ├── baselines.qmd           # Classical baseline comparison
 │   ├── foundation-model.qmd    # Chronos-2 results and model ladder
 │   ├── search.qmd              # Search loop trajectory and analysis
+│   ├── forecasts.qmd           # Rolling forecasts vs actuals (interactive)
 │   ├── results.qmd             # Full comparison heatmap and tables
-│   └── _data/                  # prepare_results.py + generated JSON
+│   └── _data/                  # prepare_results.py, generate_forecasts.py + JSON
 ├── paper/                      # LaTeX paper
 └── reference/
     └── autoresearch/           # Karpathy's repo, cloned for study
@@ -82,8 +83,11 @@ uv run pytest
 An interactive Quarto + Observable Plot dashboard for exploring results.
 
 ```bash
-# Prepare data (converts results to JSON for the charts)
+# Prepare metrics data (converts results to JSON for the charts)
 uv run python webapp/_data/prepare_results.py
+
+# Generate rolling forecasts (requires GPU, ~5 min)
+uv run python webapp/_data/generate_forecasts.py
 
 # Live preview (opens browser with hot reload)
 cd webapp && quarto preview
@@ -115,13 +119,15 @@ ANTHROPIC_API_KEY=your_key_here
 - **LLM-guided search:** Claude proposes config changes based on past results and domain knowledge
 - **Three-way ablation:** Decompose gains into (1) foundation model, (2) fine-tuning, (3) agentic search
 
-## Current results (validation era, avg RMSE across targets)
+## Current results (validation era 2006-2015, avg RMSE across targets)
 
 | Method | h=1 | h=3 | h=6 | h=12 |
 |--------|-----|-----|-----|------|
 | Random walk | 1.202 | 1.533 | 1.958 | 2.683 |
 | **ARIMA** | **1.164** | **1.504** | **1.910** | **2.641** |
-| Chronos-2 zero-shot | 1.218 | 1.596 | 2.073 | 2.924 |
+| Chronos-2 (120M) zero-shot | 1.171 | 1.542 | 1.989 | 2.820 |
+
+**Search experiment (30 iterations):** The LLM-guided search improved Chronos-2 by **6.6%** (MASE 1.94 → 1.82) by discovering that oil prices, the policy rate, and US inflation are the optimal covariates with a 96-month context window. Model: `amazon/chronos-2` (120M params).
 
 ## Links
 

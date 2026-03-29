@@ -154,25 +154,26 @@ class TestTransformations:
         try:
             train.TRANSFORMS = {}
             data = pd.DataFrame({"cpi": [1.0, 2.0, 3.0]})
-            result = apply_transforms(data)
+            result = apply_transforms(data, targets=["cpi"])
             pd.testing.assert_frame_equal(result, data)
         finally:
             train.TRANSFORMS = old_transforms
 
-    def test_apply_transforms_with_config(self):
+    def test_apply_transforms_covariate(self):
+        """Transforms are applied to covariates but not targets."""
         import train
         old_transforms = train.TRANSFORMS
         try:
-            train.TRANSFORMS = {"cpi": "ma_3"}
+            train.TRANSFORMS = {"brent_crude": "ma_3", "cpi": "ma_3"}
             data = pd.DataFrame({
                 "cpi": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
-                "other": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0],
+                "brent_crude": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0],
             })
-            result = apply_transforms(data)
-            # other column unchanged
-            pd.testing.assert_series_equal(result["other"], data["other"])
-            # cpi column is now moving average
-            assert result["cpi"].iloc[-1] == pytest.approx(5.0)  # ma(3) of [4,5,6]
+            result = apply_transforms(data, targets=["cpi"])
+            # cpi (target) should be UNCHANGED
+            pd.testing.assert_series_equal(result["cpi"], data["cpi"])
+            # brent_crude (covariate) should be transformed
+            assert result["brent_crude"].iloc[-1] == pytest.approx(50.0)  # ma(3) of [40,50,60]
         finally:
             train.TRANSFORMS = old_transforms
 

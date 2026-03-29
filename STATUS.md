@@ -1,9 +1,9 @@
 # STATUS.md — Autoresearch Macro
 
-**Stage:** Phase 1 complete, Phase 2-3 infrastructure ready
+**Stage:** Phase 3 complete (first search experiment), Phase 4 analysis next
 **Target:** TBD
 **Collaborators:** Leif Anders Thorsrud
-**Last updated:** 2026-03-28
+**Last updated:** 2026-03-29
 
 ## Submission history
 
@@ -14,40 +14,33 @@ Not yet written.
 ### Data pipeline (Phase 0) — done
 - `src/prepare.py` (1237 lines) — SSB, FRED, Norges Bank downloads with pseudo-real-time discipline
 - 18 variables, 951 months (1947-01 to 2026-03)
-- SSB table IDs and Norges Bank SDMX keys verified against live API (2026-03-28)
-- Publication lags configured in `configs/publication_lags.yml`
-- `MacroPanel.available_at()` enforces no-future-data discipline
 - 36 tests in `tests/test_prepare.py`
 
 ### Evaluation harness — done
-- `src/evaluate.py` (451 lines) — `ForecastResult`, `EvaluationResult`, save/load, comparison tables
-- Subperiod reporting for test era (pre-COVID, COVID, post-COVID)
+- `src/evaluate.py` (451 lines) — ForecastResult, EvaluationResult, save/load, comparison tables
 - 11 tests in `tests/test_evaluate.py`
 
 ### Baselines (Phase 1) — done
 - `src/baselines.py` (547 lines) — 5 methods: random walk, seasonal naive, AR(p), ARIMA, ETS
 - All evaluated on validation era (2006-2015, 120 monthly origins)
-- Results saved in `results/validation/`
-- 15 tests in `tests/test_baselines.py`
 
 ### Chronos-2 scaffold — done
-- `src/train.py` (478 lines) — AutoGluon TimeSeriesPredictor + Chronos-2 interface
-- Config section at top (agent-editable), `--config-file` override for search.py
-- Zero-shot evaluated on validation era (results saved)
+- `src/train.py` — amazon/chronos-2 (120M params), AutoGluon "Chronos-2" key
+- Native covariate support, LoRA fine-tuning
 - 12 tests in `tests/test_train.py`
 
-### Search loop (Phase 3 infrastructure) — done
-- `src/search.py` (557 lines) — LLM-guided outer loop with Claude API
-- `configs/search_space.yml` — parameter ranges
-- `program.md` — full agent instructions with domain knowledge
-- Two-phase evaluation: quick (20 origins) → full (120 origins)
-- Persistent state, JSONL logging, resume support
+### Search loop (Phase 3) — first experiment complete
+- `src/search.py` — LLM-guided outer loop with Claude API
+- **30 iterations completed, 4 accepted improvements, 6.6% improvement over baseline**
+- Best config: brent_crude + policy_rate + us_cpi, context_length=96
 - 16 tests in `tests/test_search.py`
 
+### Web dashboard — done
+- `webapp/` — Quarto + Observable Plot interactive site (6 pages)
+
 ### Totals
-- **4,707 lines** of Python (source + tests)
+- **~5,000 lines** of Python (source + tests)
 - **90 tests**, all passing
-- **6 methods** evaluated on validation era
 
 ## Validation era results (2006-2015, average RMSE across targets)
 
@@ -58,30 +51,53 @@ Not yet written.
 | AR(p) | 1.164 | 1.543 | 1.968 | 2.949 |
 | **ARIMA** | **1.164** | **1.504** | **1.910** | **2.641** |
 | ETS | 1.186 | 1.561 | 2.022 | 2.890 |
-| Chronos-2 zero-shot | 1.218 | 1.596 | 2.073 | 2.924 |
+| Chronos-2 (120M) zero-shot | 1.171 | 1.542 | 1.989 | 2.820 |
 
-ARIMA is the best classical baseline. Zero-shot Chronos-2 does not beat it.
+## Search experiment results (30 iterations, avg MASE)
+
+| Iter | Config | MASE | vs Baseline |
+|------|--------|------|-------------|
+| 0 | Baseline (univariate, all context) | 1.9443 | — |
+| 9 | + context_length=96 | 1.8635 | -4.2% |
+| 15 | + brent_crude | 1.8472 | -5.0% |
+| 18 | + policy_rate | 1.8326 | -5.7% |
+| **27** | **+ us_cpi** | **1.8158** | **-6.6%** |
+
+**Best config found by the agent:**
+```json
+{
+  "covariates": ["brent_crude", "policy_rate", "us_cpi"],
+  "context_length": 96,
+  "fine_tune": false
+}
+```
+
+**Key findings:**
+- Oil prices, monetary policy, and US inflation are the most informative covariates
+- 96-month (8-year) context window is optimal
+- Adding more covariates (exchange rates, credit, exports) hurts performance
+- Transforms on covariates don't help — raw levels work best
+- LoRA fine-tuning consistently degrades performance (overfits on small training data)
+- The discovered covariate set is economically interpretable
 
 ## Current to-dos
 
-- [ ] Add `ANTHROPIC_API_KEY` to `.env` for the search loop
-- [ ] Run search loop (first experiment — see EXPERIMENT-1.md)
-- [ ] Test Chronos-2 with manual covariate selections
-- [ ] Run baselines on test era (2016+) for Phase 5 comparison
-- [ ] Discuss with Leif: results so far, variable panel, division of labor
+- [ ] Run best config on test era (2016+) for final results
+- [ ] Run more search iterations (fine-tuning exploration)
+- [ ] Phase 4 ablation analysis (decompose gains)
+- [ ] Update webapp with search trajectory data
+- [ ] Discuss with Leif: results, next steps
 
-## Key design decisions
+## Model: amazon/chronos-2 (120M)
 
-- Start with Chronos-2, keep model-agnostic
-- Monthly macro panel as starting point
-- Build own search loop inspired by autoresearch, not a direct fork
-- Rolling pseudo-out-of-sample validation
-- LLM-guided search (Claude Sonnet via API) for config proposals
-- Subsample origins during search for speed (20 quick → 120 full)
+- **Native covariate support** — both past and known future covariates
+- **LoRA fine-tuning** — default r=8, lora_alpha=16
+- **Cross-learning** — joint predictions across time series
+- Accessed via AutoGluon `"Chronos-2"` model key
 
 ## Known data limitations
 
-- Industrial production (table 14208) ends 2023M12 — table appears discontinued at SSB
-- Unemployment (table 13760) only from 2006M01 — no pre-2006 data
+- Industrial production (table 14208) ends 2023M12
+- Unemployment (table 13760) only from 2006M01
 - House prices (seasonally adjusted) only from 2005Q1
 - NOK/EUR only from 1999 (euro introduction)

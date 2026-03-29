@@ -7,8 +7,10 @@ Test whether an LLM-guided search loop can discover a Chronos-2 configuration th
 ## Background
 
 We have established that:
-- **ARIMA** is the best classical baseline (avg MASE ~1.57 across all horizons on validation era 2006-2015)
-- **Chronos-2 zero-shot** (univariate, no covariates, no fine-tuning) does **not** beat ARIMA (avg MASE ~1.70)
+- **ARIMA** is the best classical baseline (avg RMSE 2.641 at h=12 on validation era 2006-2015)
+- **Chronos-2 (120M) zero-shot** (univariate, no covariates, no fine-tuning) is competitive at h=1 (1.171 vs ARIMA 1.164) but falls behind at longer horizons (avg RMSE 2.820 at h=12)
+
+The model is **amazon/chronos-2** (120M parameters) with **native covariate support** and **LoRA fine-tuning**. Unlike the earlier Chronos-Bolt experiments, covariates and fine-tuning are now architecturally effective.
 
 The search loop will let Claude propose config changes — which covariates to include, how to transform the data, context length, and fine-tuning settings — and evaluate whether each change improves forecasts.
 
@@ -19,13 +21,15 @@ The search agent can modify these parameters in `train.py`:
 | Parameter | Default | Search range |
 |-----------|---------|-------------|
 | **covariates** | `[]` (none) | Any subset of 14 available variables |
-| **transforms** | `{}` (none) | log_diff, pct_change, standardize, moving avg |
-| **context_length** | `null` (all) | 24, 36, 48, 64, 96, 128, or null |
-| **fine_tune** | `false` | true/false |
-| **fine_tune_steps** | 100 | 50, 100, 200, 500 |
-| **learning_rate** | 1e-4 | 1e-5 to 1e-3 |
+| **transforms** | `{}` (none) | log_diff, pct_change, standardize, moving avg (covariates only) |
+| **context_length** | `null` (all, up to 8192) | 24, 36, 48, 64, 96, 128, or null |
+| **fine_tune** | `false` | true/false (LoRA fine-tuning) |
+| **fine_tune_steps** | 1000 | 100, 500, 1000, 2000 |
+| **fine_tune_lr** | 1e-5 | 1e-6 to 1e-4 |
 | **grouping** | `univariate` | univariate, all_targets |
 | **num_samples** | 20 | 10, 20, 50 |
+
+Model: **amazon/chronos-2** (120M params) — native past/known covariate support, LoRA fine-tuning.
 
 Available covariates: house_prices, credit, exports, imports, nok_eur, nok_usd, policy_rate, brent_crude, sp500, fed_funds, us_cpi, vix, global_epu, euro_area_gdp.
 
@@ -206,7 +210,7 @@ The agent finds no configuration that consistently beats ARIMA. This is a valid 
 1. Try **manual covariate selection** based on economic theory (Phase 2):
    - Create a config with theory-driven covariates (e.g., oil for CPI, credit for house prices)
    - Test fine-tuning with these manually chosen covariates
-2. Try a **larger model** (chronos-bolt-base, ~200M params)
+2. Try a **different model** (e.g., TimesFM, Lag-Llama) to test model-agnostic search
 3. Try **more search iterations** (the agent may need 50+ iterations to explore the space)
 
 ### For the paper:

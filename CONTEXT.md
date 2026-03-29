@@ -1,46 +1,47 @@
 # CONTEXT.md — Session Resume
 
-**Last updated:** 2026-03-28
+**Last updated:** 2026-03-29
 
 ## Current state
 
-All infrastructure is built. Phase 0 and Phase 1 are complete. The project is ready to run the first agentic search experiment (Phase 3).
+First search experiment complete: 30 iterations, 4 accepted improvements, **6.6% improvement** over zero-shot baseline. The agent discovered that Chronos-2 (120M) forecasts Norwegian macro variables best with oil prices, the policy rate, and US inflation as covariates, using a 96-month context window.
 
 ## What happened
 
 - 2026-03-27: Project initiated. Research design drafted. Autoresearch cloned.
-- 2026-03-28: Full implementation session:
-  - Verified and fixed SSB table IDs against live API (6 tables changed: unemployment → 13760, exports/imports → 08803, policy rate key fixed, S&P 500 → NASDAQCOM, euro GDP quarterly fix)
-  - Built `evaluate.py` (evaluation harness with results storage and comparison)
-  - Built `baselines.py` (5 methods: random walk, seasonal naive, AR, ARIMA, ETS)
-  - Built `train.py` (Chronos-2 via AutoGluon, config override mechanism)
-  - Built `search.py` (LLM-guided outer loop with Claude API)
-  - Wrote `program.md` (full agent instructions with domain knowledge)
-  - Wrote `configs/search_space.yml` (parameter ranges)
-  - Ran all baselines + zero-shot Chronos-2 on validation era
-  - 90 tests, all passing
+- 2026-03-28: Full implementation session — data pipeline, baselines, train.py, search.py, evaluate.py, webapp. Fixed SSB table IDs, Norges Bank keys. 90 tests passing.
+- 2026-03-29:
+  - Switched from chronos-bolt-small (20M) to amazon/chronos-2 (120M)
+  - Fixed fine-tuning bugs (wrong param name, module identity, default arg binding, baseline scoring)
+  - Ran first search experiment: 30 iterations
+  - Agent found best config: `covariates=[brent_crude, policy_rate, us_cpi], context_length=96`
+  - MASE improved from 1.9443 (baseline) to 1.8158 (best), a 6.6% improvement
 
-## Key results so far
+## Search trajectory
 
-- ARIMA is the strongest classical baseline (avg RMSE 2.64 at h=12)
-- Zero-shot Chronos-2 (bolt-small, univariate) does not beat ARIMA (avg RMSE 2.92)
-- This confirms hypothesis H2: economy-specific adaptation is needed
+| Iter | Config change | MASE | Status |
+|------|--------------|------|--------|
+| 0 | Baseline | 1.9443 | accepted |
+| 9 | context_length=96 | 1.8635 | accepted (-4.2%) |
+| 15 | + brent_crude | 1.8472 | accepted (-5.0%) |
+| 18 | + policy_rate | 1.8326 | accepted (-5.7%) |
+| 27 | + us_cpi | 1.8158 | accepted (-6.6%) |
+
+26 iterations rejected. Fine-tuning, transforms, exchange rates, and additional covariates all hurt.
 
 ## Next steps
 
-1. **Run first search experiment** — see EXPERIMENT-1.md
-2. Test Chronos-2 with manual covariate selections (oil, FX, etc.)
-3. Fine-tuning experiments (Phase 2)
-4. Analyze search trajectory and discovered configurations
+1. Run best config on **test era** (2016+) for final out-of-sample results
+2. Consider more search iterations (fine-tuning with very few steps was close: 1.8160 vs 1.8158)
+3. Phase 4: ablation analysis — decompose the 6.6% gain into covariate vs context effects
+4. Update webapp with search trajectory visualization
+5. Discuss with Leif
 
 ## Critical files
 
-| File | Lines | Role |
-|------|-------|------|
-| `src/prepare.py` | 1237 | Data pipeline (LOCKED) |
-| `src/train.py` | 478 | Agent sandbox (EDITABLE) |
-| `src/evaluate.py` | 451 | Evaluation harness (LOCKED) |
-| `src/search.py` | 557 | Outer loop controller |
-| `src/baselines.py` | 547 | Classical baselines |
-| `program.md` | 82 | Agent instructions |
-| `configs/search_space.yml` | 43 | Search parameter ranges |
+| File | Role |
+|------|------|
+| `src/train.py` | Agent sandbox — amazon/chronos-2 via "Chronos-2" key |
+| `src/search.py` | LLM-guided outer loop controller |
+| `results/search_state.json` | Persisted search state (30 iterations) |
+| `results/search_log.jsonl` | Full iteration log (94 entries across all runs) |

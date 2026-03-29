@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 # ===================================================================
 
 # Model
-MODEL_PATH = "amazon/chronos-bolt-small"
+MODEL_PATH = "amazon/chronos-2"  # 120M params, native covariate support
 PREDICTION_LENGTH = 12  # max forecast horizon (months)
 
 # Covariates to include (from panel.covariates())
@@ -48,10 +48,10 @@ TRANSFORMS: dict[str, str] = {}
 # Context length (lookback window in months)
 CONTEXT_LENGTH: int | None = None  # None = use all available data
 
-# Fine-tuning
+# Fine-tuning (LoRA by default for Chronos-2)
 FINE_TUNE = False
-FINE_TUNE_STEPS = 100
-LEARNING_RATE = 1e-4
+FINE_TUNE_STEPS = 1000
+FINE_TUNE_LR = 1e-5
 
 # Grouping: "univariate" (separate model per target) or
 #           "all_targets" (single model for all targets)
@@ -99,14 +99,25 @@ TRANSFORM_FUNCTIONS: dict[str, Any] = {
 }
 
 
-def apply_transforms(data: pd.DataFrame) -> pd.DataFrame:
-    """Apply configured transformations to the data.
+def apply_transforms(data: pd.DataFrame, targets: list[str]) -> pd.DataFrame:
+    """Apply configured transformations to covariate columns only.
 
-    Returns a new DataFrame with transformed columns.
-    Columns not in TRANSFORMS are left unchanged.
+    Target variables are NEVER transformed because the evaluation protocol
+    compares forecasts against original-scale actuals. Transforming targets
+    would produce forecasts in a different scale (e.g., standardized) that
+    cannot be compared to the raw actuals.
+
+    Returns a new DataFrame with transformed covariate columns.
     """
     result = data.copy()
     for col, transform_name in TRANSFORMS.items():
+        if col in targets:
+            logger.warning(
+                "Ignoring transform '%s' on target '%s' — target transforms "
+                "would produce forecasts in wrong scale for evaluation.",
+                transform_name, col,
+            )
+            continue
         if col in result.columns and transform_name in TRANSFORM_FUNCTIONS:
             result[col] = TRANSFORM_FUNCTIONS[transform_name](result[col])
     return result
@@ -140,8 +151,8 @@ def build_ag_dataset(
     Returns:
         DataFrame in long format ready for TimeSeriesDataFrame conversion.
     """
-    # Apply transformations
-    transformed = apply_transforms(available_data)
+    # Apply transformations (covariates only — targets stay in original scale)
+    transformed = apply_transforms(available_data, targets)
 
     # Truncate to context length
     if context_length is not None and len(transformed) > context_length:
@@ -158,8 +169,24 @@ def build_ag_dataset(
         if target_series.empty:
             continue
 
-        # Use only timestamps where target is available
+        # Keep only the contiguous tail of valid observations.
+        # Transforms like log_diff create leading NaN (from diff) and
+        # scattered NaN (from log of negative values). Dropping them
+        # can create gaps that break AutoGluon's frequency inference.
+        # Instead, find the last contiguous block of valid monthly data.
         valid_idx = target_series.index
+        if len(valid_idx) > 1:
+            expected = pd.date_range(start=valid_idx[0], end=valid_idx[-1], freq="ME")
+            if not valid_idx.equals(expected):
+                # Find longest contiguous suffix
+                contiguous_start = len(valid_idx) - 1
+                for i in range(len(valid_idx) - 2, -1, -1):
+                    gap = (valid_idx[i + 1] - valid_idx[i]).days
+                    if gap > 35:  # more than one month
+                        break
+                    contiguous_start = i
+                target_series = target_series.iloc[contiguous_start:]
+                valid_idx = target_series.index
 
         for ts in valid_idx:
             row: dict[str, Any] = {
@@ -190,7 +217,7 @@ def get_current_config() -> dict[str, Any]:
         "context_length": CONTEXT_LENGTH,
         "fine_tune": FINE_TUNE,
         "fine_tune_steps": FINE_TUNE_STEPS,
-        "learning_rate": LEARNING_RATE,
+        "fine_tune_lr": FINE_TUNE_LR,
         "grouping": GROUPING,
         "num_samples": NUM_SAMPLES,
     }
@@ -209,7 +236,7 @@ def fit_predictor(
     model_path: str = MODEL_PATH,
     fine_tune: bool = FINE_TUNE,
     fine_tune_steps: int = FINE_TUNE_STEPS,
-    learning_rate: float = LEARNING_RATE,
+    learning_rate: float = FINE_TUNE_LR,
 ) -> Any:
     """Create, fit, and return an AutoGluon TimeSeriesPredictor with Chronos-2.
 
@@ -233,17 +260,18 @@ def fit_predictor(
     )
 
     hyperparameters: dict[str, Any] = {
-        "Chronos": {"model_path": model_path}
+        "Chronos-2": {"model_path": model_path}
     }
     if fine_tune:
-        hyperparameters["Chronos"]["fine_tune"] = True
-        hyperparameters["Chronos"]["fine_tune_steps"] = fine_tune_steps
-        hyperparameters["Chronos"]["learning_rate"] = learning_rate
+        hyperparameters["Chronos-2"]["fine_tune"] = True
+        hyperparameters["Chronos-2"]["fine_tune_steps"] = fine_tune_steps
+        hyperparameters["Chronos-2"]["fine_tune_lr"] = learning_rate
 
     time_limit = 300 if fine_tune else 30
     predictor = TimeSeriesPredictor(
         prediction_length=prediction_length,
         eval_metric="MASE",
+        freq="ME",
         verbosity=0,
     )
     predictor.fit(ts_data, hyperparameters=hyperparameters, time_limit=time_limit)
@@ -361,9 +389,14 @@ def run(
     )
 
     # Fit predictor once using first origin's data (loads model weights)
-    logger.info("Fitting predictor (loading model)...")
+    logger.info("Fitting predictor (loading model, fine_tune=%s)...", FINE_TUNE)
     predictor = fit_predictor(
         origins[0].available_data, targets, available_covs,
+        prediction_length=PREDICTION_LENGTH,
+        model_path=MODEL_PATH,
+        fine_tune=FINE_TUNE,
+        fine_tune_steps=FINE_TUNE_STEPS,
+        learning_rate=FINE_TUNE_LR,
     )
     logger.info("Predictor ready (%.1fs)", time.time() - start)
 
@@ -418,17 +451,21 @@ def apply_config_overrides(config_path: str) -> None:
     editing train.py source code.
     """
     overrides = json.loads(Path(config_path).read_text())
-    import train
+
+    # Modify globals of the actual running module (handles both
+    # __main__ and import-as-train cases).
+    import sys
+    this_module = sys.modules[__name__]
 
     config_vars = {
         "model_path", "prediction_length", "covariates", "transforms",
-        "context_length", "fine_tune", "fine_tune_steps", "learning_rate",
+        "context_length", "fine_tune", "fine_tune_steps", "fine_tune_lr",
         "grouping", "num_samples",
     }
     for key, value in overrides.items():
         upper_key = key.upper()
         if key.lower() in config_vars:
-            setattr(train, upper_key, value)
+            setattr(this_module, upper_key, value)
             logger.info("Config override: %s = %s", upper_key, value)
         else:
             logger.warning("Unknown config key ignored: %s", key)

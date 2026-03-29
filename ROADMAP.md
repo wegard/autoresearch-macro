@@ -38,7 +38,7 @@
 - [x] Collect all metrics: RMSE, MAE, MASE
 - [x] Results by horizon (1, 3, 6, 12 months)
 
-**Deliverable:** Baseline results table. ARIMA is the best classical baseline. Zero-shot Chronos-2 does not beat it.
+**Deliverable:** Baseline results table. ARIMA is the best classical baseline. Zero-shot Chronos-2 (120M) is competitive at h=1 but falls behind at longer horizons.
 
 ---
 
@@ -47,8 +47,8 @@
 **Goal:** Understand what economy-specific fine-tuning buys over zero-shot.
 
 - [ ] Manual covariate selection (theory-driven, Vegard + Leif pick)
-- [ ] LoRA fine-tuning of Chronos-2 on Norwegian data
-- [ ] Manual hyperparameter tuning (learning rate, LoRA rank, context length)
+- [ ] LoRA fine-tuning of amazon/chronos-2 (120M) on Norwegian data
+- [ ] Manual hyperparameter tuning (fine_tune_lr, LoRA rank, context length)
 - [ ] Compare against Phase 1 baselines
 - [ ] Document which choices matter most
 
@@ -56,20 +56,21 @@
 
 ---
 
-## Phase 3: Search loop — infrastructure ready, experiments pending
+## Phase 3: Search loop — first experiment complete
 
 **Goal:** Build and run the agentic outer-loop search.
 
-- [x] Implement search.py — LLM-guided outer loop controller (557 lines, 16 tests)
+- [x] Implement search.py — LLM-guided outer loop controller
 - [x] Define search space in configs/ (search_space.yml)
 - [x] Write program.md agent instructions
-- [x] Implement train.py scaffold (478 lines, 12 tests)
-- [ ] **Run search loop on validation era** (see EXPERIMENT-1.md)
-- [ ] Log all experiments for reproducibility
-- [ ] Analyze: which configurations does the agent discover?
+- [x] Implement train.py scaffold (amazon/chronos-2, 120M)
+- [x] **Run search loop on validation era** — 30 iterations, 6.6% improvement
+- [x] Log all experiments for reproducibility (results/search_log.jsonl)
+- [x] Analyze: agent discovered brent_crude + policy_rate + us_cpi as optimal covariates
 - [ ] Compare against Phase 2 manual pipeline
+- [ ] Run more iterations (fine-tuning exploration)
 
-**Deliverable:** Agent-selected pipeline. Full experiment log.
+**Deliverable:** Agent-selected pipeline: `covariates=[brent_crude, policy_rate, us_cpi], context_length=96`. MASE improved from 1.94 to 1.82.
 
 ---
 

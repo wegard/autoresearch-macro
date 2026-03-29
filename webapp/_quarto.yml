@@ -18,6 +18,8 @@ website:
         text: Chronos-2
       - href: search.qmd
         text: Search Loop
+      - href: forecasts.qmd
+        text: Forecasts
       - href: results.qmd
         text: Results
 

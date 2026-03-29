@@ -1,0 +1,270 @@
+---
+title: "Forecasts"
+subtitle: "Model predictions vs realized data through time"
+---
+
+```{ojs}
+//| echo: false
+forecasts = {
+  try {
+    return await FileAttachment("_data/rolling_forecasts.json").json();
+  } catch(e) {
+    return [];
+  }
+}
+
+actuals = {
+  try {
+    return await FileAttachment("_data/actuals_timeseries.json").json();
+  } catch(e) {
+    return [];
+  }
+}
+```
+
+```{ojs}
+//| echo: false
+{
+  if (forecasts.length === 0) {
+    return html`
+      <div class="chart-container" style="text-align:center; padding:3rem;">
+        <p style="font-size:1.2rem; color:#666;">No forecast data generated yet.</p>
+        <p style="color:#999;">Run the forecast generator:</p>
+        <code style="background:#f8f9fa; padding:0.5rem 1rem; border-radius:4px;">
+          uv run python webapp/_data/generate_forecasts.py
+        </code>
+      </div>
+    `;
+  }
+}
+```
+
+This page shows the Chronos-2 model's predictions overlaid on actual realized values. The best configuration from the search experiment uses **Brent crude oil**, **the policy rate**, and **US CPI** as covariates with a 96-month context window.
+
+## Rolling 1-month-ahead forecasts
+
+Select a target variable to see how the model's 1-month-ahead predictions track reality through time — including the 2008 financial crisis, COVID (2020), and the inflation surge (2022+).
+
+```{ojs}
+//| echo: false
+viewof selectedVar = Inputs.select(
+  ["cpi", "industrial_production", "retail_sales", "unemployment"],
+  {label: "Target variable", value: "cpi",
+   format: v => v.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
+)
+```
+
+```{ojs}
+//| echo: false
+//| label: fig-rolling
+//| fig-cap: "Solid line: actual values. Colored dots: model's 1-month-ahead forecasts at each origin."
+
+{
+  if (forecasts.length === 0) return html``;
+
+  // Filter h=1 forecasts for selected variable
+  const h1 = forecasts
+    .filter(d => d.variable === selectedVar && d.h === 1 && d.forecast != null)
+    .map(d => ({
+      date: new Date(d.target_date),
+      forecast: d.forecast,
+      origin: new Date(d.origin)
+    }));
+
+  // Actual series for selected variable
+  const actual = actuals
+    .filter(d => d.variable === selectedVar)
+    .map(d => ({date: new Date(d.date), value: d.value}));
+
+  // Filter to the forecast range
+  const minDate = h1.length > 0 ? d3.min(h1, d => d.date) : new Date("2006-01-01");
+  const maxDate = h1.length > 0 ? d3.max(h1, d => d.date) : new Date("2026-01-01");
+  const filteredActual = actual.filter(d => d.date >= new Date(minDate.getTime() - 365*24*60*60*1000) && d.date <= maxDate);
+
+  return Plot.plot({
+    height: 420,
+    marginLeft: 60,
+    marginBottom: 40,
+    x: {type: "utc", label: "Date"},
+    y: {label: selectedVar.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()), grid: true},
+    marks: [
+      // Era boundaries
+      Plot.ruleX([new Date("2006-01-01")], {stroke: "#2ecc71", strokeWidth: 1, strokeDasharray: "4,4"}),
+      Plot.ruleX([new Date("2016-01-01")], {stroke: "#e74c3c", strokeWidth: 1, strokeDasharray: "4,4"}),
+
+      // Actual series
+      Plot.line(filteredActual, {
+        x: "date", y: "value",
+        stroke: "#2c3e50", strokeWidth: 1.5
+      }),
+
+      // h=1 forecasts
+      Plot.dot(h1, {
+        x: "date", y: "forecast",
+        fill: "#9b59b6", fillOpacity: 0.6, r: 2.5,
+        tip: true,
+        title: d => `Origin: ${d.origin.toISOString().slice(0,10)}\nForecast: ${d.forecast.toFixed(2)}`
+      }),
+
+      // Labels
+      Plot.text([{x: new Date("2006-06-01"), text: "Validation"}], {
+        x: "x", text: "text", frameAnchor: "top", dy: 15, fontSize: 10, fill: "#2ecc71"
+      }),
+      Plot.text([{x: new Date("2016-06-01"), text: "Test"}], {
+        x: "x", text: "text", frameAnchor: "top", dy: 15, fontSize: 10, fill: "#e74c3c"
+      })
+    ]
+  });
+}
+```
+
+**Legend:** [Actual values]{style="color:#2c3e50;font-weight:bold"} | [1-month forecast]{style="color:#9b59b6;font-weight:bold"} | [Validation era]{style="color:#2ecc71"} | [Test era]{style="color:#e74c3c"}
+
+
+## Forecast fan from a specific origin
+
+Select a date to see the model's predictions at all horizons (1, 3, 6, 12 months ahead) fanning out from that point. The dots show where the model predicted the series would be; the line shows where it actually went.
+
+```{ojs}
+//| echo: false
+// Get available origin dates for the slider
+originDates = {
+  const dates = [...new Set(forecasts.filter(d => d.variable === selectedVar && d.h === 1).map(d => d.origin))].sort();
+  return dates;
+}
+
+viewof selectedOriginIdx = Inputs.range(
+  [0, Math.max(0, originDates.length - 1)],
+  {label: "Origin date", step: 1, value: Math.floor(originDates.length * 0.7),
+   format: i => originDates[i] || ""}
+)
+```
+
+```{ojs}
+//| echo: false
+selectedOrigin = originDates[selectedOriginIdx] || originDates[0]
+```
+
+```{ojs}
+//| echo: false
+//| label: fig-fan
+//| fig-cap: "Fan chart: actual trajectory (dark line) with forecast points at h=1, 3, 6, 12 months."
+
+{
+  if (forecasts.length === 0 || !selectedOrigin) return html``;
+
+  const originDate = new Date(selectedOrigin);
+
+  // Get forecasts from this origin
+  const fanForecasts = forecasts
+    .filter(d => d.variable === selectedVar && d.origin === selectedOrigin && d.forecast != null)
+    .map(d => ({
+      date: new Date(d.target_date),
+      forecast: d.forecast,
+      actual: d.actual,
+      h: d.h,
+      label: `h=${d.h}`
+    }));
+
+  // Actual series around this origin (2 years before, 1.5 years after)
+  const windowStart = new Date(originDate.getTime() - 2 * 365 * 24 * 60 * 60 * 1000);
+  const windowEnd = new Date(originDate.getTime() + 1.5 * 365 * 24 * 60 * 60 * 1000);
+  const windowActual = actuals
+    .filter(d => d.variable === selectedVar)
+    .map(d => ({date: new Date(d.date), value: d.value}))
+    .filter(d => d.date >= windowStart && d.date <= windowEnd);
+
+  // Horizon colors
+  const hColors = {"1": "#3498db", "3": "#2ecc71", "6": "#f39c12", "12": "#e74c3c"};
+
+  return Plot.plot({
+    height: 380,
+    marginLeft: 60,
+    marginBottom: 40,
+    x: {type: "utc", label: "Date", domain: [windowStart, windowEnd]},
+    y: {label: selectedVar.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()), grid: true},
+    marks: [
+      // Origin line
+      Plot.ruleX([originDate], {stroke: "#9b59b6", strokeWidth: 2}),
+      Plot.text([{x: originDate, text: `Origin: ${selectedOrigin}`}], {
+        x: "x", text: "text", dy: -10, fontSize: 10, fill: "#9b59b6", fontWeight: "bold", frameAnchor: "top"
+      }),
+
+      // Actual series
+      Plot.line(windowActual, {
+        x: "date", y: "value",
+        stroke: "#2c3e50", strokeWidth: 2
+      }),
+
+      // Forecast points (colored by horizon)
+      Plot.dot(fanForecasts, {
+        x: "date", y: "forecast",
+        fill: d => hColors[String(d.h)] || "#999",
+        r: 7, strokeWidth: 1.5, stroke: "white",
+        tip: true,
+        title: d => `h=${d.h} (${d.date.toISOString().slice(0,10)})\nForecast: ${d.forecast.toFixed(2)}\nActual: ${d.actual != null ? d.actual.toFixed(2) : 'N/A'}`
+      }),
+
+      // Actual points at forecast dates (for comparison)
+      Plot.dot(fanForecasts.filter(d => d.actual != null), {
+        x: "date", y: "actual",
+        symbol: "diamond", fill: "#2c3e50", r: 5,
+      }),
+
+      // Connect forecast to actual with thin lines
+      Plot.link(fanForecasts.filter(d => d.actual != null), {
+        x1: "date", y1: "forecast",
+        x2: "date", y2: "actual",
+        stroke: "#ccc", strokeWidth: 1, strokeDasharray: "2,2"
+      })
+    ]
+  });
+}
+```
+
+**Legend:** [h=1]{style="color:#3498db;font-weight:bold"} | [h=3]{style="color:#2ecc71;font-weight:bold"} | [h=6]{style="color:#f39c12;font-weight:bold"} | [h=12]{style="color:#e74c3c;font-weight:bold"} | [Actual]{style="color:#2c3e50;font-weight:bold"} (diamonds). Dashed lines connect forecast to actual at each horizon.
+
+
+## Forecast errors through time
+
+How does the model's 1-month-ahead error evolve? Large spikes indicate periods where the model was surprised — typically during regime changes.
+
+```{ojs}
+//| echo: false
+//| label: fig-errors
+//| fig-cap: "Forecast error (actual minus forecast) for 1-month-ahead predictions. Positive = model under-predicted."
+
+{
+  if (forecasts.length === 0) return html``;
+
+  const errors = forecasts
+    .filter(d => d.variable === selectedVar && d.h === 1 && d.forecast != null && d.actual != null)
+    .map(d => ({
+      date: new Date(d.target_date),
+      error: d.actual - d.forecast
+    }));
+
+  return Plot.plot({
+    height: 250,
+    marginLeft: 60,
+    marginBottom: 40,
+    x: {type: "utc", label: "Date"},
+    y: {label: "Error (actual - forecast)", grid: true},
+    marks: [
+      Plot.ruleY([0], {stroke: "#ccc"}),
+      Plot.ruleX([new Date("2006-01-01")], {stroke: "#2ecc71", strokeWidth: 1, strokeDasharray: "4,4"}),
+      Plot.ruleX([new Date("2016-01-01")], {stroke: "#e74c3c", strokeWidth: 1, strokeDasharray: "4,4"}),
+      Plot.dot(errors, {
+        x: "date", y: "error",
+        fill: d => d.error > 0 ? "#e74c3c" : "#3498db",
+        fillOpacity: 0.6, r: 2.5,
+        tip: true
+      }),
+      Plot.line(errors, {
+        x: "date", y: "error",
+        stroke: "#999", strokeWidth: 0.5, strokeOpacity: 0.5
+      })
+    ]
+  });
+}
+```

@@ -677,7 +677,7 @@ def log_diff(series: pd.Series) -> pd.Series:
 
 def pct_change(series: pd.Series, periods: int = 12) -> pd.Series:
     """Year-over-year (or custom period) percentage change."""
-    result = series.pct_change(periods=periods) * 100
+    result = series.pct_change(periods=periods, fill_method=None) * 100
     result.name = f"{series.name}_pct{periods}" if series.name else f"pct{periods}"
     return result
 

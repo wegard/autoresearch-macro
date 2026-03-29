@@ -120,8 +120,8 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "transforms": {},
     "context_length": None,
     "fine_tune": False,
-    "fine_tune_steps": 100,
-    "learning_rate": 1e-4,
+    "fine_tune_steps": 1000,
+    "fine_tune_lr": 1e-5,
     "grouping": "univariate",
     "num_samples": 20,
 }
@@ -365,21 +365,32 @@ def search_loop(
     if state.iteration == 0:
         logger.info("Establishing baseline (zero-shot, no covariates)...")
         baseline_config = DEFAULT_CONFIG.copy()
-        baseline_score = run_and_evaluate(baseline_config, max_origins=QUICK_EVAL_ORIGINS)
 
-        if baseline_score is None:
-            logger.error("Baseline evaluation failed. Cannot proceed.")
+        # Quick baseline (for filtering)
+        logger.info("  Quick baseline (%d origins)...", QUICK_EVAL_ORIGINS)
+        quick_baseline = run_and_evaluate(baseline_config, max_origins=QUICK_EVAL_ORIGINS)
+        if quick_baseline is None:
+            logger.error("Baseline quick evaluation failed. Cannot proceed.")
             return
+        logger.info("  Quick baseline score: %.4f", quick_baseline)
 
-        state.baseline_score = baseline_score
-        state.best_score = baseline_score
+        # Full baseline (for accept/reject decisions)
+        logger.info("  Full baseline (all origins)...")
+        full_baseline = run_and_evaluate(baseline_config, max_origins=None)
+        if full_baseline is None:
+            logger.error("Baseline full evaluation failed. Cannot proceed.")
+            return
+        logger.info("  Full baseline score: %.4f", full_baseline)
+
+        state.baseline_score = full_baseline
+        state.best_score = full_baseline
         state.best_config = baseline_config
 
         record = IterationRecord(
             iteration=0,
             config=baseline_config,
-            quick_score=baseline_score,
-            full_score=None,
+            quick_score=quick_baseline,
+            full_score=full_baseline,
             status="accepted",
             description="baseline (zero-shot, univariate)",
             runtime_seconds=0,
@@ -389,7 +400,7 @@ def search_loop(
         _log_iteration(record)
         state.save()
 
-        logger.info("Baseline score (avg_mase): %.4f", baseline_score)
+        logger.info("Baseline: quick=%.4f, full=%.4f", quick_baseline, full_baseline)
 
     # Main loop
     iteration = state.iteration

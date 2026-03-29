@@ -36,3 +36,5 @@ Your recommendation: accept, minor revision, major revision, or reject. Justify 
 ---
 
 Please be constructive but rigorous. The IJF values practical relevance — consider whether the results are useful for forecasting practitioners, not just theoretically interesting.
+
+**Format your entire response as a single Markdown document** that I can save directly as a `.md` file. Use the section headings above (Summary, Major comments, Minor comments, Questions for the authors, Overall assessment) as `###` headers.

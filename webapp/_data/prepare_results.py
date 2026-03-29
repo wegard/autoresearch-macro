@@ -130,6 +130,40 @@ def prepare_search_trajectory() -> None:
     print(f"Wrote search_trajectory.json ({len(iterations)} iterations)")
 
 
+def prepare_test_metrics() -> None:
+    """Combine test-era metrics (including subperiods) into one JSON file."""
+    test_dir = RESULTS_DIR / "test"
+    if not test_dir.exists():
+        print("No test results found, skipping test metrics.")
+        return
+
+    combined: dict = {"methods": []}
+
+    for method_dir in sorted(test_dir.iterdir()):
+        if not method_dir.is_dir():
+            continue
+        metrics_path = method_dir / "metrics.json"
+        if not metrics_path.exists():
+            continue
+
+        metrics = json.loads(metrics_path.read_text())
+
+        entry = {
+            "name": method_dir.name,
+            "display_name": _display_name(method_dir.name),
+            "category": _categorize(method_dir.name),
+            "metrics": metrics.get("metrics", {}),
+            "summary": metrics.get("summary", {}),
+            "subperiod_metrics": metrics.get("subperiod_metrics", {}),
+        }
+        combined["methods"].append(entry)
+
+    (OUTPUT_DIR / "test_metrics.json").write_text(
+        json.dumps(combined, indent=2)
+    )
+    print(f"Wrote test_metrics.json ({len(combined['methods'])} methods)")
+
+
 def _display_name(method_name: str) -> str:
     names = {
         "random_walk": "Random Walk",
@@ -138,7 +172,7 @@ def _display_name(method_name: str) -> str:
         "arima": "ARIMA",
         "ets": "ETS",
         "chronos2_zs": "Chronos-2 (zero-shot)",
-        "chronos2_ft": "Chronos-2 (fine-tuned)",
+        "chronos2_ft": "Chronos-2 (agent-tuned)",
     }
     return names.get(method_name, method_name)
 
@@ -160,6 +194,7 @@ def main() -> None:
     print()
 
     prepare_combined_metrics()
+    prepare_test_metrics()
     prepare_variable_metadata()
     prepare_panel_timeseries()
     prepare_search_trajectory()

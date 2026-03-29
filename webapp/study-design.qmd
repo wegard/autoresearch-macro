@@ -1,0 +1,231 @@
+---
+title: "Study Design"
+subtitle: "Motivation, data, evaluation protocol, and search procedure"
+---
+
+```{ojs}
+//| echo: false
+variables = FileAttachment("_data/variable_metadata.json").json()
+```
+
+## Research question
+
+Can an LLM-guided search procedure improve pseudo-real-time forecasts of the Norwegian macroeconomy by selecting data representations, covariates, and fine-tuning settings for a time series foundation model?
+
+We test this by running an automated search loop over the pipeline configuration of **Chronos-2** (120M parameters), a pretrained time series foundation model, and comparing against classical baselines under a strict rolling pseudo-real-time evaluation protocol.
+
+## Hypotheses
+
+| | Hypothesis | Status |
+|---|-----------|--------|
+| H1 | Zero-shot Chronos-2 improves on classical baselines for some series | Partially confirmed (h=1 competitive, longer horizons fall behind) |
+| H2 | Economy-specific adaptation improves on zero-shot | Confirmed (covariates reduce MASE by 6.6%) |
+| H3 | LLM-guided search discovers better setups than manual selection | Under investigation |
+| H4 | Most gains come from covariate selection, not fine-tuning | Confirmed so far (fine-tuning hurts, covariates help) |
+
+
+## Data
+
+The panel combines **18 macroeconomic variables** from three sources, covering Norwegian domestic indicators, central bank data, and global macro variables.
+
+### Variable panel
+
+```{ojs}
+//| echo: false
+Inputs.table(variables.map(v => ({
+  Variable: v.display_name,
+  Source: v.source,
+  "Pub. lag": `${v.publication_lag_days}d`,
+  Target: v.is_target ? "Yes" : "",
+  Description: v.description,
+  From: v.first_available ? v.first_available.slice(0, 10) : "—"
+})), {
+  sort: "Source",
+  rows: 20,
+  width: {Variable: 160, Source: 100, "Pub. lag": 60, Target: 45, Description: 250, From: 85}
+})
+```
+
+### Pseudo-real-time discipline
+
+At each forecast origin *t*, only data published by date *t* is used. For an observation from month *m*:
+
+> The observation is available when: **end-of-month(*m*) + publication lag ≤ *t***
+
+This prevents future information leakage. Publication lags range from 0 days (policy rate, known in real time) to 90 days (Euro area GDP). Daily series are aggregated to monthly averages; quarterly series are forward-filled.
+
+
+## Evaluation protocol
+
+### Rolling expanding-window design
+
+```{ojs}
+//| echo: false
+//| label: fig-protocol
+//| fig-cap: "Evaluation timeline. Each row represents a forecast origin. The model uses all available data up to the origin (blue) and produces forecasts at h=1,3,6,12 months ahead (orange dots)."
+
+{
+  // Illustrative diagram: show 5 sample origins
+  const origins = [
+    {origin: new Date("2006-06-30"), label: "2006-06"},
+    {origin: new Date("2009-01-31"), label: "2009-01"},
+    {origin: new Date("2012-06-30"), label: "2012-06"},
+    {origin: new Date("2015-12-31"), label: "2015-12"},
+    {origin: new Date("2020-01-31"), label: "2020-01"},
+  ];
+
+  const horizons = [1, 3, 6, 12];
+  const data = [];
+
+  for (const o of origins) {
+    // Training bar
+    data.push({
+      origin: o.label,
+      x1: new Date("1990-01-01"),
+      x2: o.origin,
+      type: "Training data"
+    });
+    // Forecast points
+    for (const h of horizons) {
+      const target = new Date(o.origin);
+      target.setMonth(target.getMonth() + h);
+      data.push({
+        origin: o.label,
+        x: target,
+        h: h,
+        type: "Forecast"
+      });
+    }
+  }
+
+  const bars = data.filter(d => d.type === "Training data");
+  const dots = data.filter(d => d.type === "Forecast");
+
+  return Plot.plot({
+    height: 220,
+    marginLeft: 80,
+    marginBottom: 40,
+    x: {type: "utc", label: "Date", domain: [new Date("1988-01-01"), new Date("2022-01-01")]},
+    y: {label: "Origin", domain: origins.map(o => o.label).reverse()},
+    marks: [
+      // Validation / test boundary
+      Plot.ruleX([new Date("2016-01-01")], {stroke: "#e74c3c", strokeDasharray: "4,4"}),
+      Plot.text([{x: new Date("2016-01-01"), text: "Test era →"}], {
+        x: "x", text: "text", dy: -8, dx: 5, fontSize: 9, fill: "#e74c3c", textAnchor: "start"
+      }),
+      // Training bars
+      Plot.barX(bars, {
+        x1: "x1", x2: "x2", y: "origin",
+        fill: "#3498db", fillOpacity: 0.4
+      }),
+      // Origin markers
+      Plot.dot(origins.map(o => ({x: o.origin, y: o.label})), {
+        x: "x", y: "y", fill: "#2c3e50", r: 5
+      }),
+      // Forecast dots
+      Plot.dot(dots, {
+        x: "x", y: "origin",
+        fill: d => ({"1": "#f39c12", "3": "#e67e22", "6": "#d35400", "12": "#c0392b"})[d.h],
+        r: 4,
+        tip: true, title: d => `h=${d.h}`
+      })
+    ]
+  });
+}
+```
+
+| Era | Period | Origins | Purpose |
+|-----|--------|---------|---------|
+| Validation | 2006-01 to 2015-12 | 120 monthly | Search, model selection |
+| Test | 2016-01 onward | ~110 monthly | Final out-of-sample (frozen) |
+
+Test-era subperiods: pre-COVID (2016-19), COVID (2020-21), post-COVID/inflation (2022+).
+
+
+## Metrics
+
+| Metric | Formula | Interpretation |
+|--------|---------|----------------|
+| **RMSE** | √(mean((y - ŷ)²)) | Penalizes large errors; in original units |
+| **MAE** | mean(\|y - ŷ\|) | Average absolute error; in original units |
+| **MASE** | MAE / MAE_naive | Scale-free; < 1 beats random walk |
+
+**MASE** is the primary search metric because it is comparable across variables with different scales.
+
+
+## Baselines
+
+| Method | Specification |
+|--------|---------------|
+| Random walk | ŷ_{t+h} = y_t (last observed value) |
+| Seasonal naive | ŷ_{t+h} = y_{t+h-12} (same month last year) |
+| AR(p) | Direct OLS, lag order by BIC, p ∈ {1,...,12} |
+| ARIMA(p,d,q) | AIC grid search: p ∈ {0-3}, d ∈ {0-1}, q ∈ {0-2} |
+| ETS | Auto-selected trend/seasonal via AIC |
+
+
+## Foundation model: Chronos-2
+
+**amazon/chronos-2** (120M parameters) — a universal time series transformer pretrained on billions of observations.
+
+| Property | Value |
+|----------|-------|
+| Parameters | 120M |
+| Architecture | Transformer (universal) |
+| Context length | Up to 8,192 time steps |
+| Covariate support | Past covariates + known future covariates (native) |
+| Fine-tuning | LoRA (r=8, α=16) via AutoGluon |
+| Interface | AutoGluon `"Chronos-2"` model key |
+
+Unlike earlier Chronos-Bolt models, Chronos-2 natively integrates covariate information during inference — making covariate selection a meaningful search dimension.
+
+
+## Search procedure
+
+An LLM (**Claude Sonnet**) proposes pipeline configurations based on domain knowledge and past results. Each iteration:
+
+1. Claude reads: task description, search space, current best config, iteration history
+2. Claude proposes a JSON config (which covariates, transforms, context length, fine-tuning)
+3. **Quick evaluation** on 20 subsampled origins (~30s)
+4. If improved: **full evaluation** on all 120 origins (~3 min)
+5. Accept if full score improves; reject otherwise
+6. Log iteration, update state, continue
+
+### Search space
+
+```{ojs}
+//| echo: false
+{
+  const space = [
+    {Dimension: "Covariates", Range: "Any subset of 14 variables", Default: "None"},
+    {Dimension: "Covariate transforms", Range: "none, log_diff, pct_change_1/12, standardize, MA", Default: "None"},
+    {Dimension: "Context length", Range: "24, 36, 48, 64, 96, 128, unlimited", Default: "Unlimited"},
+    {Dimension: "Fine-tuning", Range: "Off / LoRA", Default: "Off"},
+    {Dimension: "Fine-tune steps", Range: "100, 500, 1000, 2000", Default: "1000"},
+    {Dimension: "Fine-tune LR", Range: "1e-6 to 1e-4 (log scale)", Default: "1e-5"},
+    {Dimension: "Grouping", Range: "Univariate / All targets", Default: "Univariate"},
+  ];
+  return Inputs.table(space, {rows: 10, width: {Dimension: 160, Range: 280, Default: 100}});
+}
+```
+
+Target variables are never transformed — forecasts must be in the original scale for evaluation.
+
+
+## Reproducibility
+
+| Component | Version / Setting |
+|-----------|------------------|
+| Python | 3.11 |
+| chronos-forecasting | 2.2.2 |
+| autogluon.timeseries | 1.5.0 |
+| PyTorch | 2.9.1 (CUDA 12.8) |
+| Hardware | NVIDIA RTX 4090 (24 GB) |
+| Origin subsample seed | 42 |
+| Dependency lock | `uv.lock` |
+
+All data sources are publicly available. The Anthropic API key is required only for the search loop.
+
+::: {.callout-note}
+Full details including table IDs, series codes, and formula notation are in [METHODOLOGY.md](../METHODOLOGY.md).
+:::

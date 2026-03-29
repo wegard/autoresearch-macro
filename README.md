@@ -17,9 +17,10 @@ Can an agentic search procedure improve macro forecasts by selecting data repres
 ```
 autoresearch-macro/
 ├── README.md                   # this file
+├── METHODOLOGY.md              # formal study design (source of truth for the paper)
 ├── EXPERIMENT-1.md             # first experiment guide
 ├── CONTEXT.md                  # session resume for AI assistants
-├── DESIGN.md                   # full research design
+├── DESIGN.md                   # original research design brainstorm
 ├── ROADMAP.md                  # phased timeline and deliverables
 ├── STATUS.md                   # current status and results
 ├── CLAUDE.md                   # instructions for Claude Code

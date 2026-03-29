@@ -17,7 +17,7 @@ Can an agentic search procedure improve macro forecasts by selecting data repres
 ```
 autoresearch-macro/
 ├── README.md                   # this file
-├── METHODOLOGY.md              # formal study design (source of truth for the paper)
+├── METHODOLOGY.md              # formal study design — source of truth for the paper (keep updated!)
 ├── EXPERIMENT-1.md             # first experiment guide
 ├── CONTEXT.md                  # session resume for AI assistants
 ├── DESIGN.md                   # original research design brainstorm
@@ -111,6 +111,10 @@ ANTHROPIC_API_KEY=your_key_here
 - FRED API key: free at <https://fred.stlouisfed.org/docs/api/api_key.html>
 - Anthropic API key: for the search loop's LLM-guided config proposals
 - SSB and Norges Bank APIs are public (no key needed)
+
+## Methodology
+
+The formal study design is documented in [`METHODOLOGY.md`](METHODOLOGY.md). This is the **source of truth** for the paper — it covers the research question, hypotheses, data specification, evaluation protocol, metrics, baselines, foundation model details, search procedure, and reproducibility notes. Keep it updated when methods change.
 
 ## Key design decisions
 

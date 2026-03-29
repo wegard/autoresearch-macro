@@ -34,6 +34,10 @@ Automated feature engineering for macroeconomic forecasting using agentic search
 - `uv run ruff check src/ tests/` for linting
 - Tests must pass after every change
 
+## Methodology document
+
+`METHODOLOGY.md` is the **source of truth** for the paper. When making changes to the data pipeline, evaluation protocol, baselines, model configuration, search procedure, or any other methodological aspect, **update METHODOLOGY.md to reflect those changes**. Also update the changelog at the bottom of the file.
+
 ## Key constraints
 
 - The search loop must respect pseudo-real-time data discipline (no future data at any forecast origin)

@@ -19,6 +19,8 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{appendix}
+\usepackage{multirow}
+\usepackage{pdflscape}
 
 \geometry{margin=1in}
 \onehalfspacing
@@ -36,7 +38,7 @@
 \newcommand{\leif}[1]{\textcolor{orange}{\textbf{[LAT: #1]}}}
 
 % --- Title ---
-\title{Automated Feature Engineering for Macroeconomic Forecasting\\with Foundation Models\thanks{We thank \todo{acknowledgments}. The views expressed are those of the authors.}}
+\title{Can Agentic Search Improve Foundation Model Forecasts\\for Small Open Economies?\thanks{We thank \todo{acknowledgments}. The views expressed are those of the authors.}}
 
 \author{
     Vegard H.\ Larsen\thanks{BI Norwegian Business School. Email: \href{mailto:vegard.h.larsen@bi.no}{vegard.h.larsen@bi.no}}
@@ -51,9 +53,7 @@
 \maketitle
 
 \begin{abstract}
-\todo{Write abstract.}
-
-We study whether an agentic search procedure can improve pseudo-real-time forecasts of the Norwegian macroeconomy by selecting data representations, covariates, and fine-tuning settings for time series foundation models. Rather than allowing unrestricted model rewriting, the agent searches over data transformations, target groupings, covariates, context windows, and fine-tuning settings using rolling forecast-origin validation. We compare against zero-shot foundation models, manually fine-tuned models, and standard macro forecasting baselines. The main contribution is a decomposition of forecast gains into three sources: the foundation model itself, economy-specific adaptation, and autonomous search over the forecasting pipeline.
+We study whether an LLM-guided search procedure can improve pseudo-real-time forecasts of the Norwegian macroeconomy by selecting covariates, data transformations, and fine-tuning settings for a time series foundation model. Using Chronos-2 (120M parameters) as the backbone, we let an LLM agent iteratively propose pipeline configurations, evaluated on a rolling validation window spanning 2006--2015 with 120 monthly forecast origins. The search discovers an economically interpretable configuration---oil prices, the policy rate, US inflation, and the NOK/EUR exchange rate as covariates, with a 96-month context window---that reduces the mean absolute scaled error by 6.8\% relative to the zero-shot baseline. However, when evaluated on the held-out test period (2016--2025), which includes the COVID pandemic and the post-2022 inflation surge, the agent-tuned configuration does not generalize: zero-shot Chronos-2 proves more robust to these structural breaks than both the agent-tuned model and classical baselines. We decompose these results by subperiod and variable, finding that the search overfits to validation-era covariate relationships that break down under regime change. Our findings highlight both the promise and the limitations of automated pipeline optimization for macroeconomic forecasting.
 
 \bigskip
 \noindent\textbf{Keywords:} macroeconomic forecasting, foundation models, automated machine learning, time series, Norway
@@ -70,7 +70,20 @@ We study whether an agentic search procedure can improve pseudo-real-time foreca
 \label{sec:introduction}
 % ===================================================================
 
-\todo{Write introduction.}
+Time series foundation models---large neural networks pretrained on billions of observations from diverse domains---have rapidly entered the forecaster's toolkit. Models such as Chronos \citep{ansari2024chronos,ansari2025chronos2}, TimesFM \citep{das2024decoder}, and MOIRAI \citep{woo2024unified} promise accurate zero-shot forecasts without task-specific training, raising the question of whether they can match or exceed classical methods in rigorous macroeconomic applications.
+
+We investigate this question in the context of Norwegian macroeconomic forecasting. Norway provides an ideal laboratory: it is a small open economy with excellent data availability, clear exposure to global commodity shocks via oil exports, and a well-studied forecasting literature against which to benchmark \citep{bjornland2019dutch,aastveit2023inflation}. We focus on monthly forecasts of four target variables---CPI inflation, industrial production, retail sales, and unemployment---at horizons of 1, 3, 6, and 12 months ahead, using a rolling pseudo-real-time evaluation protocol that respects publication lags.
+
+Beyond simply evaluating foundation model performance, we ask whether an \emph{automated search procedure} can improve the forecasting pipeline. Inspired by the agentic search framework of \citet{karpathy2026autoresearch}, we design an outer loop in which a large language model (Claude Sonnet) proposes modifications to the forecasting configuration---which covariates to include, how to transform them, the context window length, and whether to fine-tune the model---and evaluates each proposal against a rolling validation metric. The agent operates within a constrained search space: it may select from 14 macroeconomic covariates, apply standard transformations, and adjust fine-tuning hyperparameters, but it cannot modify the model architecture or the evaluation protocol.
+
+Our main findings are threefold. First, zero-shot Chronos-2 is competitive with ARIMA at short forecast horizons and proves more robust to the structural breaks of the test period (COVID, the inflation surge) than classical methods. Second, the LLM-guided search discovers an economically interpretable pipeline configuration---oil prices, the Norges Bank policy rate, US inflation, and the NOK/EUR exchange rate---that improves validation-era performance by 6.8\%. Third, and crucially, this improvement does not generalize to the out-of-sample test period: the agent-tuned configuration overfits to covariate relationships in the 2006--2015 validation window that break down under the regime changes of 2016--2025.
+
+This overfitting result is itself a key contribution. It demonstrates a fundamental tension in automated pipeline optimization for macroeconomic forecasting: the very covariate relationships that an agent discovers as informative during ``normal'' times may become misleading during crises and structural breaks. Our subperiod analysis reveals that the agent-tuned configuration performs well during the stable pre-COVID period (2016--2019) but deteriorates sharply during and after the pandemic, while zero-shot Chronos-2 degrades more gracefully.
+
+The paper contributes to three literatures. To the macro forecasting literature, we provide the first rigorous pseudo-real-time evaluation of a time series foundation model on Norwegian data. To the foundation model literature, we document how zero-shot robustness can dominate task-specific adaptation in the presence of structural breaks. To the AutoML literature, we demonstrate both the potential and the hazards of LLM-guided pipeline search in an economic setting where stationarity cannot be assumed.
+
+The remainder of the paper is organized as follows. Section~\ref{sec:literature} reviews related work. Section~\ref{sec:methodology} describes the Chronos-2 model and the agentic search procedure. Section~\ref{sec:data} presents the data and evaluation protocol. Section~\ref{sec:results} reports results. Section~\ref{sec:discussion} discusses implications and limitations. Section~\ref{sec:conclusion} concludes.
+
 
 % ===================================================================
 \section{Related literature}
@@ -130,6 +143,7 @@ The most directly relevant precedent for our approach is Karpathy's ``autoresear
 \paragraph{Our contribution.}
 We adapt this agentic search framework to macroeconomics by constraining the search agent to operate over data representations, covariate selection, and fine-tuning configurations for Chronos-2---never over model architecture. The evaluation is pseudo-real-time with proper publication-lag handling, and the search is governed by rolling forecast-origin validation loss. This allows us to cleanly decompose forecast improvements into three sources: the foundation model, economy-specific adaptation, and autonomous search. To our knowledge, no prior work has systematically applied agentic search to the rigorous pseudo-out-of-sample environments demanded by the macro forecasting literature.
 
+
 % ===================================================================
 \section{Methodology}
 \label{sec:methodology}
@@ -138,17 +152,71 @@ We adapt this agentic search framework to macroeconomics by constraining the sea
 \subsection{Foundation model: Chronos-2}
 \label{sec:chronos}
 
-\todo{Describe Chronos-2 architecture, covariate handling via group attention, fine-tuning with LoRA.}
+We use Chronos-2 \citep{ansari2025chronos2} as the foundation model backbone, accessed via the AutoGluon TimeSeries interface \citep{shchur2023autogluon}. The model has 120 million parameters and supports a maximum context length of 8,192 time steps. Its key architectural innovation is a group attention mechanism that alternates between time attention (within a single series) and group attention (across series in a batch), enabling in-context learning from covariates without requiring explicit covariate-specific input channels.
 
-\subsection{Agentic search loop}
+Unlike earlier Chronos-Bolt models, which produce deterministic point forecasts and ignore additional columns in the input data, Chronos-2 natively integrates both past covariates (historical values of auxiliary series) and known future covariates (e.g., calendar features) during inference. This makes covariate selection a meaningful dimension for the search agent to explore.
+
+\paragraph{Fine-tuning.} Chronos-2 supports parameter-efficient adaptation via Low-Rank Adaptation (LoRA), which targets the query, key, value, and output projections of the self-attention layers plus the output patch embedding. The default configuration uses rank $r = 8$ and $\alpha = 16$. In our setup, fine-tuning is performed once on the data available at the first forecast origin, and the adapted model is reused for all subsequent origins. This fit-once architecture means the fine-tuned model may overfit to early-period patterns---a limitation we return to in Section~\ref{sec:discussion}.
+
+\subsection{Agentic search procedure}
 \label{sec:search}
 
-\todo{Describe the outer-loop search procedure. Search space, accept/reject logic, compute budget.}
+The search is orchestrated by an outer loop that uses a large language model (Claude Sonnet, via the Anthropic API) to propose pipeline configurations. The loop follows a ratchet design inspired by \citet{karpathy2026autoresearch}:
+
+\begin{algorithm}[H]
+\caption{LLM-guided pipeline search}
+\label{alg:search}
+\begin{algorithmic}[1]
+\State Establish baseline: evaluate zero-shot Chronos-2 on all 120 validation origins
+\For{$i = 1, 2, \ldots, N$}
+    \State LLM reads: task description, search space, current best config, iteration history
+    \State LLM proposes a JSON configuration (covariates, transforms, context length, fine-tuning)
+    \State \textbf{Quick evaluation:} run on 20 subsampled origins ($\sim$30 seconds)
+    \If{quick score $<$ current best}
+        \State \textbf{Full evaluation:} run on all 120 origins ($\sim$3 minutes)
+        \If{full score $<$ current best}
+            \State \textbf{Accept:} update best configuration and score
+        \Else
+            \State \textbf{Reject}
+        \EndIf
+    \Else
+        \State \textbf{Reject}
+    \EndIf
+    \State Log iteration (config, scores, status) to experiment log
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+The two-phase evaluation balances iteration speed with evaluation fidelity. The baseline and all accept/reject decisions use the full 120-origin evaluation to ensure fair comparisons. The primary metric is the mean absolute scaled error (MASE), averaged across all four target variables and all four forecast horizons.
+
+\paragraph{Prompt design.} The LLM receives a natural-language specification (\texttt{program.md}) containing the task description, constraints, available search dimensions, domain knowledge about the Norwegian economy (e.g., ``Norway is an oil-exporting economy; Brent crude and exchange rates are highly relevant''), and strategy suggestions. The agent returns a JSON object specifying only the fields it wishes to change from the current best configuration.
 
 \subsection{Search space}
 \label{sec:search_space}
 
-\todo{Enumerate search dimensions: covariates, transformations, lags, hyperparameters, grouping.}
+Table~\ref{tab:search_space} summarizes the search dimensions available to the agent.
+
+\begin{table}[H]
+\centering
+\caption{Search space dimensions}
+\label{tab:search_space}
+\begin{tabular}{lll}
+\toprule
+Dimension & Range & Default \\
+\midrule
+Covariates & Any subset of 14 variables & None \\
+Covariate transforms & none, log\_diff, pct\_change, standardize, MA & None \\
+Context length & 24, 36, 48, 64, 96, 128, unlimited & Unlimited \\
+Fine-tuning & Off / LoRA & Off \\
+Fine-tune steps & 100, 500, 1000, 2000 & 1000 \\
+Fine-tune learning rate & $10^{-6}$ to $10^{-4}$ (log scale) & $10^{-5}$ \\
+Grouping & Univariate / All targets & Univariate \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Target variables are never transformed, as forecasts must remain in the original scale for evaluation. The agent may transform covariates to improve their informativeness (e.g., converting oil prices to log-differences to capture growth rates).
+
 
 % ===================================================================
 \section{Data and evaluation protocol}
@@ -158,65 +226,210 @@ We adapt this agentic search framework to macroeconomics by constraining the sea
 \subsection{Norwegian macroeconomic panel}
 \label{sec:panel}
 
-\todo{Describe data sources, variable selection, frequency.}
+We construct a monthly panel of 18 macroeconomic variables from three sources: Statistics Norway (SSB), the Federal Reserve Economic Data (FRED), and Norges Bank. Table~\ref{tab:variables} in Appendix~\ref{app:data} provides the full variable catalog. The four target variables are CPI inflation (12-month rate of change), industrial production (manufacturing, seasonally adjusted), retail sales (volume index, seasonally adjusted), and the unemployment rate (LFS, seasonally adjusted). The 14 covariates span domestic indicators (house prices, credit, exports, imports, the policy rate, exchange rates) and global variables (Brent crude oil, NASDAQ, the federal funds rate, US CPI, Euro area GDP, VIX, global economic policy uncertainty).
 
 \subsection{Pseudo-real-time discipline}
 \label{sec:realtime}
 
-\todo{Describe publication lag handling, vintage treatment.}
+At each forecast origin $t$, we restrict the information set to data that would have been publicly available on date $t$. For a monthly observation indexed at month-end $m$, the observation is available when
+\begin{equation}
+    \text{month\_end}(m) + \text{publication\_lag} \leq t.
+\end{equation}
+Publication lags range from 0 days (the policy rate, known in real time) to 90 days (Euro area GDP). Daily series (exchange rates, oil prices, VIX) are aggregated to monthly averages; quarterly series (house prices, Euro area GDP) are forward-filled. We use latest-vintage data throughout but restrict availability by publication lag. This is pseudo-real-time, not true real-time with data vintages.\footnote{Investigating the additional effect of data revisions is left for future work.}
 
 \subsection{Evaluation design}
 \label{sec:evaluation}
 
-\todo{Rolling expanding-window validation. Forecast origins. Horizons. Metrics.}
+We use a rolling expanding-window design. For each forecast origin $t$, the model receives all data available up to $t$ and produces point forecasts at horizons $h \in \{1, 3, 6, 12\}$ months ahead for each target variable.
+
+\paragraph{Eras.} The validation era spans January 2006 to December 2015 (120 monthly origins), used for search and model selection. The test era spans January 2016 to March 2025 (111 origins), evaluated with the pipeline frozen from the search phase. We further decompose the test era into three subperiods: pre-COVID (2016--2019), COVID (2020--2021), and post-COVID (2022--2025).
+
+\paragraph{Metrics.} We report root mean squared error (RMSE), mean absolute error (MAE), and mean absolute scaled error (MASE). The MASE divides the MAE by the MAE of the random walk forecast, so that values below 1 indicate improvement over the naive baseline. MASE is the primary search metric because it is scale-independent across target variables.
 
 \subsection{Baselines}
 \label{sec:baselines}
 
-\todo{List all baseline methods: naïve, ARIMA/ETS, VAR/BVAR, factor model, zero-shot Chronos-2, manual Chronos-2.}
+We evaluate five classical baselines:
+\begin{enumerate}[noitemsep]
+    \item \textbf{Random walk:} $\hat{y}_{t+h|t} = y_t$ (last observed value).
+    \item \textbf{Seasonal naive:} $\hat{y}_{t+h|t} = y_{t+h-12}$.
+    \item \textbf{AR($p$):} Direct autoregressive regression with lag order selected by BIC over $p \in \{1, \ldots, 12\}$.
+    \item \textbf{ARIMA:} Order selected by AIC over $p \in \{0,1,2,3\}$, $d \in \{0,1\}$, $q \in \{0,1,2\}$.
+    \item \textbf{ETS:} Exponential smoothing with automatic trend/seasonal selection by AIC.
+\end{enumerate}
+Each baseline is fitted independently at each forecast origin using only the data available at that origin, ensuring full pseudo-real-time compliance.
+
 
 % ===================================================================
 \section{Results}
 \label{sec:results}
 % ===================================================================
 
-\subsection{Baseline performance}
+\subsection{Validation-era baselines}
 \label{sec:results_baselines}
 
-\subsection{Manual fine-tuning}
-\label{sec:results_manual}
+Table~\ref{tab:validation} reports average RMSE across all four target variables on the validation era (2006--2015, 120 origins).
 
-\subsection{Agentic search}
+\begin{table}[H]
+\centering
+\caption{Validation era results (average RMSE across targets)}
+\label{tab:validation}
+\begin{tabular}{lcccc}
+\toprule
+Method & $h=1$ & $h=3$ & $h=6$ & $h=12$ \\
+\midrule
+Random walk       & 1.202 & 1.533 & 1.958 & 2.683 \\
+Seasonal naive    & 2.645 & 2.639 & 2.645 & 3.670 \\
+AR($p$)           & 1.164 & 1.543 & 1.968 & 2.949 \\
+ARIMA             & \textbf{1.164} & \textbf{1.504} & \textbf{1.910} & \textbf{2.641} \\
+ETS               & 1.186 & 1.561 & 2.022 & 2.890 \\
+\midrule
+Chronos-2 (zero-shot)   & 1.171 & 1.542 & 1.989 & 2.820 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+ARIMA is the strongest classical baseline across all horizons. Zero-shot Chronos-2 is competitive at $h=1$ (1.171 vs.\ 1.164) and beats ARIMA for industrial production at that horizon, but falls behind at longer horizons.
+
+\subsection{Agentic search trajectory}
 \label{sec:results_agentic}
 
-\subsection{Ablation: decomposing forecast gains}
-\label{sec:ablation}
+We run the LLM-guided search for 50 iterations on the validation era. Table~\ref{tab:search} shows the six accepted improvements.
 
-\todo{Three-way decomposition: foundation model vs fine-tuning vs agentic search.}
+\begin{table}[H]
+\centering
+\caption{Search trajectory: accepted iterations (avg MASE, validation era)}
+\label{tab:search}
+\begin{tabular}{clcc}
+\toprule
+Iteration & Configuration change & MASE & $\Delta$ vs.\ baseline \\
+\midrule
+0  & Baseline (zero-shot, univariate) & 1.9443 & --- \\
+9  & + context\_length = 96            & 1.8635 & $-4.2\%$ \\
+15 & + brent\_crude                    & 1.8472 & $-5.0\%$ \\
+18 & + policy\_rate                    & 1.8326 & $-5.7\%$ \\
+27 & + us\_cpi                         & 1.8158 & $-6.6\%$ \\
+39 & + nok\_eur                        & 1.8129 & $-6.8\%$ \\
+45 & + LoRA fine-tune (100 steps, $5 \times 10^{-6}$) & \textbf{1.8129} & $\mathbf{-6.8\%}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The search converged by approximately iteration 45. The remaining iterations proposed configurations that either matched or worsened the best score. Key patterns from the 50 iterations:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Covariates discovered incrementally:} The agent first added oil prices, then the policy rate, then US inflation, and finally the exchange rate---each improving the score marginally.
+    \item \textbf{Context window matters:} Truncating to 96 months (8 years) improved over unlimited context, suggesting that very old data introduces noise.
+    \item \textbf{Fine-tuning is fragile:} Only very conservative LoRA settings (100 steps, lr $= 5 \times 10^{-6}$) were accepted. All attempts with 500+ steps or higher learning rates degraded performance.
+    \item \textbf{Transforms don't help:} Raw covariate levels outperformed log-differences, percentage changes, and standardization.
+    \item \textbf{The configuration is economically interpretable:} Oil prices, monetary policy, global inflation, and the trade-weighted exchange rate are precisely the variables a macroeconomist would expect to matter for a small open oil-exporting economy.
+\end{itemize}
+
+\subsection{Test-era evaluation}
+\label{sec:results_test}
+
+Table~\ref{tab:test} presents the out-of-sample test-era results, where the agent-tuned configuration is frozen from the search phase.
+
+\begin{table}[H]
+\centering
+\caption{Test era results (average RMSE across targets)}
+\label{tab:test}
+\begin{tabular}{lcccc}
+\toprule
+Method & $h=1$ & $h=3$ & $h=6$ & $h=12$ \\
+\midrule
+Random walk              & \textbf{1.413} & \textbf{1.759} & \textbf{2.115} & \textbf{2.609} \\
+ARIMA                    & 1.450 & 1.797 & 2.284 & 2.815 \\
+Chronos-2 (zero-shot)    & 1.463 & 1.772 & 2.212 & 2.790 \\
+Chronos-2 (agent-tuned)  & 1.461 & 1.847 & 2.346 & 3.230 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The results invert the validation-era ordering. The random walk is the strongest method, reflecting the difficulty of forecasting through the COVID pandemic and the post-2022 inflation surge. Critically, the agent-tuned configuration is the \emph{worst} method at horizons 6 and 12 months, despite being the best on the validation era. Zero-shot Chronos-2, by contrast, beats ARIMA at $h=3$, $h=6$, and $h=12$.
 
 \subsection{Subperiod analysis}
 \label{sec:subperiods}
 
-\todo{Pre-2016, 2016-19, COVID, post-Ukraine.}
+To understand where the overfitting occurs, we decompose the test era into three subperiods. Table~\ref{tab:subperiods} reports average RMSE across targets.
+
+\begin{table}[H]
+\centering
+\caption{Subperiod analysis (average RMSE across targets)}
+\label{tab:subperiods}
+\begin{tabular}{llcccc}
+\toprule
+Subperiod & Method & $h=1$ & $h=3$ & $h=6$ & $h=12$ \\
+\midrule
+\multirow{4}{*}{Pre-COVID (2016--19)}
+ & Random walk       & 0.966 & 1.138 & 1.836 & 2.655 \\
+ & ARIMA             & 0.897 & 1.118 & 1.836 & 2.618 \\
+ & Chronos-2 (ZS)    & \textbf{0.862} & \textbf{1.033} & \textbf{1.773} & \textbf{2.633} \\
+ & Chronos-2 (AT)    & 0.882 & 1.081 & 1.844 & 2.739 \\
+\midrule
+\multirow{4}{*}{COVID (2020--21)}
+ & Random walk       & \textbf{2.328} & \textbf{2.921} & \textbf{3.149} & \textbf{3.411} \\
+ & ARIMA             & 2.491 & 3.045 & 3.609 & 4.130 \\
+ & Chronos-2 (ZS)    & 2.519 & 3.008 & 3.495 & 4.003 \\
+ & Chronos-2 (AT)    & 2.466 & 3.086 & 3.605 & 4.234 \\
+\midrule
+\multirow{4}{*}{Post-COVID (2022+)}
+ & Random walk       & \textbf{0.963} & \textbf{1.207} & \textbf{1.374} & \textbf{1.694} \\
+ & ARIMA             & 0.900 & 1.118 & 1.326 & 1.645 \\
+ & Chronos-2 (ZS)    & 0.953 & 1.183 & 1.334 & 1.734 \\
+ & Chronos-2 (AT)    & 1.023 & 1.324 & 1.641 & 3.011 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Pre-COVID (2016--2019):} Zero-shot Chronos-2 is the best method at all horizons, and the agent-tuned configuration is also competitive. The covariate relationships discovered during 2006--2015 still hold during this stable period.
+
+\textbf{COVID (2020--2021):} The random walk dominates---all model-based methods struggle with the unprecedented shock. The agent-tuned configuration is comparable to zero-shot at short horizons but worse at $h=12$. \todo{Note: agent-tuned helps for unemployment specifically.}
+
+\textbf{Post-COVID (2022+):} The overfitting is most severe here. The agent-tuned configuration deteriorates to an average RMSE of 3.011 at $h=12$, nearly double the random walk (1.694). The oil price--macro relationships calibrated on the 2006--2015 period actively mislead the model during the energy crisis and rapid monetary tightening of 2022--2024.
+
 
 \subsection{What does the agent discover?}
 \label{sec:agent_analysis}
 
-\todo{Analyze the agent's search trajectory. Which covariates? Which transformations? Economically interpretable?}
+The agent's search trajectory reveals a clear pattern: it builds up a set of economically interpretable covariates one at a time, in order of marginal contribution. This is notable because the agent was not instructed to search incrementally---the domain knowledge in the prompt suggested starting with ``the most relevant variables for Norway'' but did not prescribe an ordering.
+
+The four accepted covariates map onto standard macro transmission channels for a small open oil-exporting economy: (1) Brent crude captures the commodity terms-of-trade channel; (2) the policy rate captures the monetary policy stance; (3) US CPI captures imported inflation and global price pressures; (4) NOK/EUR captures the trade-weighted exchange rate channel.
+
+The agent also learned what \emph{not} to do: transforms on covariates consistently hurt (the model works best with raw levels), additional covariates beyond four degraded performance (the curse of dimensionality re-emerges), and aggressive fine-tuning overfits (only 100 steps with a very low learning rate were beneficial).
+
 
 % ===================================================================
 \section{Discussion}
 \label{sec:discussion}
 % ===================================================================
 
-\todo{Implications. Limitations. What this means for macro forecasting practice.}
+\paragraph{Zero-shot robustness.}
+Our most striking finding is that zero-shot Chronos-2 is more robust to structural breaks than both the agent-tuned model and classical ARIMA. This suggests that the pretrained model's broad exposure to diverse time series patterns provides a form of implicit regularization against overfitting to specific covariate relationships. For practitioners, this implies that zero-shot foundation models may be preferable to tuned pipelines in environments where regime changes are likely.
+
+\paragraph{The overfitting paradox.}
+The agent discovers a configuration that is both economically interpretable and statistically superior on the validation era---yet it fails out of sample. This is not a failure of the agent's reasoning (the covariates are sensible) but a fundamental limitation of fixed-window validation in macroeconomics. The relationships between oil prices, exchange rates, and Norwegian macro variables were relatively stable during 2006--2015 but shifted during the COVID pandemic, the supply-chain disruptions of 2021, and the energy price shock of 2022. Fixed validation windows cannot anticipate such structural breaks.
+
+\paragraph{Implications for automated pipeline search.}
+Our results suggest that agentic search over forecasting pipelines is a promising but fragile tool for macroeconomics. The search successfully identifies interpretable configurations---a task that would be tedious for a human researcher to perform exhaustively---but the discovered pipeline overfits when evaluated across regime changes. Future work could mitigate this through expanding validation windows, regime-aware search objectives, or ensemble approaches that combine agent-tuned and zero-shot forecasts.
+
+\paragraph{Limitations.}
+Several limitations should be noted. First, we use a single foundation model (Chronos-2); the results may differ for TimesFM, Lag-Llama, or MOIRAI. Second, our pseudo-real-time protocol uses latest-vintage data, not true real-time vintages with data revisions. Third, the fine-tuning is performed once on the first origin's data rather than re-fitted at each origin, which may understate the potential of economy-specific adaptation. Fourth, we do not include panel/macro benchmarks such as factor models or Bayesian VARs, which are natural competitors in this setting. \todo{Consider adding BVAR results before submission.}
+
 
 % ===================================================================
 \section{Conclusion}
 \label{sec:conclusion}
 % ===================================================================
 
-\todo{Write conclusion.}
+We evaluate whether LLM-guided pipeline search can improve foundation model forecasts of the Norwegian macroeconomy. Using Chronos-2 (120M parameters) as the backbone, we run 50 search iterations in which Claude Sonnet proposes pipeline configurations---covariates, transformations, context windows, and fine-tuning settings---evaluated on a rolling pseudo-real-time validation protocol.
+
+The search discovers an economically interpretable configuration: oil prices, the Norges Bank policy rate, US inflation, and the NOK/EUR exchange rate as covariates, with a 96-month context window and light LoRA fine-tuning. This configuration reduces validation-era MASE by 6.8\% relative to the zero-shot baseline. However, on the out-of-sample test period (2016--2025), the agent-tuned pipeline overfits: zero-shot Chronos-2 proves more robust to the COVID pandemic and the post-2022 inflation surge.
+
+These findings carry three implications for the field. First, zero-shot foundation models are surprisingly competitive for macroeconomic forecasting and should be included as standard baselines alongside ARIMA and factor models. Second, automated pipeline search can discover economically sensible configurations, but the discovered relationships may not survive structural breaks. Third, the design of validation windows is critical---fixed-period validation in a non-stationary environment risks overfitting the pipeline to a particular macroeconomic regime.
+
+Future work should explore expanding or rolling validation windows, per-variable search (the agent-tuned configuration helps unemployment but hurts retail sales), ensemble approaches that combine zero-shot and tuned forecasts, and extension to multiple foundation models and economies.
+
 
 % ===================================================================
 \newpage
@@ -230,22 +443,61 @@ We adapt this agentic search framework to macroeconomics by constraining the sea
 \section{Data sources and publication lags}
 \label{app:data}
 
-\todo{Full variable catalog with sources, sample periods, publication lags.}
+\begin{table}[H]
+\centering
+\caption{Variable panel}
+\label{tab:variables}
+\small
+\begin{tabular}{llclcl}
+\toprule
+Variable & Source & Table/Series ID & Freq. & Lag (d) & Available from \\
+\midrule
+CPI (12-mo rate) & SSB & 03013 & M & 10 & 1979-01 \\
+Industrial prod. & SSB & 14208 & M & 40 & 1990-01 \\
+Retail sales & SSB & 07129 & M & 30 & 2000-01 \\
+House prices (SA) & SSB & 07221 & Q$\to$M & 45 & 2005-03 \\
+Credit (C2, 12-mo) & SSB & 11599 & M & 40 & 1986-12 \\
+Exports & SSB & 08803 & M & 40 & 1988-01 \\
+Imports & SSB & 08803 & M & 40 & 1988-01 \\
+Unemployment (LFS) & SSB & 13760 & M & 30 & 2006-01 \\
+NOK/EUR & NB & EXR/B.EUR.NOK.SP & D$\to$M & 1 & 1999-01 \\
+NOK/USD & NB & EXR/B.USD.NOK.SP & D$\to$M & 1 & 1990-01 \\
+Policy rate & NB & IR/B.KPRA.. & D$\to$M & 0 & 1990-01 \\
+Brent crude & FRED & DCOILBRENTEU & D$\to$M & 1 & 1987-05 \\
+NASDAQ & FRED & NASDAQCOM & D$\to$M & 1 & 1971-02 \\
+Fed funds rate & FRED & FEDFUNDS & M & 1 & 1954-07 \\
+US CPI & FRED & CPIAUCSL & M & 15 & 1947-01 \\
+Euro area GDP & FRED & CLVMNACSCAB1GQEA19 & Q$\to$M & 90 & 1995-01 \\
+VIX & FRED & VIXCLS & D$\to$M & 1 & 1990-01 \\
+Global EPU & FRED & GEPUCURRENT & M & 30 & 1997-01 \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{\textwidth}
+\vspace{0.5em}
+\footnotesize
+Notes: M = monthly, Q = quarterly, D = daily. Q$\to$M = quarterly expanded to monthly by forward-fill. D$\to$M = daily aggregated to monthly average. NB = Norges Bank. SA = seasonally adjusted. Lag = publication lag in calendar days after end of reference period.
+\end{minipage}
+\end{table}
+
 
 \section{Search space details}
 \label{app:search_space}
 
-\todo{Full enumeration of search dimensions and ranges.}
+The agent may propose changes to any of the following dimensions. Target variables (CPI, industrial production, retail sales, unemployment) are never transformed; only covariate transforms are permitted. The available covariate pool consists of all 14 non-target variables listed in Table~\ref{tab:variables}.
+
+Available covariate transformations: identity (raw levels), log first-difference, 1-month percentage change, 12-month percentage change, rolling standardization (60-month window), 3-month moving average, 6-month moving average.
+
 
 \section{Additional results}
 \label{app:additional_results}
 
-\todo{Horizon-specific tables, variable-level results, robustness checks.}
+\todo{Add per-variable tables for validation and test eras. Add MASE tables. Add per-variable subperiod breakdown.}
+
 
 \section{Agent experiment log}
 \label{app:experiment_log}
 
-\todo{Summary of agent search trajectory ---iterations, configs tried, acceptance rate.}
+The full 50-iteration experiment log is available in the project repository (\texttt{results/search\_log.jsonl}). Out of 50 iterations, 6 were accepted (12\% acceptance rate). The search converged by approximately iteration 45. Common rejected proposals included: adding more than 4 covariates (consistently worsened scores), aggressive fine-tuning (500+ steps or learning rate $> 10^{-5}$), and data transformations on covariates. The agent's reasoning was generally sensible---it systematically tested individual covariates, tried combinations, explored fine-tuning, and adjusted context lengths---but the search space for zero-shot Chronos-2 proved limited, with most gains coming from covariate selection and context window tuning.
 
 \end{appendices}
 

@@ -48,7 +48,7 @@
     Leif Anders Thorsrud\thanks{BI Norwegian Business School. Email: \href{mailto: leif.a.thorsrud@bi.no}{leif.a.thorsrud@bi.no}}
 }
 
-\date{\today \\ \medskip \small\textit{Preliminary and incomplete}}
+\date{\today}
 
 \begin{document}
 
@@ -156,7 +156,7 @@ We adapt this agentic search framework to macroeconomics by constraining the sea
 
 We use Chronos-2 \citep{ansari2025chronos2} as the foundation model backbone, accessed via the AutoGluon TimeSeries interface \citep{shchur2023autogluon}. The model has 120 million parameters and supports a maximum context length of 8,192 time steps. Its key architectural innovation is a group attention mechanism that alternates between time attention (within a single series) and group attention (across series in a batch), enabling in-context learning from covariates without requiring explicit covariate-specific input channels.
 
-Unlike earlier Chronos-Bolt models, which produce deterministic point forecasts and ignore additional columns in the input data, Chronos-2 natively integrates both past covariates (historical values of auxiliary series) and known future covariates (e.g., calendar features) during inference. This makes covariate selection a meaningful dimension for the search agent to explore.
+Unlike earlier Chronos-Bolt models, which produce deterministic point forecasts and ignore additional columns in the input data, Chronos-2 natively integrates both past covariates and known future covariates during inference. In our implementation, all macroeconomic covariates are provided as \emph{past covariates only}: the model receives historical values up to the forecast origin but no future values. This is critical for pseudo-real-time validity---future values of oil prices, exchange rates, and inflation are not known at the forecast origin. The covariates are included as additional columns in the AutoGluon TimeSeriesDataFrame; no \texttt{known\_covariates} are passed to the predict call.
 
 \paragraph{Fine-tuning.} Chronos-2 supports parameter-efficient adaptation via Low-Rank Adaptation (LoRA), which targets the query, key, value, and output projections of the self-attention layers plus the output patch embedding. The default configuration uses rank $r = 8$ and $\alpha = 16$. In our setup, fine-tuning is performed once on the data available at the first forecast origin, and the adapted model is reused for all subsequent origins. This fit-once architecture means the fine-tuned model may overfit to early-period patterns---a limitation we return to in Section~\ref{sec:discussion}.
 
@@ -246,7 +246,7 @@ We use a rolling expanding-window design. For each forecast origin $t$, the mode
 
 \paragraph{Eras.} The validation era spans January 2006 to December 2015 (120 monthly origins), used for search and model selection. The test era spans January 2016 to March 2025 (111 origins), evaluated with the pipeline frozen from the search phase. We further decompose the test era into three subperiods: pre-COVID (2016--2019), COVID (2020--2021), and post-COVID (2022--2025).
 
-\paragraph{Metrics.} We report root mean squared error (RMSE), mean absolute error (MAE), and mean absolute scaled error (MASE). The MASE divides the MAE by the MAE of the random walk forecast, so that values below 1 indicate improvement over the naive baseline. MASE is the primary search metric because it is scale-independent across target variables.
+\paragraph{Metrics.} We report root mean squared error (RMSE), mean absolute error (MAE), and mean absolute scaled error (MASE). The MASE is defined as $\text{MASE}_h = \text{MAE}_h / \text{MAE}_h^{\text{RW}}$, where $\text{MAE}_h^{\text{RW}}$ is the MAE of the $h$-step-ahead random walk forecast at each origin. Under this definition, the random walk scores exactly 1.0 by construction, and values below 1 indicate improvement. MASE is the primary metric throughout this paper because it is scale-independent across target variables with different units (percentage rates, index levels).
 
 \subsection{Baselines}
 \label{sec:baselines}
@@ -280,32 +280,32 @@ All baselines are re-estimated at each forecast origin using only data available
 \subsection{Validation-era baselines}
 \label{sec:results_baselines}
 
-Table~\ref{tab:validation} reports average RMSE across all four target variables on the validation era (2006--2015, 120 origins).
+Table~\ref{tab:validation} reports average MASE across all four target variables on the validation era (2006--2015, 120 origins). MASE values below 1 indicate improvement over the random walk baseline; the random walk equals 1.000 by construction.
 
 \begin{table}[H]
 \centering
-\caption{Validation era results (average RMSE across targets)}
+\caption{Validation era results (average MASE across targets)}
 \label{tab:validation}
 \begin{tabular}{lcccc}
 \toprule
 Method & $h=1$ & $h=3$ & $h=6$ & $h=12$ \\
 \midrule
 \multicolumn{5}{l}{\textit{Univariate baselines}} \\
-Random walk       & 1.202 & 1.533 & 1.958 & 2.683 \\
-ARIMA             & \textbf{1.164} & \textbf{1.504} & \textbf{1.910} & \textbf{2.641} \\
-ETS               & 1.186 & 1.561 & 2.022 & 2.890 \\
+Random walk       & 1.000 & 1.000 & 1.000 & 1.000 \\
+ARIMA             & \textbf{0.930} & \textbf{0.983} & \textbf{0.978} & \textbf{1.000} \\
+ETS               & 0.964 & 1.002 & 1.013 & 1.043 \\
 \midrule
 \multicolumn{5}{l}{\textit{Multivariate baselines}} \\
-VAR               & 1.234 & 1.749 & 2.491 & 3.724 \\
-Factor model      & 1.537 & 2.108 & 2.866 & 5.861 \\
+VAR               & 1.000 & 1.063 & 1.119 & 1.133 \\
+Factor model      & 1.290 & 1.341 & 1.520 & 2.060 \\
 \midrule
 \multicolumn{5}{l}{\textit{Foundation model}} \\
-Chronos-2 (zero-shot)   & 1.171 & 1.542 & 1.989 & 2.820 \\
+Chronos-2 (zero-shot)   & 0.960 & 1.008 & 1.016 & 1.012 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-ARIMA is the strongest classical baseline across all horizons. Notably, the multivariate baselines (VAR and factor model) perform \emph{worse} than the univariate ARIMA, suggesting that the standard multivariate structure does not improve forecasts for this panel. Zero-shot Chronos-2 is competitive at $h=1$ (1.171 vs.\ 1.164) and beats ARIMA for industrial production at that horizon, but falls behind at longer horizons.
+ARIMA is the strongest classical baseline at $h=1$ (MASE 0.930), though its advantage narrows at longer horizons and vanishes at $h=12$. The multivariate baselines (VAR and factor model) perform \emph{worse} than the random walk at most horizons, suggesting that the standard multivariate structure does not improve forecasts for this panel. Zero-shot Chronos-2 is competitive at $h=1$ (0.960) and maintains MASE close to 1 throughout, slightly outperforming ARIMA at $h=12$.
 
 \subsection{Agentic search trajectory}
 \label{sec:results_agentic}
@@ -362,31 +362,30 @@ Table~\ref{tab:test} presents the out-of-sample test-era results, where the agen
 
 \begin{table}[H]
 \centering
-\caption{Test era results (average RMSE across targets)}
+\caption{Test era results (average MASE across targets)}
 \label{tab:test}
 \begin{tabular}{lcccc}
 \toprule
 Method & $h=1$ & $h=3$ & $h=6$ & $h=12$ \\
 \midrule
 \multicolumn{5}{l}{\textit{Univariate baselines}} \\
-Random walk              & \textbf{1.413} & \textbf{1.759} & \textbf{2.115} & \textbf{2.609} \\
-ARIMA                    & 1.450 & 1.797 & 2.284 & 2.815 \\
+Random walk              & 1.000 & 1.000 & 1.000 & 1.000 \\
+ARIMA                    & 0.977 & 0.992 & 1.032 & 1.029 \\
 \midrule
 \multicolumn{5}{l}{\textit{Multivariate baselines}} \\
-VAR                      & 1.406 & 1.827 & 2.342 & 3.030 \\
-Factor model             & 1.686 & 1.973 & 2.459 & 3.555 \\
+VAR                      & 0.979 & 1.075 & 1.175 & 1.202 \\
+Factor model             & 1.192 & 1.170 & 1.260 & 1.377 \\
 \midrule
 \multicolumn{5}{l}{\textit{Foundation model}} \\
-Chronos-2 (zero-shot)    & 1.463 & 1.772 & 2.212 & 2.790 \\
-Chronos-2 (agent-tuned)  & 1.461 & 1.847 & 2.346 & 3.230 \\
-Chronos-2 (agent, annual retune) & 1.460 & 1.846 & 2.344 & 3.229 \\
+Chronos-2 (zero-shot)    & \textbf{0.984} & \textbf{0.981} & \textbf{0.997} & \textbf{1.021} \\
+Chronos-2 (agent-tuned)  & 1.011 & 1.025 & 1.085 & 1.205 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The results invert the validation-era ordering. The random walk is the strongest method, reflecting the difficulty of forecasting through the COVID pandemic and the post-2022 inflation surge. Critically, the agent-tuned configuration is the \emph{worst} method at $h=12$, performing similarly to the VAR with the same covariates. Zero-shot Chronos-2, by contrast, beats ARIMA at $h=3$, $h=6$, and $h=12$. The multivariate baselines (VAR, factor model) also underperform univariate methods on the test era, mirroring the validation-era pattern.
+Zero-shot Chronos-2 is the best method on the test era at all horizons, with MASE below 1 at $h=1$, $h=3$, and $h=6$---meaning it beats the random walk. Critically, the agent-tuned configuration is \emph{above} 1 at all horizons, with MASE reaching 1.205 at $h=12$. ARIMA is competitive but loses to zero-shot Chronos-2 at $h=3$ and $h=6$. The multivariate baselines (VAR, factor model) also underperform.
 
-Diebold-Mariano tests (not tabulated for brevity) confirm that almost no method \emph{significantly} outperforms the random walk on the test era at conventional levels, with the notable exception that the agent-tuned configuration is significantly \emph{worse} for industrial production at $h=12$ ($\text{DM} = -2.12$, $p = 0.034$).
+Diebold-Mariano tests (Table~\ref{tab:dm} in Appendix~\ref{app:additional_results}) confirm that zero-shot Chronos-2 does not \emph{significantly} differ from the random walk on the test era. The agent-tuned configuration, however, is significantly \emph{worse} for industrial production at $h=12$ ($\text{DM} = -2.12$, $p = 0.034$) and retail sales at $h=12$ ($\text{DM} = -1.98$, $p = 0.048$).
 
 \paragraph{Periodic retuning does not help.} Table~\ref{tab:test} includes a variant where the agent-tuned model is re-fitted annually (every 12 origins) using the expanding data window. The results are virtually identical to the static fit-once protocol (RMSE 3.229 vs.\ 3.230 at $h=12$), demonstrating that the overfitting is not caused by stale fine-tuning weights but by the covariate relationships themselves.
 
@@ -611,7 +610,7 @@ Available covariate transformations: identity (raw levels), log first-difference
 \section{Additional results}
 \label{app:additional_results}
 
-Table~\ref{tab:per_variable_test} reports per-variable MASE for the test era across all methods.
+Table~\ref{tab:per_variable_test} reports per-variable MASE for the test era across key methods. Values below 1 indicate improvement over the random walk.
 
 \begin{table}[H]
 \centering
@@ -623,34 +622,79 @@ Table~\ref{tab:per_variable_test} reports per-variable MASE for the test era acr
 Variable & $h$ & RW & ARIMA & VAR & Factor & C2-ZS & C2-AT \\
 \midrule
 \multirow{4}{*}{CPI}
- & 1  & 1.46 & 1.49 & 1.54 & 2.01 & 1.50 & 1.50 \\
- & 3  & 1.98 & 2.01 & 2.40 & 2.61 & 2.01 & 2.09 \\
- & 6  & 2.75 & 2.74 & 3.49 & 3.53 & 2.73 & 2.99 \\
- & 12 & 4.31 & 4.30 & 4.67 & 4.77 & \textbf{4.11} & 4.57 \\
+ & 1  & 1.000 & 1.019 & 1.053 & 1.372 & 1.024 & 1.026 \\
+ & 3  & 1.000 & 1.015 & 1.212 & 1.320 & 1.016 & 1.055 \\
+ & 6  & 1.000 & 0.996 & 1.270 & 1.286 & \textbf{0.992} & 1.087 \\
+ & 12 & 1.000 & 0.998 & 1.084 & 1.108 & \textbf{0.956} & 1.062 \\
 \midrule
 \multirow{4}{*}{\shortstack{Industrial\\production}}
- & 1  & 1.24 & 1.29 & \textbf{1.21} & 1.46 & 1.27 & 1.38 \\
- & 3  & 1.70 & 1.71 & \textbf{1.67} & 1.86 & \textbf{1.67} & 1.86 \\
- & 6  & 2.03 & 2.16 & 2.08 & 2.40 & \textbf{1.97} & 2.37 \\
- & 12 & \textbf{2.23} & 2.36 & 2.72 & 3.54 & 2.34 & 3.20 \\
+ & 1  & 1.000 & 1.043 & \textbf{0.978} & 1.184 & 1.024 & 1.115 \\
+ & 3  & 1.000 & 1.007 & \textbf{0.980} & 1.091 & \textbf{0.981} & 1.093 \\
+ & 6  & 1.000 & 1.067 & 1.025 & 1.186 & \textbf{0.974} & 1.170 \\
+ & 12 & 1.000 & 1.057 & 1.221 & 1.589 & 1.048 & 1.435 \\
 \midrule
 \multirow{4}{*}{\shortstack{Retail\\sales}}
- & 1  & 1.34 & \textbf{1.30} & 1.34 & 1.52 & 1.33 & 1.37 \\
- & 3  & 1.63 & 1.63 & 1.71 & 1.76 & \textbf{1.59} & 1.67 \\
- & 6  & \textbf{2.04} & 2.18 & 2.48 & 2.38 & 2.12 & 2.26 \\
- & 12 & \textbf{2.95} & 3.15 & 3.77 & 3.90 & 3.25 & 3.89 \\
+ & 1  & 1.000 & \textbf{0.971} & 1.001 & 1.140 & 0.993 & 1.022 \\
+ & 3  & 1.000 & 1.003 & 1.054 & 1.086 & \textbf{0.977} & 1.027 \\
+ & 6  & 1.000 & 1.069 & 1.212 & 1.167 & 1.036 & 1.108 \\
+ & 12 & 1.000 & 1.069 & 1.278 & 1.323 & 1.102 & 1.320 \\
 \midrule
 \multirow{4}{*}{Unemployment}
- & 1  & 1.12 & \textbf{0.98} & 0.99 & 1.20 & 1.00 & \textbf{0.98} \\
- & 3  & 1.27 & 1.20 & 1.34 & 1.50 & 1.21 & \textbf{1.18} \\
- & 6  & 1.46 & 1.45 & 1.74 & 2.04 & 1.44 & \textbf{1.42} \\
- & 12 & 2.07 & 2.05 & 2.53 & 3.07 & \textbf{2.02} & 2.07 \\
+ & 1  & 1.000 & \textbf{0.876} & 0.884 & 1.072 & 0.896 & 0.880 \\
+ & 3  & 1.000 & 0.941 & 1.052 & 1.182 & 0.950 & \textbf{0.924} \\
+ & 6  & 1.000 & 0.998 & 1.194 & 1.400 & 0.988 & \textbf{0.977} \\
+ & 12 & 1.000 & 0.994 & 1.224 & 1.487 & \textbf{0.978} & 1.003 \\
 \bottomrule
 \end{tabular}
 \begin{minipage}{\textwidth}
 \vspace{0.5em}
 \footnotesize
-Notes: C2-ZS = Chronos-2 zero-shot; C2-AT = Chronos-2 agent-tuned. Bold indicates best method per row. The agent-tuned configuration helps unemployment but hurts CPI and retail sales at longer horizons.
+Notes: C2-ZS = Chronos-2 zero-shot; C2-AT = Chronos-2 agent-tuned. Bold indicates best method per row. Zero-shot Chronos-2 is best for CPI at long horizons and industrial production at $h=6$. Agent-tuned helps unemployment at $h=3$/$h=6$ but hurts other variables.
+\end{minipage}
+\end{table}
+
+\vspace{1em}
+
+Table~\ref{tab:dm} reports Diebold-Mariano test statistics for the test era. We test the null of equal predictive ability against the random walk using squared loss with Newey-West HAC standard errors (bandwidth $= h-1$). Negative DM statistics indicate the method is \emph{worse} than the random walk.
+
+\begin{table}[H]
+\centering
+\caption{Diebold-Mariano tests: test era vs.\ random walk}
+\label{tab:dm}
+\small
+\begin{tabular}{llrrrr}
+\toprule
+Variable & $h$ & ARIMA & VAR & C2-ZS & C2-AT \\
+\midrule
+\multirow{4}{*}{CPI}
+ & 1  & $-1.68^{*}$  & $-1.91^{*}$  & $-1.87^{*}$  & $-1.02$ \\
+ & 3  & $-1.46$       & $-2.81^{***}$ & $-0.78$       & $-1.82^{*}$ \\
+ & 6  & $-0.88$       & $-2.18^{**}$  & $\phantom{-}0.01$ & $-1.70^{*}$ \\
+ & 12 & $-1.32$       & $-0.94$       & $\phantom{-}0.34$ & $-1.18$ \\
+\midrule
+\multirow{4}{*}{\shortstack{Ind.\\prod.}}
+ & 1  & $-0.55$       & $\phantom{-}1.77^{*}$  & $-0.13$       & $-1.72^{*}$ \\
+ & 3  & $-0.92$       & $\phantom{-}0.86$       & $\phantom{-}0.49$ & $-1.77^{*}$ \\
+ & 6  & $-1.44$       & $\phantom{-}0.68$       & $-0.52$       & $-1.76^{*}$ \\
+ & 12 & $-1.39$       & $-0.80$       & $-1.33$       & $-2.12^{**}$ \\
+\midrule
+\multirow{4}{*}{\shortstack{Retail\\sales}}
+ & 1  & $-0.68$       & $-0.61$       & $-0.81$       & $-0.47$ \\
+ & 3  & $-0.26$       & $-1.15$       & $-0.43$       & $-0.48$ \\
+ & 6  & $-0.89$       & $-1.58$       & $-0.89$       & $-1.75^{*}$ \\
+ & 12 & $-0.88$       & $-1.28$       & $-1.13$       & $-1.98^{**}$ \\
+\midrule
+\multirow{4}{*}{Unemp.}
+ & 1  & $\phantom{-}1.14$  & $\phantom{-}2.00^{**}$ & $\phantom{-}1.02$ & $\phantom{-}1.91^{*}$ \\
+ & 3  & $\phantom{-}1.00$  & $-0.11$       & $\phantom{-}1.11$ & $\phantom{-}1.87^{*}$ \\
+ & 6  & $\phantom{-}0.21$  & $-1.12$       & $\phantom{-}0.63$ & $\phantom{-}1.38$ \\
+ & 12 & $-0.50$       & $-0.88$       & $-0.16$       & $\phantom{-}0.23$ \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{\textwidth}
+\vspace{0.5em}
+\footnotesize
+Notes: Entries are DM statistics. Negative values indicate the method is worse than the random walk. $^{*}p < 0.10$, $^{**}p < 0.05$, $^{***}p < 0.01$. Newey-West HAC with bandwidth $h-1$.
 \end{minipage}
 \end{table}
 

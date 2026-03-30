@@ -350,6 +350,7 @@ def run(
     era: str = "validation",
     horizons: list[int] | None = None,
     max_origins: int | None = None,
+    retune_interval: int | None = None,
 ) -> ForecastResult:
     """Run the full forecasting pipeline.
 
@@ -358,6 +359,8 @@ def run(
         era: 'validation' or 'test'.
         horizons: Forecast horizons (default: HORIZONS).
         max_origins: If set, subsample to this many origins.
+        retune_interval: If set, re-fit the predictor every N origins.
+            None = fit once (default). 12 = re-tune annually.
 
     Returns:
         ForecastResult ready for evaluation.
@@ -383,12 +386,13 @@ def run(
 
     start = time.time()
 
+    retune_desc = f", retune every {retune_interval}" if retune_interval else ""
     logger.info(
-        "Running Chronos-2 (%s): %d targets, %d origins, covariates=%s, fine_tune=%s",
-        MODEL_PATH, len(targets), len(origins), available_covs, FINE_TUNE,
+        "Running Chronos-2 (%s): %d targets, %d origins, covariates=%s, fine_tune=%s%s",
+        MODEL_PATH, len(targets), len(origins), available_covs, FINE_TUNE, retune_desc,
     )
 
-    # Fit predictor once using first origin's data (loads model weights)
+    # Fit predictor on first origin's data
     logger.info("Fitting predictor (loading model, fine_tune=%s)...", FINE_TUNE)
     predictor = fit_predictor(
         origins[0].available_data, targets, available_covs,
@@ -403,6 +407,18 @@ def run(
     point_forecasts: dict[str, pd.DataFrame] = {}
 
     for i, origin in enumerate(origins):
+        # Periodic re-tuning: re-fit the predictor every N origins
+        if retune_interval and i > 0 and i % retune_interval == 0:
+            logger.info("  Re-tuning predictor at origin %d/%d...", i + 1, len(origins))
+            predictor = fit_predictor(
+                origin.available_data, targets, available_covs,
+                prediction_length=PREDICTION_LENGTH,
+                model_path=MODEL_PATH,
+                fine_tune=FINE_TUNE,
+                fine_tune_steps=FINE_TUNE_STEPS,
+                learning_rate=FINE_TUNE_LR,
+            )
+
         if (i + 1) % 10 == 0 or i == 0:
             elapsed = time.time() - start
             logger.info("  Origin %d/%d (%.1fs elapsed)", i + 1, len(origins), elapsed)
@@ -491,6 +507,10 @@ def main() -> None:
         "--config-file", type=str, default=None,
         help="JSON file with config overrides (used by search.py)",
     )
+    parser.add_argument(
+        "--retune-interval", type=int, default=None,
+        help="Re-fit predictor every N origins (None = fit once)",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -503,7 +523,7 @@ def main() -> None:
         apply_config_overrides(args.config_file)
 
     panel = load_panel()
-    fr = run(panel, era=args.era, max_origins=args.origins)
+    fr = run(panel, era=args.era, max_origins=args.origins, retune_interval=args.retune_interval)
     eval_result = evaluate(fr, panel)
     print(format_results_table(eval_result))
 

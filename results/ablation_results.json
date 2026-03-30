@@ -1,0 +1,90 @@
+{
+  "validation": [
+    {
+      "name": "zs_baseline",
+      "label": "Zero-shot baseline",
+      "mase": 1.944265730488616,
+      "runtime": 320.4405355453491
+    },
+    {
+      "name": "ctx96",
+      "label": "+ context_length=96",
+      "mase": 1.8634869377271874,
+      "runtime": 333.6386592388153
+    },
+    {
+      "name": "ctx96_brent",
+      "label": "+ brent_crude",
+      "mase": 1.8472009324317367,
+      "runtime": 206.11673307418823
+    },
+    {
+      "name": "ctx96_brent_policy",
+      "label": "+ policy_rate",
+      "mase": 1.8325995546344507,
+      "runtime": 249.26341938972473
+    },
+    {
+      "name": "ctx96_3covs",
+      "label": "+ us_cpi",
+      "mase": 1.815797719979173,
+      "runtime": 302.75003123283386
+    },
+    {
+      "name": "ctx96_4covs",
+      "label": "+ nok_eur",
+      "mase": 1.8129245616754215,
+      "runtime": 267.0250291824341
+    },
+    {
+      "name": "ctx96_4covs_ft",
+      "label": "+ LoRA fine-tune",
+      "mase": 1.812919016226891,
+      "runtime": 306.87546467781067
+    }
+  ],
+  "test": [
+    {
+      "name": "zs_baseline",
+      "label": "Zero-shot baseline",
+      "mase": 1.9711623336456057,
+      "runtime": 266.29829931259155
+    },
+    {
+      "name": "ctx96",
+      "label": "+ context_length=96",
+      "mase": 1.980622907332135,
+      "runtime": 302.6542088985443
+    },
+    {
+      "name": "ctx96_brent",
+      "label": "+ brent_crude",
+      "mase": 1.984905135777733,
+      "runtime": 311.29341650009155
+    },
+    {
+      "name": "ctx96_brent_policy",
+      "label": "+ policy_rate",
+      "mase": 2.0902692464083117,
+      "runtime": 276.06036829948425
+    },
+    {
+      "name": "ctx96_3covs",
+      "label": "+ us_cpi",
+      "mase": 2.133010257059135,
+      "runtime": 249.79692554473877
+    },
+    {
+      "name": "ctx96_4covs",
+      "label": "+ nok_eur",
+      "mase": 2.1726894448537704,
+      "runtime": 248.11298632621765
+    },
+    {
+      "name": "ctx96_4covs_ft",
+      "label": "+ LoRA fine-tune",
+      "mase": 2.17465389389735,
+      "runtime": 276.3585331439972
+    }
+  ]
+}

@@ -1028,6 +1028,7 @@ def evaluate_forecasts(
                 continue
             actual_list: list[float] = []
             pred_list: list[float] = []
+            naive_error_list: list[float] = []
 
             for origin in origins:
                 od = origin.origin_date
@@ -1040,15 +1041,20 @@ def evaluate_forecasts(
                         actual_list.append(float(a))
                         pred_list.append(float(p))
 
+                        # Random walk h-step naive error: y_{t+h} - y_t
+                        # where y_t is the last observed value at origin
+                        if var in origin.available_data.columns:
+                            last_obs = origin.available_data[var].dropna()
+                            if not last_obs.empty:
+                                rw_forecast = float(last_obs.iloc[-1])
+                                naive_error_list.append(float(a) - rw_forecast)
+
             if not actual_list:
                 continue
 
             a_arr = np.array(actual_list)
             p_arr = np.array(pred_list)
-
-            # Naive forecast error (random walk: predict last known value)
-            # For h-step ahead: naive error = y_{t+h} - y_t
-            naive_errors = np.diff(a_arr) if len(a_arr) > 1 else np.array([1.0])
+            naive_errors = np.array(naive_error_list) if naive_error_list else np.array([1.0])
 
             results[var][h] = {
                 "rmse": rmse(a_arr, p_arr),

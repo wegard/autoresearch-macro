@@ -484,32 +484,38 @@ To assess whether the LLM agent adds value over naive search, we run a 50-iterat
 
 \begin{table}[H]
 \centering
-\caption{LLM-guided vs.\ random search (50 iterations each)}
+\caption{Search strategy comparison (50 iterations each)}
 \label{tab:search_comparison}
-\begin{tabular}{lcc}
+\begin{tabular}{lccc}
 \toprule
- & LLM-guided & Random \\
+ & LLM (informed) & LLM (blind) & Random \\
 \midrule
-Best validation MASE & 1.813 & 1.799 \\
-Accepted iterations  & 6 (12\%) & 1 (2\%) \\
-Iterations to best   & 45 & 1 \\
-Best config interpretable? & Yes & No \\
+Best validation MASE & 0.943 & 0.968 & --- \\
+Accepted iterations  & 6 (12\%) & 6 (12\%) & 1 (2\%) \\
+Covariates found     & oil, rate, CPI, FX & rate, FFR, CPI & 5 mixed \\
+Context truncation?  & Yes (96 mo.) & No & --- \\
+Fine-tuning?         & Yes (light) & Yes (light) & --- \\
 \bottomrule
 \end{tabular}
+\begin{minipage}{\textwidth}
+\vspace{0.5em}
+\footnotesize
+Notes: ``Informed'' = prompt includes Norwegian-specific domain knowledge. ``Blind'' = generic prompt with no country-specific hints. FFR = federal funds rate, FX = NOK/EUR exchange rate. Random search best MASE not directly comparable due to different corrected-MASE baseline.
+\end{minipage}
 \end{table}
 
-Random search achieved a marginally better validation MASE (1.799 vs.\ 1.813) through a single lucky draw at iteration 1, but failed to improve further over the remaining 49 iterations. Its best configuration---five covariates including house prices, Euro area GDP, and global EPU with mixed transformations---is economically less coherent than the LLM's incremental discovery of oil prices, monetary policy, global inflation, and exchange rates.
+To assess whether the domain hints drive the covariate discovery, we run a \emph{domain-blind} variant where the prompt contains no Norwegian-specific knowledge---no mention of oil exports, exchange rates, or commodity dependence. The blind agent independently discovers the policy rate and US CPI as covariates---the same monetary policy and global inflation channels found by the informed search. However, it selects the federal funds rate instead of Brent crude oil and omits the exchange rate entirely, suggesting a rates-based rather than commodity-based macro framework. Notably, the blind agent does \emph{not} truncate the context window, avoiding the context-driven overfitting that accounts for $+3.4\%$ of the informed search's validation-to-test gap (Table~\ref{tab:ablation}).
 
-The LLM search is more efficient (12\% vs.\ 2\% acceptance rate) and produces interpretable configurations through systematic, incremental refinement. However, the marginal validation improvement does not translate to better test-era performance in either case, reinforcing the overfitting finding.
+Random search achieved a single accepted configuration through a lucky draw, with five covariates (house prices, Euro area GDP, global EPU, imports, policy rate) and mixed transformations---economically incoherent compared to either LLM variant.
 
 \subsection{What does the agent discover?}
 \label{sec:agent_analysis}
 
-The agent's search trajectory reveals a clear pattern: it builds up a set of economically interpretable covariates one at a time, in order of marginal contribution. This is notable because the agent was not instructed to search incrementally---the domain knowledge in the prompt suggested starting with ``the most relevant variables for Norway'' but did not prescribe an ordering.
+The informed agent's search trajectory reveals a clear pattern: it builds up a set of economically interpretable covariates one at a time, in order of marginal contribution. The four accepted covariates map onto standard macro transmission channels for a small open oil-exporting economy: (1) Brent crude captures the commodity terms-of-trade channel; (2) the policy rate captures the monetary policy stance; (3) US CPI captures imported inflation and global price pressures; (4) NOK/EUR captures the bilateral exchange rate channel.
 
-The four accepted covariates map onto standard macro transmission channels for a small open oil-exporting economy: (1) Brent crude captures the commodity terms-of-trade channel; (2) the policy rate captures the monetary policy stance; (3) US CPI captures imported inflation and global price pressures; (4) NOK/EUR captures the trade-weighted exchange rate channel.
+The domain-blind agent converges on a partially overlapping but distinct set: the policy rate and US CPI are re-discovered independently, confirming these as robust macro channels that do not require domain-specific prompting. However, the blind agent substitutes the federal funds rate for Brent crude---preferring a rates-based framework over a commodity framework---and does not truncate the context window. This divergence is economically meaningful: the blind agent's configuration may be less prone to the oil-price overfitting that dominates the informed search's test-era failure.
 
-The agent also learned what \emph{not} to do: transforms on covariates consistently hurt (the model works best with raw levels), additional covariates beyond four degraded performance (the curse of dimensionality re-emerges), and aggressive fine-tuning overfits (only 100 steps with a very low learning rate were beneficial).
+Both agents learned what \emph{not} to do: transforms on covariates consistently hurt (the model works best with raw levels), additional covariates beyond three or four degraded performance (the curse of dimensionality re-emerges), and aggressive fine-tuning overfits (only conservative LoRA with very low learning rates were accepted).
 
 
 % ===================================================================
@@ -518,22 +524,22 @@ The agent also learned what \emph{not} to do: transforms on covariates consisten
 % ===================================================================
 
 \paragraph{Zero-shot robustness.}
-Our most striking finding is that zero-shot Chronos-2 is more robust to structural breaks than both the agent-tuned model and classical ARIMA. The ablation analysis (Table~\ref{tab:ablation}) quantifies this precisely: the zero-shot baseline degrades by only 1.4\% from validation to test, while each added covariate widens the gap monotonically to 20\%. This suggests that the pretrained model's broad exposure to diverse time series patterns provides a form of implicit regularization against overfitting to specific covariate relationships. For practitioners, this implies that zero-shot foundation models may be preferable to tuned pipelines in environments where regime changes are likely.
+Our most striking finding is that zero-shot Chronos-2 is more robust to structural breaks than both the agent-tuned model and classical ARIMA. The ablation analysis (Table~\ref{tab:ablation}) quantifies this precisely: the zero-shot baseline has a validation-to-test gap of only $-0.3\%$ (MASE 0.999 vs.\ 0.996), while each added covariate widens the gap monotonically to $+14.6\%$. This suggests that the pretrained model's broad exposure to diverse time series patterns provides a form of implicit regularization against overfitting to specific covariate relationships. For practitioners, this implies that zero-shot foundation models may be preferable to tuned pipelines in environments where regime changes are likely.
 
 \paragraph{The overfitting paradox.}
-The agent discovers a configuration that is both economically interpretable and statistically superior on the validation era---yet it fails out of sample. This is not a failure of the agent's reasoning (the covariates are sensible) but a fundamental limitation of fixed-window validation in macroeconomics. The ablation identifies the policy rate as the single largest source of overfitting ($+14.1\%$ gap), consistent with the dramatic regime shift from near-zero rates (2016--2021) to rapid monetary tightening (2022--2024). Periodic retuning of the fine-tuned model does not help (Table~\ref{tab:test}), confirming that the problem lies in the covariate relationships themselves, not in stale model weights.
+The agent discovers a configuration that is both economically interpretable and statistically superior on the validation era---yet it fails out of sample. This is not a failure of the agent's reasoning (the covariates are sensible) but a fundamental limitation of fixed-window validation in macroeconomics. The ablation identifies the policy rate as the single largest source of overfitting ($+9.9\%$ gap), consistent with the dramatic regime shift from near-zero rates (2016--2021) to rapid monetary tightening (2022--2024). Periodic retuning of the fine-tuned model does not help (Table~\ref{tab:test}), confirming that the problem lies in the covariate relationships themselves, not in stale model weights.
 
 \paragraph{Multivariate baselines underperform.}
 The VAR and factor model baselines, which access the same covariate information as the agent-tuned Chronos-2, also underperform univariate ARIMA on both eras. This suggests that the multivariate structure per se does not improve Norwegian macro forecasts in this period---a finding consistent with the well-documented difficulty of beating univariate benchmarks in macro forecasting \citep{stock2002macroeconomic}.
 
-\paragraph{LLM search vs.\ random search.}
-The LLM-guided search is more efficient than random sampling (6 vs.\ 1 accepted configurations in 50 iterations) and produces more economically interpretable pipelines through incremental, reasoned exploration. However, random search achieved a marginally better validation score through a single lucky draw. Since neither approach generalizes to the test era, the practical advantage of LLM-guided search lies in interpretability rather than raw performance.
+\paragraph{LLM search vs.\ random search vs.\ domain-blind search.}
+The LLM-guided search is more efficient than random sampling (6 vs.\ 1 accepted configurations in 50 iterations) and produces more economically interpretable pipelines through incremental, reasoned exploration. The domain-blind experiment (Table~\ref{tab:search_comparison}) demonstrates that the LLM discovers economically meaningful covariates (monetary policy, global inflation) even without country-specific domain knowledge. However, the domain hints bias the informed agent toward oil-specific channels and context truncation---precisely the features that drive the most overfitting. This suggests a practical trade-off: domain knowledge improves validation performance but may increase fragility to regime changes.
 
 \paragraph{Implications for automated pipeline search.}
 Our results suggest that agentic search over forecasting pipelines is a promising but fragile tool for macroeconomics. The search successfully identifies interpretable configurations---a task that would be tedious for a human researcher to perform exhaustively---but the discovered pipeline overfits when evaluated across regime changes. Future work could mitigate this through expanding or rolling validation windows, regime-aware search objectives, ensemble approaches that combine agent-tuned and zero-shot forecasts, or per-variable search strategies (the agent-tuned configuration consistently helps unemployment but hurts retail sales).
 
 \paragraph{Limitations.}
-Several limitations should be noted. First, we use a single foundation model (Chronos-2); the results may differ for TimesFM, Lag-Llama, or MOIRAI. Second, our pseudo-real-time protocol uses latest-vintage data, not true real-time vintages with data revisions. Third, the search agent receives domain knowledge about the Norwegian economy in its prompt, partially guiding the covariate discovery; a domain-blind experiment would better test pure autonomous search. Fourth, we evaluate only point forecasts, though Chronos-2 is a probabilistic model; density forecast evaluation using CRPS could reveal different patterns. Fifth, the evidence comes from a single country with four target variables; generalization to other economies remains to be tested.
+Several limitations should be noted. First, we use a single foundation model (Chronos-2); the results may differ for TimesFM, Lag-Llama, or MOIRAI. Second, our pseudo-real-time protocol uses latest-vintage data, not true real-time vintages with data revisions. Third, while our domain-blind experiment shows the LLM discovers meaningful covariates without Norwegian-specific hints, the informed and blind agents converge on partially different configurations; the sensitivity of discovered pipelines to prompt design deserves further study. Fourth, we evaluate only point forecasts, though Chronos-2 is a probabilistic model; density forecast evaluation using CRPS could reveal different patterns. Fifth, the evidence comes from a single country with four target variables; generalization to other economies remains to be tested.
 
 
 % ===================================================================

@@ -1,0 +1,822 @@
+{
+  "iteration": 33,
+  "best_score": 0.9675865468449641,
+  "best_config": {
+    "covariates": [
+      "policy_rate",
+      "fed_funds",
+      "us_cpi"
+    ],
+    "transforms": {},
+    "context_length": null,
+    "fine_tune": true,
+    "fine_tune_steps": 500,
+    "fine_tune_lr": 5e-06,
+    "grouping": "univariate",
+    "num_samples": 20
+  },
+  "baseline_score": 0.9991352554799859,
+  "history": [
+    {
+      "iteration": 0,
+      "config": {
+        "covariates": [],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9628478861789407,
+      "full_score": 0.9991352554799859,
+      "status": "accepted",
+      "description": "baseline (zero-shot, univariate)",
+      "runtime_seconds": 0,
+      "timestamp": "2026-03-30T15:31:10.011340"
+    },
+    {
+      "iteration": 1,
+      "config": {
+        "covariates": [
+          "policy_rate"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9432733655370746,
+      "full_score": 0.9874452697908076,
+      "status": "accepted",
+      "description": "covs=[policy_rate]",
+      "runtime_seconds": 205.77967929840088,
+      "timestamp": "2026-03-30T15:34:35.952035"
+    },
+    {
+      "iteration": 2,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "sp500"
+        ],
+        "transforms": {
+          "sp500": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9484223314744453,
+      "full_score": 0.9988539239304143,
+      "status": "rejected",
+      "description": "covs=[policy_rate,sp500], transforms=1",
+      "runtime_seconds": 216.88059616088867,
+      "timestamp": "2026-03-30T15:38:12.958706"
+    },
+    {
+      "iteration": 3,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9252174822421242,
+      "full_score": 0.9761575063715595,
+      "status": "accepted",
+      "description": "covs=[policy_rate,fed_funds]",
+      "runtime_seconds": 298.83156394958496,
+      "timestamp": "2026-03-30T15:43:11.945417"
+    },
+    {
+      "iteration": 4,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "sp500"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9299699204252581,
+      "full_score": 0.979753529952933,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,sp500], ft=true",
+      "runtime_seconds": 357.5719714164734,
+      "timestamp": "2026-03-30T15:49:09.647107"
+    },
+    {
+      "iteration": 5,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9351429426667609,
+      "full_score": 0.9684359297924603,
+      "status": "accepted",
+      "description": "covs=[policy_rate,fed_funds,us_cpi]",
+      "runtime_seconds": 201.40786266326904,
+      "timestamp": "2026-03-30T15:52:31.162101"
+    },
+    {
+      "iteration": 6,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi"
+        ],
+        "transforms": {
+          "policy_rate": "pct_change_1",
+          "fed_funds": "pct_change_1",
+          "us_cpi": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9676867853518782,
+      "full_score": 1.0120027424733384,
+      "status": "rejected",
+      "description": "transforms=3",
+      "runtime_seconds": 201.33235383033752,
+      "timestamp": "2026-03-30T15:55:52.622769"
+    },
+    {
+      "iteration": 7,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi",
+          "vix"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9302589283985953,
+      "full_score": 0.9684404541941449,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,us_cpi...], ft=true",
+      "runtime_seconds": 250.1510820388794,
+      "timestamp": "2026-03-30T16:00:02.905227"
+    },
+    {
+      "iteration": 8,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi",
+          "vix"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9343961380603514,
+      "full_score": 0.9695786399012991,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,us_cpi...]",
+      "runtime_seconds": 203.3723177909851,
+      "timestamp": "2026-03-30T16:03:26.366270"
+    },
+    {
+      "iteration": 9,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi"
+        ],
+        "transforms": {},
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9295106868557398,
+      "full_score": 0.9884692630249408,
+      "status": "rejected",
+      "description": "ctx=48",
+      "runtime_seconds": 199.2426221370697,
+      "timestamp": "2026-03-30T16:06:45.698152"
+    },
+    {
+      "iteration": 10,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi"
+        ],
+        "transforms": {},
+        "context_length": 64,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9347967437117278,
+      "full_score": 0.9859720063528272,
+      "status": "rejected",
+      "description": "ctx=64",
+      "runtime_seconds": 198.8167884349823,
+      "timestamp": "2026-03-30T16:10:04.640602"
+    },
+    {
+      "iteration": 11,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "brent_crude"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9509358556752645,
+      "full_score": 0.9751029138260735,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,brent_crude]",
+      "runtime_seconds": 208.85268878936768,
+      "timestamp": "2026-03-30T16:13:33.616369"
+    },
+    {
+      "iteration": 12,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi",
+          "vix"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9343961380603514,
+      "full_score": 0.9695786399012991,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,us_cpi...]",
+      "runtime_seconds": 209.45417284965515,
+      "timestamp": "2026-03-30T16:17:03.190451"
+    },
+    {
+      "iteration": 13,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "vix"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9250022158487965,
+      "full_score": 0.9701861620682095,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,vix]",
+      "runtime_seconds": 208.98591804504395,
+      "timestamp": "2026-03-30T16:20:32.307925"
+    },
+    {
+      "iteration": 14,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "nok_eur"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9476768291126569,
+      "full_score": 0.9907952213374049,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,nok_eur]",
+      "runtime_seconds": 209.99293661117554,
+      "timestamp": "2026-03-30T16:24:02.439052"
+    },
+    {
+      "iteration": 15,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9252174822421242,
+      "full_score": 0.9761575063715595,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds]",
+      "runtime_seconds": 205.24269723892212,
+      "timestamp": "2026-03-30T16:27:27.823078"
+    },
+    {
+      "iteration": 16,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "credit"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9332075899508735,
+      "full_score": 0.9772108133221309,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,credit]",
+      "runtime_seconds": 204.1547989845276,
+      "timestamp": "2026-03-30T16:30:52.105005"
+    },
+    {
+      "iteration": 17,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi"
+        ],
+        "transforms": {},
+        "context_length": 36,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.924037483489135,
+      "full_score": 0.9832102029951381,
+      "status": "rejected",
+      "description": "ctx=36",
+      "runtime_seconds": 200.66051292419434,
+      "timestamp": "2026-03-30T16:34:12.892179"
+    },
+    {
+      "iteration": 18,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi"
+        ],
+        "transforms": {
+          "policy_rate": "pct_change_1",
+          "fed_funds": "pct_change_1"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9616696018327453,
+      "full_score": 1.0099780726684733,
+      "status": "rejected",
+      "description": "transforms=2",
+      "runtime_seconds": 198.22312927246094,
+      "timestamp": "2026-03-30T16:37:31.241679"
+    },
+    {
+      "iteration": 19,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi",
+          "euro_area_gdp"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9339461409046569,
+      "full_score": 0.9688709931393831,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,us_cpi...]",
+      "runtime_seconds": 202.50255584716797,
+      "timestamp": "2026-03-30T16:40:53.876580"
+    },
+    {
+      "iteration": 20,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "vix",
+          "brent_crude"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9545032457706865,
+      "full_score": 0.9778820510677186,
+      "status": "rejected",
+      "description": "covs=[policy_rate,vix,brent_crude]",
+      "runtime_seconds": 200.8589313030243,
+      "timestamp": "2026-03-30T16:44:14.842542"
+    },
+    {
+      "iteration": 21,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi",
+          "sp500"
+        ],
+        "transforms": {
+          "sp500": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9408767645379814,
+      "full_score": 0.9891024929711699,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,us_cpi...], transforms=1",
+      "runtime_seconds": 203.92003393173218,
+      "timestamp": "2026-03-30T16:47:38.905878"
+    },
+    {
+      "iteration": 22,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.925142893894193,
+      "full_score": 0.9675865468449641,
+      "status": "accepted",
+      "description": "ft=true",
+      "runtime_seconds": 350.7156069278717,
+      "timestamp": "2026-03-30T16:53:29.752931"
+    },
+    {
+      "iteration": 23,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9174373828841872,
+      "full_score": 0.9725584270762289,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 404.3607110977173,
+      "timestamp": "2026-03-30T17:00:14.243515"
+    },
+    {
+      "iteration": 24,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9174373828841872,
+      "full_score": 0.9725584270762289,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 650.7017958164215,
+      "timestamp": "2026-03-30T17:11:05.074845"
+    },
+    {
+      "iteration": 25,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9174373828841872,
+      "full_score": 0.9725584270762289,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 403.5648157596588,
+      "timestamp": "2026-03-30T17:17:48.769275"
+    },
+    {
+      "iteration": 26,
+      "config": {
+        "covariates": [
+          "nok_usd",
+          "sp500",
+          "global_epu"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9465510022580998,
+      "full_score": 0.9881640600708225,
+      "status": "rejected",
+      "description": "covs=[nok_usd,sp500,global_epu]",
+      "runtime_seconds": 313.15600085258484,
+      "timestamp": "2026-03-30T17:23:02.031744"
+    },
+    {
+      "iteration": 27,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9174373828841872,
+      "full_score": 0.9725584270762289,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 389.72649121284485,
+      "timestamp": "2026-03-30T17:29:31.889626"
+    },
+    {
+      "iteration": 28,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9171932559922604,
+      "full_score": 0.9730365969397439,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 306.5812726020813,
+      "timestamp": "2026-03-30T17:34:38.610782"
+    },
+    {
+      "iteration": 29,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi",
+          "vix"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.925433952007268,
+      "full_score": 0.9701129585320469,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,us_cpi...]",
+      "runtime_seconds": 306.6436104774475,
+      "timestamp": "2026-03-30T17:39:45.404138"
+    },
+    {
+      "iteration": 30,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi",
+          "vix"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9211956378517905,
+      "full_score": 0.9775642820337053,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,us_cpi...]",
+      "runtime_seconds": 305.95519852638245,
+      "timestamp": "2026-03-30T17:44:51.483584"
+    },
+    {
+      "iteration": 31,
+      "config": {
+        "covariates": [
+          "sp500",
+          "vix",
+          "brent_crude"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9620712767513995,
+      "full_score": 0.983154507032069,
+      "status": "rejected",
+      "description": "covs=[sp500,vix,brent_crude]",
+      "runtime_seconds": 309.7574083805084,
+      "timestamp": "2026-03-30T17:50:01.374069"
+    },
+    {
+      "iteration": 32,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "us_cpi"
+        ],
+        "transforms": {
+          "us_cpi": "log_diff",
+          "fed_funds": "pct_change_1",
+          "policy_rate": "pct_change_1"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9604488542952359,
+      "full_score": 1.018535884973053,
+      "status": "rejected",
+      "description": "transforms=3",
+      "runtime_seconds": 310.8026475906372,
+      "timestamp": "2026-03-30T17:55:12.305615"
+    },
+    {
+      "iteration": 33,
+      "config": {
+        "covariates": [
+          "nok_eur",
+          "brent_crude",
+          "sp500",
+          "vix"
+        ],
+        "transforms": {
+          "nok_eur": "log_diff",
+          "brent_crude": "log_diff",
+          "sp500": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.942784525251481,
+      "full_score": 1.0071583515410245,
+      "status": "rejected",
+      "description": "covs=[nok_eur,brent_crude,sp500...], transforms=3",
+      "runtime_seconds": 313.61603355407715,
+      "timestamp": "2026-03-30T18:00:26.043308"
+    }
+  ],
+  "start_time": "2026-03-30T15:27:52.799486"
+}

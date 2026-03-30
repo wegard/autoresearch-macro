@@ -38,12 +38,14 @@
 \newcommand{\leif}[1]{\textcolor{orange}{\textbf{[LAT: #1]}}}
 
 % --- Title ---
-\title{Can Agentic Search Improve Foundation Model Forecasts\\for Small Open Economies?\thanks{We thank \todo{acknowledgments}. The views expressed are those of the authors.}}
+\title{Can Agentic Search Improve Foundation Model Forecasts for Small Open Economies?
+%\thanks{We thank ...}. The views expressed are those of the authors.
+}
 
 \author{
     Vegard H.\ Larsen\thanks{BI Norwegian Business School. Email: \href{mailto:vegard.h.larsen@bi.no}{vegard.h.larsen@bi.no}}
     \and
-    Leif Anders Thorsrud\thanks{BI Norwegian Business School. Email: leif.a.thorsrud@bi.no}
+    Leif Anders Thorsrud\thanks{BI Norwegian Business School. Email: \href{mailto: leif.a.thorsrud@bi.no}{leif.a.thorsrud@bi.no}}
 }
 
 \date{\today \\ \medskip \small\textit{Preliminary and incomplete}}
@@ -329,7 +331,7 @@ Iteration & Configuration change & MASE & $\Delta$ vs.\ baseline \\
 \end{tabular}
 \end{table}
 
-The search converged by approximately iteration 45. The remaining iterations proposed configurations that either matched or worsened the best score. Key patterns from the 50 iterations:
+Figure~\ref{fig:trajectory} visualizes the search trajectory, and Figure~\ref{fig:timeline} shows the covariate discovery timeline. The search converged by approximately iteration 45. The remaining iterations proposed configurations that either matched or worsened the best score. Key patterns from the 50 iterations:
 
 \begin{itemize}[noitemsep]
     \item \textbf{Covariates discovered incrementally:} The agent first added oil prices, then the policy rate, then US inflation, and finally the exchange rate---each improving the score marginally.
@@ -338,6 +340,20 @@ The search converged by approximately iteration 45. The remaining iterations pro
     \item \textbf{Transforms don't help:} Raw covariate levels outperformed log-differences, percentage changes, and standardization.
     \item \textbf{The configuration is economically interpretable:} Oil prices, monetary policy, global inflation, and the trade-weighted exchange rate are precisely the variables a macroeconomist would expect to matter for a small open oil-exporting economy.
 \end{itemize}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig1_search_trajectory.pdf}
+\caption{LLM-guided search trajectory (50 iterations). Green circles: accepted improvements. Red crosses: rejected proposals. The step line shows the best-so-far MASE frontier.}
+\label{fig:trajectory}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig5_covariate_timeline.pdf}
+\caption{Covariate discovery timeline. The agent builds up an economically interpretable covariate set incrementally over 50 iterations, with MASE improving at each accepted step.}
+\label{fig:timeline}
+\end{figure}
 
 \subsection{Test-era evaluation}
 \label{sec:results_test}
@@ -408,6 +424,15 @@ Subperiod & Method & $h=1$ & $h=3$ & $h=6$ & $h=12$ \\
 \end{tabular}
 \end{table}
 
+Figure~\ref{fig:subperiods} visualizes the subperiod comparison at $h=12$.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig3_subperiod_bars.pdf}
+\caption{Test-era subperiod comparison (average RMSE across targets, $h=12$). The agent-tuned configuration collapses in the post-COVID period while zero-shot Chronos-2 degrades more gracefully.}
+\label{fig:subperiods}
+\end{figure}
+
 \textbf{Pre-COVID (2016--2019):} Zero-shot Chronos-2 is the best method at all horizons, and the agent-tuned configuration is also competitive. The covariate relationships discovered during 2006--2015 still hold during this stable period.
 
 \textbf{COVID (2020--2021):} The random walk dominates---all model-based methods struggle with the unprecedented shock. The agent-tuned configuration is comparable to zero-shot at short horizons but worse at $h=12$. The exception is unemployment, where the agent-tuned model is the best method at all horizons (e.g., RMSE 0.658 vs.\ 0.691 for random walk at $h=1$), suggesting that the policy rate covariate provides useful signal for labor market dynamics even during the pandemic.
@@ -444,7 +469,14 @@ Notes: Each row adds one component to the previous row's configuration, followin
 \end{minipage}
 \end{table}
 
-The ablation reveals a striking pattern: every step that improves validation-era performance \emph{monotonically increases} the validation-to-test gap. The zero-shot baseline is the most robust configuration, with only 1.4\% degradation. The single largest source of overfitting is the policy rate covariate ($+14.1\%$ gap), likely because the monetary policy regime changed dramatically between the near-zero rate environment of 2016--2021 and the rapid tightening cycle of 2022--2024. Fine-tuning, by contrast, contributes almost nothing to the overfitting (20.0\% vs.\ 19.8\%), confirming the periodic retuning result above.
+Figure~\ref{fig:scissors} visualizes this ``scissors'' pattern. The ablation reveals a striking pattern: every step that improves validation-era performance \emph{monotonically increases} the validation-to-test gap.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig2_ablation_scissors.pdf}
+\caption{Ablation ``scissors'' plot. Validation MASE (blue) improves with each search step while test MASE (red) worsens. The shaded area shows the growing generalization gap. The policy rate covariate contributes the largest single jump.}
+\label{fig:scissors}
+\end{figure} The zero-shot baseline is the most robust configuration, with only 1.4\% degradation. The single largest source of overfitting is the policy rate covariate ($+14.1\%$ gap), likely because the monetary policy regime changed dramatically between the near-zero rate environment of 2016--2021 and the rapid tightening cycle of 2022--2024. Fine-tuning, by contrast, contributes almost nothing to the overfitting (20.0\% vs.\ 19.8\%), confirming the periodic retuning result above.
 
 \subsection{LLM-guided vs.\ random search}
 \label{sec:llm_vs_random}

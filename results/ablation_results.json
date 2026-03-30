@@ -3,88 +3,88 @@
     {
       "name": "zs_baseline",
       "label": "Zero-shot baseline",
-      "mase": 1.944265730488616,
-      "runtime": 320.4405355453491
+      "mase": 0.9991352554799859,
+      "runtime": 158.44396901130676
     },
     {
       "name": "ctx96",
       "label": "+ context_length=96",
-      "mase": 1.8634869377271874,
-      "runtime": 333.6386592388153
+      "mase": 0.9684314218937952,
+      "runtime": 158.64376425743103
     },
     {
       "name": "ctx96_brent",
       "label": "+ brent_crude",
-      "mase": 1.8472009324317367,
-      "runtime": 206.11673307418823
+      "mase": 0.9627094446722854,
+      "runtime": 157.62714290618896
     },
     {
       "name": "ctx96_brent_policy",
       "label": "+ policy_rate",
-      "mase": 1.8325995546344507,
-      "runtime": 249.26341938972473
+      "mase": 0.951296957601166,
+      "runtime": 159.08550763130188
     },
     {
       "name": "ctx96_3covs",
       "label": "+ us_cpi",
-      "mase": 1.815797719979173,
-      "runtime": 302.75003123283386
+      "mase": 0.9411515716908891,
+      "runtime": 157.64824390411377
     },
     {
       "name": "ctx96_4covs",
       "label": "+ nok_eur",
-      "mase": 1.8129245616754215,
-      "runtime": 267.0250291824341
+      "mase": 0.9436934711591356,
+      "runtime": 156.8785126209259
     },
     {
       "name": "ctx96_4covs_ft",
       "label": "+ LoRA fine-tune",
-      "mase": 1.812919016226891,
-      "runtime": 306.87546467781067
+      "mase": 0.9433485523533829,
+      "runtime": 187.92446732521057
     }
   ],
   "test": [
     {
       "name": "zs_baseline",
       "label": "Zero-shot baseline",
-      "mase": 1.9711623336456057,
-      "runtime": 266.29829931259155
+      "mase": 0.9958649346590346,
+      "runtime": 149.45481610298157
     },
     {
       "name": "ctx96",
       "label": "+ context_length=96",
-      "mase": 1.980622907332135,
-      "runtime": 302.6542088985443
+      "mase": 1.000890254183322,
+      "runtime": 144.7154483795166
     },
     {
       "name": "ctx96_brent",
       "label": "+ brent_crude",
-      "mase": 1.984905135777733,
-      "runtime": 311.29341650009155
+      "mase": 1.0044921153802058,
+      "runtime": 145.6042103767395
     },
     {
       "name": "ctx96_brent_policy",
       "label": "+ policy_rate",
-      "mase": 2.0902692464083117,
-      "runtime": 276.06036829948425
+      "mase": 1.0458669877272508,
+      "runtime": 145.85788011550903
     },
     {
       "name": "ctx96_3covs",
       "label": "+ us_cpi",
-      "mase": 2.133010257059135,
-      "runtime": 249.79692554473877
+      "mase": 1.063514973061642,
+      "runtime": 145.72296690940857
     },
     {
       "name": "ctx96_4covs",
       "label": "+ nok_eur",
-      "mase": 2.1726894448537704,
-      "runtime": 248.11298632621765
+      "mase": 1.0803831379959559,
+      "runtime": 146.26838946342468
     },
     {
       "name": "ctx96_4covs_ft",
       "label": "+ LoRA fine-tune",
-      "mase": 2.17465389389735,
-      "runtime": 276.3585331439972
+      "mase": 1.0814034487344735,
+      "runtime": 176.13090682029724
     }
   ]
 }

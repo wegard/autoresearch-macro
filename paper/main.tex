@@ -452,19 +452,19 @@ To understand which component of the search-discovered pipeline drives the test-
 \toprule
 Configuration & Validation & Test & Gap \\
 \midrule
-Zero-shot baseline         & 1.944 & 1.971 & $+1.4\%$  \\
-+ context\_length = 96     & 1.864 & 1.981 & $+6.3\%$  \\
-+ brent\_crude             & 1.847 & 1.985 & $+7.5\%$  \\
-+ policy\_rate             & 1.833 & 2.090 & $+14.1\%$ \\
-+ us\_cpi                  & 1.816 & 2.133 & $+17.5\%$ \\
-+ nok\_eur                 & 1.813 & 2.173 & $+19.8\%$ \\
-+ LoRA fine-tune           & 1.813 & 2.175 & $+20.0\%$ \\
+Zero-shot baseline         & 0.999 & 0.996 & $-0.3\%$  \\
++ context\_length = 96     & 0.968 & 1.001 & $+3.4\%$  \\
++ brent\_crude             & 0.963 & 1.005 & $+4.3\%$  \\
++ policy\_rate             & 0.951 & 1.046 & $+9.9\%$ \\
++ us\_cpi                  & 0.941 & 1.064 & $+13.0\%$ \\
++ nok\_eur                 & 0.944 & 1.080 & $+14.5\%$ \\
++ LoRA fine-tune           & 0.943 & 1.081 & $+14.6\%$ \\
 \bottomrule
 \end{tabular}
 \begin{minipage}{\textwidth}
 \vspace{0.5em}
 \footnotesize
-Notes: Each row adds one component to the previous row's configuration, following the order in which the search agent accepted improvements. The ``Gap'' column reports the percentage increase in MASE from validation to test era.
+Notes: Each row adds one component to the previous row's configuration, following the order in which the search agent accepted improvements. The ``Gap'' column reports the percentage change in MASE from validation to test era. Values below 1 indicate improvement over the random walk.
 \end{minipage}
 \end{table}
 

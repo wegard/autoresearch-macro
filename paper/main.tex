@@ -712,6 +712,87 @@ The full 50-iteration experiment log is available in the project repository (\te
 
 For comparison, a 50-iteration random search achieved a 2\% acceptance rate with a single accepted configuration at iteration 1 (validation MASE 1.799). The random search's best configuration used 5 covariates (house prices, Euro area GDP, global EPU, imports, policy rate) with mixed transformations---economically less coherent than the LLM's incremental discovery.
 
+\section{Reproducibility}
+\label{app:reproducibility}
+
+\subsection*{Software environment}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{ll}
+\toprule
+Component & Version \\
+\midrule
+Python & 3.11.15 \\
+\texttt{chronos-forecasting} & 2.2.2 \\
+\texttt{autogluon.timeseries} & 1.5.0 \\
+PyTorch & 2.11.0+cu130 \\
+\texttt{statsmodels} & 0.14.6 \\
+\texttt{pandas} & 2.3.3 \\
+\texttt{numpy} & 2.1.3 \\
+\texttt{anthropic} (Claude API client) & 0.86.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent All dependencies are pinned in a \texttt{uv.lock} file. The project uses \texttt{uv} for dependency management. Hardware: NVIDIA GeForce RTX 4090 (24\,GB VRAM).
+
+\subsection*{Foundation model}
+
+Chronos-2 is loaded via AutoGluon using the model identifier \texttt{amazon/chronos-2} and the \texttt{"Chronos-2"} model key. The model has 120M parameters. For zero-shot inference, the model weights are loaded directly from the HuggingFace Hub. For LoRA fine-tuning, the target modules are the self-attention Q, K, V, O projections and the output patch embedding, with rank $r = 8$ and $\alpha = 16$. Point forecasts are extracted from the \texttt{mean} column of the AutoGluon prediction output.
+
+\subsection*{LLM search agent}
+
+The search agent uses Claude Sonnet (\texttt{claude-sonnet-4-20250514}) via the Anthropic Messages API with \texttt{max\_tokens=1024} and default temperature. The system prompt (\texttt{program.md}) contains the task description, search space constraints, available covariates, and---in the informed variant---domain knowledge about the Norwegian economy. The full prompt text is available in the project repository. The domain-blind variant (\texttt{configs/program\_blind.md}) removes all country-specific hints.
+
+At each iteration, the agent receives the current best configuration, the MASE score, and a history of the most recent 15 iterations (config, score, status). The agent returns a JSON object specifying only the fields to change. Responses are parsed by extracting the first JSON object found, with fallback handling for markdown code blocks.
+
+\subsection*{Data retrieval}
+
+All data sources are publicly available:
+\begin{itemize}[noitemsep]
+    \item \textbf{Statistics Norway (SSB):} JSON-stat2 API at \texttt{data.ssb.no/api/v0}. No authentication required. Table IDs and content codes are listed in Table~\ref{tab:variables}.
+    \item \textbf{Norges Bank:} SDMX-CSV API at \texttt{data.norges-bank.no/api/data}. No authentication.
+    \item \textbf{FRED:} Via the \texttt{fredapi} Python client. Requires a free API key from \texttt{fred.stlouisfed.org}.
+    \item \textbf{Anthropic API:} Required for the LLM search agent. Not required for baselines or zero-shot evaluation.
+\end{itemize}
+
+\noindent Data is cached locally after the first download. Publication lags are configured in \texttt{configs/publication\_lags.yml}. Daily series are aggregated to monthly averages; quarterly series are forward-filled. All covariates are provided as past-only values (no future covariate leakage).
+
+\subsection*{Evaluation protocol}
+
+Forecast origins are generated at monthly frequency. Validation era: January 2006 through December 2015 (120 origins). Test era: January 2016 through March 2025 (111 origins). At each origin, the information set is restricted by publication lags. Quick evaluation during search uses 20 origins subsampled with seed 42; full evaluation uses all origins. The baseline is always scored on all origins to ensure fair comparisons.
+
+\subsection*{Random seeds and determinism}
+
+Origin subsampling uses \texttt{numpy.random.default\_rng(42)}. AutoGluon and PyTorch use default seeds (not explicitly controlled). Chronos-2 produces deterministic point forecasts via a single forward pass. The LLM search agent is non-deterministic due to the stochastic nature of the Claude API; repeated runs may discover different configurations.
+
+\subsection*{Replication}
+
+The complete project repository includes:
+\begin{itemize}[noitemsep]
+    \item Source code: \texttt{src/prepare.py}, \texttt{train.py}, \texttt{evaluate.py}, \texttt{search.py}, \texttt{baselines.py}
+    \item Configuration files: \texttt{configs/publication\_lags.yml}, \texttt{search\_space.yml}, \texttt{best\_config.json}
+    \item Search prompts: \texttt{program.md} (informed), \texttt{configs/program\_blind.md} (domain-blind)
+    \item Experiment logs: \texttt{results/search\_log.jsonl} (all iterations with configs and scores)
+    \item Test suite: 90 tests via \texttt{pytest}
+    \item Dependency lock: \texttt{uv.lock} (pinned versions)
+\end{itemize}
+
+\noindent To replicate the baseline evaluation:
+\begin{verbatim}
+uv sync --all-extras
+uv run python src/prepare.py
+uv run python src/baselines.py --all --era validation --save
+uv run python src/train.py --era validation --save
+\end{verbatim}
+
+\noindent To replicate the search experiment (requires \texttt{ANTHROPIC\_API\_KEY}):
+\begin{verbatim}
+uv run python src/search.py --max-iterations 50
+\end{verbatim}
+
 \end{appendices}
 
 \end{document}

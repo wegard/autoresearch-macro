@@ -152,14 +152,16 @@ def build_prompt(
     search_space: str,
     available_covariates: list[str],
     max_history: int = 15,
+    program_override: str | None = None,
 ) -> tuple[str, str]:
     """Build system and user prompts for the Claude API call.
 
     Returns:
         (system_prompt, user_prompt) tuple.
     """
-    # System prompt: program.md
-    system_prompt = PROGRAM_PATH.read_text()
+    # System prompt: program.md (or override)
+    program_file = Path(program_override) if program_override else PROGRAM_PATH
+    system_prompt = program_file.read_text()
 
     # User prompt: search space + state + history
     lines = [
@@ -210,6 +212,7 @@ def _summarize_config(config: dict[str, Any]) -> str:
 def propose_config(
     state: SearchState,
     available_covariates: list[str],
+    program_override: str | None = None,
 ) -> tuple[dict[str, Any], str]:
     """Call Claude API to propose the next config.
 
@@ -223,7 +226,9 @@ def propose_config(
         raise ValueError("ANTHROPIC_API_KEY not set in environment or .env")
 
     search_space = SEARCH_SPACE_PATH.read_text() if SEARCH_SPACE_PATH.exists() else ""
-    system_prompt, user_prompt = build_prompt(state, search_space, available_covariates)
+    system_prompt, user_prompt = build_prompt(
+        state, search_space, available_covariates, program_override=program_override
+    )
 
     client = anthropic.Anthropic(api_key=api_key)
     response = client.messages.create(
@@ -379,6 +384,7 @@ def search_loop(
     max_iterations: int | None = None,
     resume: bool = False,
     mode: str = "llm",
+    program_path: str | None = None,
 ) -> None:
     """Run the search loop.
 
@@ -386,6 +392,7 @@ def search_loop(
         max_iterations: Stop after this many iterations (None = run forever).
         resume: If True, resume from saved state.
         mode: "llm" for LLM-guided search, "random" for random search baseline.
+        program_path: Path to alternative program.md for LLM prompt.
     """
     from prepare import load_panel
 
@@ -463,7 +470,9 @@ def search_loop(
             if mode == "random":
                 overrides, description = propose_random_config(available_covariates)
             else:
-                overrides, description = propose_config(state, available_covariates)
+                overrides, description = propose_config(
+                    state, available_covariates, program_override=program_path
+                )
         except Exception as e:
             logger.exception("Config proposal failed: %s", e)
             record = IterationRecord(
@@ -597,6 +606,10 @@ def main() -> None:
         "--mode", type=str, default="llm", choices=["llm", "random"],
         help="Search mode: 'llm' (Claude-guided) or 'random' (random sampling baseline)",
     )
+    parser.add_argument(
+        "--program", type=str, default=None,
+        help="Path to alternative program.md for the LLM prompt (e.g., configs/program_blind.md)",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -613,6 +626,7 @@ def main() -> None:
         max_iterations=args.max_iterations,
         resume=args.resume,
         mode=args.mode,
+        program_path=args.program,
     )
 
 

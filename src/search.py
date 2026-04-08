@@ -4,11 +4,15 @@ Orchestrates an LLM-guided search over the forecasting pipeline configuration.
 Uses Claude API to propose config changes, evaluates them via train.py,
 and accepts/rejects based on validation performance.
 
+Supports multiple search modes (LLM, random, greedy) and multiple countries.
+
 Usage:
-    python src/search.py                         # Run until interrupted
-    python src/search.py --max-iterations 10     # Run 10 iterations
-    python src/search.py --resume                # Resume from saved state
-    python src/search.py --status                # Show current search state
+    python src/search.py                                    # Norway LLM search
+    python src/search.py --country canada --mode llm --program prompts/informed_canada.md
+    python src/search.py --country sweden --mode random --seed 42 --max-iterations 50
+    python src/search.py --country norway --mode greedy --max-iterations 200
+    python src/search.py --resume                           # Resume from saved state
+    python src/search.py --status                           # Show current search state
 """
 
 from __future__ import annotations
@@ -24,6 +28,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+import shutil
+
 import numpy as np
 from dotenv import load_dotenv
 
@@ -33,12 +39,31 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(PROJECT_ROOT / ".env")
 
 RESULTS_DIR = PROJECT_ROOT / "results"
-SEARCH_LOG_PATH = RESULTS_DIR / "search_log.jsonl"
-SEARCH_STATE_PATH = RESULTS_DIR / "search_state.json"
 CONFIG_DIR = PROJECT_ROOT / "configs"
 CURRENT_CONFIG_PATH = CONFIG_DIR / "current_config.json"
 PROGRAM_PATH = PROJECT_ROOT / "program.md"
 SEARCH_SPACE_PATH = CONFIG_DIR / "search_space.yml"
+
+COUNTRIES = ["norway", "canada", "sweden"]
+
+# Legacy paths (for backward compat with existing Norway results)
+SEARCH_LOG_PATH = RESULTS_DIR / "search_log.jsonl"
+SEARCH_STATE_PATH = RESULTS_DIR / "search_state.json"
+
+
+def _search_paths(
+    country: str, mode: str, seed: int, tag: str | None = None,
+) -> tuple[Path, Path]:
+    """Get parameterized search state and log file paths."""
+    if country == "norway" and mode == "llm" and seed == 0 and tag is None:
+        # Backward compat with existing Norway results
+        return SEARCH_STATE_PATH, SEARCH_LOG_PATH
+    base = RESULTS_DIR / country
+    base.mkdir(parents=True, exist_ok=True)
+    suffix = f"{mode}_{tag}_{seed}" if tag else f"{mode}_{seed}"
+    state_path = base / f"search_state_{suffix}.json"
+    log_path = base / f"search_log_{suffix}.jsonl"
+    return state_path, log_path
 
 # Subsampled origins for quick evaluation
 QUICK_EVAL_ORIGINS = 20
@@ -101,14 +126,15 @@ class SearchState:
             state.history.append(IterationRecord(**h))
         return state
 
-    def save(self) -> None:
-        RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-        SEARCH_STATE_PATH.write_text(self.to_json())
+    def save(self, path: Path | None = None) -> None:
+        save_path = path or SEARCH_STATE_PATH
+        _robust_write(save_path, self.to_json())
 
     @classmethod
-    def load(cls) -> SearchState | None:
-        if SEARCH_STATE_PATH.exists():
-            return cls.from_json(SEARCH_STATE_PATH.read_text())
+    def load(cls, path: Path | None = None) -> SearchState | None:
+        load_path = path or SEARCH_STATE_PATH
+        if load_path.exists():
+            return cls.from_json(load_path.read_text())
         return None
 
 
@@ -128,10 +154,26 @@ DEFAULT_CONFIG: dict[str, Any] = {
 }
 
 
+def _robust_write(path: Path, text: str, retries: int = 5, delay: float = 2.0) -> None:
+    """Write text to a file with retries for transient filesystem errors (e.g. SSHFS)."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    for attempt in range(retries):
+        try:
+            path.write_text(text)
+            return
+        except OSError as e:
+            if attempt < retries - 1:
+                logger.warning("Write to %s failed (attempt %d/%d): %s — retrying in %.0fs",
+                               path.name, attempt + 1, retries, e, delay)
+                time.sleep(delay)
+                delay *= 2
+            else:
+                raise
+
+
 def write_config(config: dict[str, Any]) -> Path:
     """Write config to JSON file for train.py to read."""
-    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-    CURRENT_CONFIG_PATH.write_text(json.dumps(config, indent=2))
+    _robust_write(CURRENT_CONFIG_PATH, json.dumps(config, indent=2))
     return CURRENT_CONFIG_PATH
 
 
@@ -176,7 +218,12 @@ def build_prompt(
         lines.append("## Recent history\n")
         recent = state.history[-max_history:]
         for rec in recent:
-            score_str = f"{rec.full_score:.4f}" if rec.full_score else f"~{rec.quick_score:.4f}"
+            if rec.full_score is not None:
+                score_str = f"{rec.full_score:.4f}"
+            elif rec.quick_score is not None:
+                score_str = f"~{rec.quick_score:.4f}"
+            else:
+                score_str = "N/A"
             # Summarize config changes vs best
             cfg_summary = _summarize_config(rec.config)
             lines.append(
@@ -287,54 +334,126 @@ def _extract_description(text: str, config: dict[str, Any]) -> str:
 # ---------------------------------------------------------------------------
 
 
-def run_and_evaluate(
-    config: dict[str, Any],
-    max_origins: int | None = None,
-) -> float | None:
-    """Run train.py with given config and return the score.
+def _eval_in_child(config_json: str, max_origins: int | None,
+                    country: str, result_pipe: Any) -> None:
+    """Target function for subprocess evaluation.
 
-    Returns:
-        Score (avg_mase) or None on failure.
+    Runs in a forked child process so all file descriptors (PyTorch, joblib,
+    safetensors) are reclaimed by the OS when the child exits.
     """
-    from evaluate import evaluate
-    from prepare import load_panel
-    from train import apply_config_overrides, run
-
-    config_path = write_config(config)
-
+    config_path = None
     try:
-        # Apply config overrides in this process
+        import sys
+        import tempfile
+        sys.path.insert(0, str(PROJECT_ROOT / "src"))
+        from evaluate import evaluate
+        from train import apply_config_overrides, run
+
+        config = json.loads(config_json)
+        # Write to a unique temp file to avoid race conditions when
+        # multiple search processes run in parallel.
+        CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+        fd, tmp = tempfile.mkstemp(suffix=".json", dir=CONFIG_DIR, prefix="cfg_")
+        config_path = Path(tmp)
+        with os.fdopen(fd, "w") as f:
+            json.dump(config, f, indent=2)
         apply_config_overrides(str(config_path))
 
-        panel = load_panel()
+        if country == "norway":
+            from prepare import load_panel
+            panel = load_panel()
+        elif country == "canada":
+            from prepare_canada import load_panel_canada
+            panel = load_panel_canada()
+        elif country == "sweden":
+            from prepare_sweden import load_panel_sweden
+            panel = load_panel_sweden()
+        else:
+            from prepare import load_panel
+            panel = load_panel()
+
         fr = run(panel, era="validation", max_origins=max_origins)
         eval_result = evaluate(fr, panel)
 
-        # Extract score from summary
         if not eval_result.summary:
-            logger.warning("No summary metrics — evaluation produced no results")
-            return None
+            result_pipe.send(None)
+            return
 
-        # Average across all horizons
         scores = [
             eval_result.summary[h].get(SCORE_METRIC, float("inf"))
             for h in eval_result.summary
         ]
-        return float(sum(scores) / len(scores)) if scores else None
-
+        result_pipe.send(float(sum(scores) / len(scores)) if scores else None)
     except Exception as e:
-        logger.exception("Run failed: %s", e)
-        return None
+        logger.exception("Child eval failed: %s", e)
+        result_pipe.send(None)
+    finally:
+        if config_path is not None:
+            config_path.unlink(missing_ok=True)
+
+
+# Country name used by the current search_loop invocation (set in search_loop)
+_current_country: str = "norway"
+
+
+def run_and_evaluate(
+    config: dict[str, Any],
+    max_origins: int | None = None,
+    panel: Any | None = None,
+) -> float | None:
+    """Run train.py with given config and return the score.
+
+    Evaluation runs in a child process so that all file descriptors from
+    PyTorch, AutoGluon, joblib, etc. are reclaimed by the OS when the
+    child exits. This prevents the 'Too many open files' crashes during
+    long greedy search runs.
+
+    Args:
+        config: Pipeline configuration to evaluate.
+        max_origins: Subsample origins for quick eval (None = all).
+        panel: Ignored (kept for API compat). The child loads its own panel.
+
+    Returns:
+        Score (avg_mase) or None on failure.
+    """
+    import multiprocessing as mp
+
+    parent_conn, child_conn = mp.Pipe(duplex=False)
+    child = mp.Process(
+        target=_eval_in_child,
+        args=(json.dumps(config), max_origins, _current_country, child_conn),
+    )
+    child.start()
+    child_conn.close()  # Parent doesn't write to the pipe
+
+    # Wait for result with a generous timeout (fine-tuning can take minutes)
+    timeout = 600  # 10 minutes
+    if parent_conn.poll(timeout):
+        score = parent_conn.recv()
+    else:
+        logger.error("Child evaluation timed out after %ds", timeout)
+        child.kill()
+        score = None
+
+    child.join(timeout=30)
+    if child.exitcode and child.exitcode != 0:
+        logger.warning("Child process exited with code %d", child.exitcode)
+        score = None
+
+    parent_conn.close()
+    return score
 
 
 def propose_random_config(
     available_covariates: list[str],
+    rng: np.random.Generator | None = None,
 ) -> tuple[dict[str, Any], str]:
     """Propose a random configuration from the search space.
 
     Used as a baseline comparison for the LLM-guided search.
     """
-    rng = np.random.default_rng()
+    if rng is None:
+        rng = np.random.default_rng()
 
     # Random covariate subset (0-5 covariates)
     n_covs = rng.integers(0, min(6, len(available_covariates) + 1))
@@ -376,6 +495,132 @@ def reset_train_config() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Greedy stepwise search
+# ---------------------------------------------------------------------------
+
+# Full action space for greedy search
+CONTEXT_LENGTH_OPTIONS = [None, 24, 36, 48, 64, 96, 128]
+FINE_TUNE_STEPS_OPTIONS = [100, 500, 1000, 2000]
+FINE_TUNE_LR_OPTIONS = [1e-6, 5e-6, 1e-5, 5e-5, 1e-4]
+
+
+def _generate_greedy_neighbors(
+    current: dict[str, Any],
+    available_covariates: list[str],
+) -> list[tuple[dict[str, Any], str]]:
+    """Generate all single-step neighbor configs from the current best.
+
+    Returns list of (config_overrides, description) tuples.
+    """
+    neighbors: list[tuple[dict[str, Any], str]] = []
+    current_covs = set(current.get("covariates", []))
+
+    # 1. Add each available covariate (one at a time)
+    for cov in available_covariates:
+        if cov not in current_covs:
+            new_covs = sorted(current_covs | {cov})
+            neighbors.append((
+                {"covariates": new_covs},
+                f"add {cov}",
+            ))
+
+    # 2. Remove each selected covariate (one at a time)
+    for cov in current_covs:
+        new_covs = sorted(current_covs - {cov})
+        neighbors.append((
+            {"covariates": new_covs},
+            f"remove {cov}",
+        ))
+
+    # 3. Change context_length
+    current_ctx = current.get("context_length")
+    for ctx in CONTEXT_LENGTH_OPTIONS:
+        if ctx != current_ctx:
+            neighbors.append((
+                {"context_length": ctx},
+                f"context={ctx}",
+            ))
+
+    # 4. Toggle fine_tune
+    current_ft = current.get("fine_tune", False)
+    if current_ft:
+        neighbors.append((
+            {"fine_tune": False},
+            "disable fine-tune",
+        ))
+    else:
+        neighbors.append((
+            {"fine_tune": True, "fine_tune_steps": 500, "fine_tune_lr": 5e-6},
+            "enable fine-tune (500 steps, 5e-6)",
+        ))
+
+    # 5. Fine-tune hyperparameters (only if fine-tune is on)
+    if current.get("fine_tune"):
+        current_steps = current.get("fine_tune_steps", 1000)
+        for steps in FINE_TUNE_STEPS_OPTIONS:
+            if steps != current_steps:
+                neighbors.append((
+                    {"fine_tune_steps": steps},
+                    f"ft_steps={steps}",
+                ))
+
+        current_lr = current.get("fine_tune_lr", 1e-5)
+        for lr in FINE_TUNE_LR_OPTIONS:
+            if abs(lr - current_lr) / current_lr > 0.1:
+                neighbors.append((
+                    {"fine_tune_lr": lr},
+                    f"ft_lr={lr:.0e}",
+                ))
+
+    return neighbors
+
+
+def propose_greedy_config(
+    state: SearchState,
+    available_covariates: list[str],
+    panel: Any | None = None,
+    rejected_descriptions: set[str] | None = None,
+) -> tuple[dict[str, Any] | None, str]:
+    """Greedy stepwise: quick-eval all neighbors, return the best one.
+
+    Returns (None, description) if no improving neighbor is found (convergence).
+    Skips neighbors whose descriptions are in rejected_descriptions (i.e.,
+    neighbors that passed quick eval but failed full eval on a previous round).
+    """
+    neighbors = _generate_greedy_neighbors(state.best_config, available_covariates)
+    rejected = rejected_descriptions or set()
+
+    # Filter out previously rejected neighbors
+    candidates = [(o, d) for o, d in neighbors if d not in rejected]
+    skipped = len(neighbors) - len(candidates)
+    if skipped:
+        logger.info("Greedy step: evaluating %d neighbors (%d skipped as previously rejected)...",
+                     len(candidates), skipped)
+    else:
+        logger.info("Greedy step: evaluating %d neighbors...", len(candidates))
+
+    best_neighbor = None
+    best_quick_score = state.best_score
+    best_description = ""
+
+    for overrides, description in candidates:
+        candidate = merge_config(state.best_config, overrides)
+        score = run_and_evaluate(
+            candidate, max_origins=QUICK_EVAL_ORIGINS, panel=panel)
+        if score is not None and score < best_quick_score:
+            best_quick_score = score
+            best_neighbor = overrides
+            best_description = description
+            logger.info("  Neighbor %s: %.4f (improvement!)", description, score)
+
+    if best_neighbor is None:
+        return None, "no improving neighbor"
+
+    logger.info("Best neighbor: %s (quick=%.4f)", best_description, best_quick_score)
+    return best_neighbor, f"greedy: {best_description}"
+
+
+# ---------------------------------------------------------------------------
 # Main search loop
 # ---------------------------------------------------------------------------
 
@@ -385,24 +630,52 @@ def search_loop(
     resume: bool = False,
     mode: str = "llm",
     program_path: str | None = None,
+    country: str = "norway",
+    seed: int = 0,
+    tag: str | None = None,
 ) -> None:
     """Run the search loop.
 
     Args:
         max_iterations: Stop after this many iterations (None = run forever).
         resume: If True, resume from saved state.
-        mode: "llm" for LLM-guided search, "random" for random search baseline.
+        mode: "llm", "random", or "greedy".
         program_path: Path to alternative program.md for LLM prompt.
+        country: Country to run search for.
+        seed: Random seed for reproducibility.
+        tag: Optional tag for distinguishing runs (e.g., "blind").
     """
-    from prepare import load_panel
+    global _current_country
+    _current_country = country
 
-    panel = load_panel()
+    # Pre-import autogluon in the parent process so forked children inherit
+    # the loaded modules. This prevents failures when another uv process
+    # modifies the shared virtualenv during a parallel run.
+    try:
+        import autogluon.timeseries  # noqa: F401
+        logger.info("Pre-imported autogluon.timeseries in parent process")
+    except ImportError:
+        logger.warning("autogluon.timeseries not available — child evals may fail")
+
+    from baselines import load_country_panel
+
+    panel = load_country_panel(country)
     available_covariates = panel.covariates()
+
+    # Parameterized output paths
+    state_path, log_path = _search_paths(country, mode, seed, tag=tag)
+
+    # Seeded RNG for random/greedy modes
+    rng = np.random.default_rng(seed) if seed != 0 else np.random.default_rng()
+
+    logger.info("Search: country=%s, mode=%s, seed=%d", country, mode, seed)
+    logger.info("  State: %s", state_path)
+    logger.info("  Log: %s", log_path)
 
     # Initialize or resume state
     state: SearchState
     if resume:
-        loaded = SearchState.load()
+        loaded = SearchState.load(state_path)
         if loaded:
             state = loaded
             logger.info("Resumed from iteration %d (best score: %.4f)",
@@ -420,7 +693,8 @@ def search_loop(
 
         # Quick baseline (for filtering)
         logger.info("  Quick baseline (%d origins)...", QUICK_EVAL_ORIGINS)
-        quick_baseline = run_and_evaluate(baseline_config, max_origins=QUICK_EVAL_ORIGINS)
+        quick_baseline = run_and_evaluate(
+            baseline_config, max_origins=QUICK_EVAL_ORIGINS, panel=panel)
         if quick_baseline is None:
             logger.error("Baseline quick evaluation failed. Cannot proceed.")
             return
@@ -428,7 +702,7 @@ def search_loop(
 
         # Full baseline (for accept/reject decisions)
         logger.info("  Full baseline (all origins)...")
-        full_baseline = run_and_evaluate(baseline_config, max_origins=None)
+        full_baseline = run_and_evaluate(baseline_config, max_origins=None, panel=panel)
         if full_baseline is None:
             logger.error("Baseline full evaluation failed. Cannot proceed.")
             return
@@ -449,13 +723,17 @@ def search_loop(
             timestamp=datetime.now().isoformat(),
         )
         state.history.append(record)
-        _log_iteration(record)
-        state.save()
+        _log_iteration(record, log_path)
+        state.save(state_path)
 
         logger.info("Baseline: quick=%.4f, full=%.4f", quick_baseline, full_baseline)
 
     # Main loop
     iteration = state.iteration
+    consecutive_errors = 0
+    # Track greedy neighbors that passed quick-eval but failed full-eval,
+    # so we don't waste iterations retrying the same deceptive neighbor.
+    greedy_rejected: set[str] = set()
     while max_iterations is None or iteration < max_iterations:
         iteration += 1
         state.iteration = iteration
@@ -465,16 +743,32 @@ def search_loop(
         logger.info("ITERATION %d (best: %.4f)", iteration, state.best_score)
         logger.info("{'=' * 60}")
 
-        # 1. Propose config
+        # 1. Propose config (with backoff on consecutive connection errors)
         try:
             if mode == "random":
-                overrides, description = propose_random_config(available_covariates)
+                overrides, description = propose_random_config(
+                    available_covariates, rng=rng)
+            elif mode == "greedy":
+                overrides, description = propose_greedy_config(
+                    state, available_covariates, panel=panel,
+                    rejected_descriptions=greedy_rejected)
+                if overrides is None:
+                    logger.info("Greedy search converged — no improving neighbors.")
+                    break
             else:
                 overrides, description = propose_config(
                     state, available_covariates, program_override=program_path
                 )
+            consecutive_errors = 0
         except Exception as e:
-            logger.exception("Config proposal failed: %s", e)
+            consecutive_errors += 1
+            if consecutive_errors >= 3:
+                wait = min(300, 30 * (consecutive_errors - 2))
+                logger.warning(
+                    "Connection error (%d consecutive). Waiting %ds before retry...",
+                    consecutive_errors, wait)
+                time.sleep(wait)
+            logger.error("Config proposal failed: %s", e)
             record = IterationRecord(
                 iteration=iteration, config={}, quick_score=None, full_score=None,
                 status="error", description=f"proposal failed: {e}",
@@ -482,8 +776,8 @@ def search_loop(
                 timestamp=datetime.now().isoformat(),
             )
             state.history.append(record)
-            _log_iteration(record)
-            state.save()
+            _log_iteration(record, log_path)
+            state.save(state_path)
             continue
 
         # 2. Merge with best config
@@ -492,7 +786,8 @@ def search_loop(
 
         # 3. Quick evaluation (subsampled origins)
         logger.info("Quick evaluation (%d origins)...", QUICK_EVAL_ORIGINS)
-        quick_score = run_and_evaluate(candidate_config, max_origins=QUICK_EVAL_ORIGINS)
+        quick_score = run_and_evaluate(
+            candidate_config, max_origins=QUICK_EVAL_ORIGINS, panel=panel)
 
         if quick_score is None:
             record = IterationRecord(
@@ -503,8 +798,8 @@ def search_loop(
                 timestamp=datetime.now().isoformat(),
             )
             state.history.append(record)
-            _log_iteration(record)
-            state.save()
+            _log_iteration(record, log_path)
+            state.save(state_path)
             logger.warning("Quick evaluation failed, skipping.")
             continue
 
@@ -513,8 +808,9 @@ def search_loop(
         # 4. If quick eval shows improvement, run full evaluation
         full_score = None
         if quick_score < state.best_score:
-            logger.info("Quick eval improved! Running full evaluation (120 origins)...")
-            full_score = run_and_evaluate(candidate_config, max_origins=None)
+            logger.info("Quick eval improved! Running full evaluation...")
+            full_score = run_and_evaluate(
+                candidate_config, max_origins=None, panel=panel)
 
             if full_score is not None:
                 logger.info("Full score: %.4f (best: %.4f)", full_score, state.best_score)
@@ -525,9 +821,20 @@ def search_loop(
             state.best_score = full_score
             state.best_config = candidate_config
             accepted = True
+            # New best config — all neighbors are fresh again
+            greedy_rejected.clear()
             logger.info("ACCEPTED — new best: %.4f", full_score)
         else:
-            logger.info("REJECTED — keeping best: %.4f", state.best_score)
+            # Track rejected greedy neighbors so we don't retry them.
+            # Strip the "greedy: " prefix to match the description format
+            # used by _generate_greedy_neighbors.
+            if mode == "greedy" and full_score is not None:
+                raw_desc = description.removeprefix("greedy: ")
+                greedy_rejected.add(raw_desc)
+                logger.info("REJECTED — keeping best: %.4f (marking '%s' as tried)",
+                            state.best_score, raw_desc)
+            else:
+                logger.info("REJECTED — keeping best: %.4f", state.best_score)
 
         # 6. Log
         record = IterationRecord(
@@ -541,8 +848,8 @@ def search_loop(
             timestamp=datetime.now().isoformat(),
         )
         state.history.append(record)
-        _log_iteration(record)
-        state.save()
+        _log_iteration(record, log_path)
+        state.save(state_path)
 
     # Cleanup
     reset_train_config()
@@ -551,11 +858,24 @@ def search_loop(
     logger.info("Best config: %s", json.dumps(state.best_config, indent=2, default=str))
 
 
-def _log_iteration(record: IterationRecord) -> None:
+def _log_iteration(record: IterationRecord, log_path: Path | None = None) -> None:
     """Append iteration to JSONL log file."""
-    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    with open(SEARCH_LOG_PATH, "a") as f:
-        f.write(json.dumps(asdict(record), default=str) + "\n")
+    path = log_path or SEARCH_LOG_PATH
+    line = json.dumps(asdict(record), default=str) + "\n"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    for attempt in range(5):
+        try:
+            with open(path, "a") as f:
+                f.write(line)
+            return
+        except OSError as e:
+            if attempt < 4:
+                delay = 2.0 * (2 ** attempt)
+                logger.warning("Log append to %s failed (attempt %d/5): %s — retrying in %.0fs",
+                               path.name, attempt + 1, e, delay)
+                time.sleep(delay)
+            else:
+                raise
 
 
 def show_status() -> None:
@@ -588,7 +908,7 @@ def show_status() -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="LLM-guided search over forecasting pipeline configuration",
+        description="Search over forecasting pipeline configuration",
     )
     parser.add_argument(
         "--max-iterations", type=int, default=None,
@@ -603,12 +923,24 @@ def main() -> None:
         help="Show current search status and exit",
     )
     parser.add_argument(
-        "--mode", type=str, default="llm", choices=["llm", "random"],
-        help="Search mode: 'llm' (Claude-guided) or 'random' (random sampling baseline)",
+        "--mode", type=str, default="llm", choices=["llm", "random", "greedy"],
+        help="Search mode: 'llm', 'random', or 'greedy' (stepwise)",
     )
     parser.add_argument(
         "--program", type=str, default=None,
-        help="Path to alternative program.md for the LLM prompt (e.g., configs/program_blind.md)",
+        help="Path to prompt file for the LLM (e.g., prompts/informed_canada.md)",
+    )
+    parser.add_argument(
+        "--country", type=str, default="norway", choices=COUNTRIES,
+        help="Country to run search for (default: norway)",
+    )
+    parser.add_argument(
+        "--seed", type=int, default=0,
+        help="Random seed for reproducibility (default: 0 = unseeded)",
+    )
+    parser.add_argument(
+        "--tag", type=str, default=None,
+        help="Optional tag for state/log filenames (e.g., 'blind')",
     )
     args = parser.parse_args()
 
@@ -627,6 +959,9 @@ def main() -> None:
         resume=args.resume,
         mode=args.mode,
         program_path=args.program,
+        country=args.country,
+        seed=args.seed,
+        tag=args.tag,
     )
 
 

@@ -267,7 +267,7 @@ def fit_predictor(
         hyperparameters["Chronos-2"]["fine_tune_steps"] = fine_tune_steps
         hyperparameters["Chronos-2"]["fine_tune_lr"] = learning_rate
 
-    time_limit = 300 if fine_tune else 30
+    time_limit = 1800 if fine_tune else 120
     predictor = TimeSeriesPredictor(
         prediction_length=prediction_length,
         eval_metric="MASE",
@@ -511,6 +511,11 @@ def main() -> None:
         "--retune-interval", type=int, default=None,
         help="Re-fit predictor every N origins (None = fit once)",
     )
+    parser.add_argument(
+        "--country", type=str, default="norway",
+        choices=["norway", "canada", "sweden"],
+        help="Country to run for (default: norway)",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -522,8 +527,14 @@ def main() -> None:
     if args.config_file:
         apply_config_overrides(args.config_file)
 
-    panel = load_panel()
+    if args.country == "norway":
+        panel = load_panel()
+    else:
+        from baselines import load_country_panel
+        panel = load_country_panel(args.country)
+
     fr = run(panel, era=args.era, max_origins=args.origins, retune_interval=args.retune_interval)
+    fr.country = args.country
     eval_result = evaluate(fr, panel)
     print(format_results_table(eval_result))
 

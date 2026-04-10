@@ -2,15 +2,16 @@
 
 **Collaborators:** Vegard Larsen, Leif Anders Thorsrud
 **Started:** 2026-03-27
-**Status:** Search experiment complete (50 iterations, 6.8% improvement)
+**Target journal:** International Journal of Forecasting
+**Status:** Three-country expansion (Norway + Canada + Sweden) in progress per `paper/REVISION-PLAN-4.md`. Search runs complete for Norway; Canada and Sweden informed/random/greedy runs complete, blind runs pending. See `STATUS.md`.
 
 ## What
 
-Agentic outer-loop search over data transformations, covariate selection, and fine-tuning settings for time series foundation models (Chronos-2). Applied to pseudo-real-time forecasting of the Norwegian macroeconomy.
+Agentic outer-loop search over data transformations, covariate selection, and fine-tuning settings for time series foundation models (Chronos-2). Applied to pseudo-real-time forecasting of Norway, Canada, and Sweden.
 
 ## Research question
 
-Can an agentic search procedure improve macro forecasts by selecting data representations, covariates, and fine-tuning settings — relative to zero-shot foundation models, manually tuned models, and standard baselines?
+Can an agentic search procedure improve macro forecasts across small open economies by selecting data representations, covariates, and fine-tuning settings — and do validation-era gains survive out-of-sample regime changes (COVID, post-2022 inflation)?
 
 ## Repository structure
 
@@ -18,38 +19,49 @@ Can an agentic search procedure improve macro forecasts by selecting data repres
 autoresearch-macro/
 ├── README.md                   # this file
 ├── METHODOLOGY.md              # formal study design — source of truth for the paper (keep updated!)
-├── EXPERIMENT-1.md             # first experiment guide
-├── CONTEXT.md                  # session resume for AI assistants
-├── DESIGN.md                   # original research design brainstorm
-├── ROADMAP.md                  # phased timeline and deliverables
-├── STATUS.md                   # current status and results
+├── STATUS.md                   # current status and per-country search matrix
 ├── CLAUDE.md                   # instructions for Claude Code
 ├── log.md                      # decision log
-├── program.md                  # agent instructions for search loop
+├── ROADMAP.md                  # phased timeline and deliverables
+├── CONTEXT.md                  # session resume for AI assistants
+├── DESIGN.md                   # original research design brainstorm (historical)
+├── EXPERIMENT-1.md             # first experiment guide (historical)
+├── PREPARE-SPEC.md             # prepare.py spec (historical)
+├── program.md                  # legacy Norway agent instructions
+├── prompts/                    # LLM search prompts
+│   ├── blind.md                # domain-blind agent
+│   ├── informed_norway.md      # domain-informed, Norway
+│   ├── informed_canada.md      # domain-informed, Canada
+│   └── informed_sweden.md      # domain-informed, Sweden
 ├── src/
-│   ├── prepare.py              # data pipeline — 18 variables, pseudo-real-time (LOCKED)
+│   ├── prepare.py              # Norway data pipeline (LOCKED)
+│   ├── prepare_canada.py       # Canada data pipeline (LOCKED)
+│   ├── prepare_sweden.py       # Sweden data pipeline (LOCKED)
 │   ├── train.py                # Chronos-2 + AutoGluon scaffold (AGENT-EDITABLE)
 │   ├── evaluate.py             # evaluation harness, metrics, comparison (LOCKED)
-│   ├── baselines.py            # 5 classical baselines (RW, SN, AR, ARIMA, ETS)
-│   └── search.py               # LLM-guided outer loop controller
-├── tests/                      # 90 tests (pytest)
+│   ├── baselines.py            # Classical + ML baselines: RW, SN, AR, ARIMA, ETS, VAR, factor, BVAR, Elastic Net
+│   ├── search.py               # LLM/random/greedy outer-loop controller (multi-country, multi-seed)
+│   ├── build_forecast_errors.py # consolidates results into forecast_errors.parquet
+│   └── tables/generate_tables.py # script-generates LaTeX tables from results
+├── tests/                      # 126 tests (pytest)
 ├── configs/
-│   ├── publication_lags.yml    # days-after-month-end for each variable
-│   └── search_space.yml        # valid parameter ranges for the search
+│   ├── publication_lags.yml    # per-country publication lags
+│   ├── search_space.yml        # valid parameter ranges for the search
+│   └── manual_economist_benchmarks.yaml # locked per-country manual benchmarks
+├── metadata/
+│   ├── variable_catalog.csv
+│   ├── canada_target_decision.md
+│   └── partner_activity_mapping.csv
 ├── data/                       # cached data (gitignored)
 ├── results/                    # experiment logs, metrics (gitignored)
-│   └── validation/             # 6 methods evaluated on 2006-2015
+│   ├── {norway,canada,sweden}/ # per-country search states and logs
+│   ├── validation/             # per-method validation-era results
+│   └── test/                   # per-method test-era results
+├── audit/                      # audit trail against the original Norway paper
+├── paper/
+│   ├── main.tex                # LaTeX manuscript
+│   └── REVISION-PLAN-{1..4}.md # revision execution specs
 ├── webapp/                     # Interactive Quarto + D3.js dashboard
-│   ├── _quarto.yml             # Quarto website config
-│   ├── index.qmd               # Landing page
-│   ├── data-pipeline.qmd       # Data sources and pseudo-real-time explorer
-│   ├── baselines.qmd           # Classical baseline comparison
-│   ├── foundation-model.qmd    # Chronos-2 results and model ladder
-│   ├── search.qmd              # Search loop trajectory and analysis
-│   ├── forecasts.qmd           # Rolling forecasts vs actuals (interactive)
-│   ├── results.qmd             # Full comparison heatmap and tables
-│   └── _data/                  # prepare_results.py, generate_forecasts.py + JSON
-├── paper/                      # LaTeX paper
 └── reference/
     └── autoresearch/           # Karpathy's repo, cloned for study
 ```
@@ -57,23 +69,34 @@ autoresearch-macro/
 ## Quick start
 
 ```bash
-# Install all dependencies
-uv sync --all-extras
+# Install all dependencies (AutoGluon + dev tools)
+uv sync --extra ml --extra dev
 
-# Download data and build panel
+# Download data and build panels for all three countries
 uv run python src/prepare.py
+uv run python src/prepare_canada.py
+uv run python src/prepare_sweden.py
 
 # Run all baselines on validation era
-uv run python src/baselines.py --all --era validation --save
+uv run python src/baselines.py --all --era validation --save --country norway
 
 # Run zero-shot Chronos-2
-uv run python src/train.py --era validation --save
-
-# Compare results
-uv run python src/evaluate.py --compare results/validation/random_walk results/validation/arima results/validation/chronos2_zs
+uv run python src/train.py --era validation --save --country norway
 
 # Run the LLM-guided search loop (requires ANTHROPIC_API_KEY in .env)
-uv run python src/search.py --max-iterations 10
+# HF_HUB_OFFLINE=1 skips HuggingFace HEAD checks during model load
+HF_HUB_OFFLINE=1 uv run python src/search.py \
+    --country norway --mode llm --seed 42 \
+    --program prompts/informed_norway.md --max-iterations 50
+
+# Blind search — use --tag to get a separate state file
+HF_HUB_OFFLINE=1 uv run python src/search.py \
+    --country norway --mode llm --seed 42 \
+    --program prompts/blind.md --tag blind --max-iterations 50
+
+# Consolidate errors and regenerate tables
+uv run python src/build_forecast_errors.py
+uv run python src/tables/generate_tables.py
 
 # Run tests
 uv run pytest
@@ -119,20 +142,22 @@ The formal study design is documented in [`METHODOLOGY.md`](METHODOLOGY.md). Thi
 ## Key design decisions
 
 - **Agent constrained:** Search loop edits covariate selection, transforms, fine-tuning params — not model architecture
-- **Rolling validation:** Expanding window, 2006-2015 validation era, 120 monthly origins
-- **Pseudo-real-time:** Publication lags enforced at every forecast origin
-- **LLM-guided search:** Claude proposes config changes based on past results and domain knowledge
-- **Three-way ablation:** Decompose gains into (1) foundation model, (2) fine-tuning, (3) agentic search
+- **Rolling validation:** Expanding window, 2006-2015 validation era, 120 monthly origins per country
+- **Pseudo-real-time:** Publication lags enforced at every forecast origin, for all three countries
+- **Search comparators:** Informed LLM, blind (domain-stripped) LLM, random, greedy stepwise, manual economist benchmark
+- **Three countries, harmonized design:** Norway, Canada, Sweden — same targets, same horizons, same covariate template, common evaluation window 2006-01 to 2025-03
 
-## Current results (validation era 2006-2015, avg RMSE across targets)
+## Current results snapshot (validation era, avg MASE)
 
-| Method | h=1 | h=3 | h=6 | h=12 |
-|--------|-----|-----|-----|------|
-| Random walk | 1.202 | 1.533 | 1.958 | 2.683 |
-| **ARIMA** | **1.164** | **1.504** | **1.910** | **2.641** |
-| Chronos-2 (120M) zero-shot | 1.171 | 1.542 | 1.989 | 2.820 |
+| Country | Zero-shot | Informed LLM (seed 42) | Blind LLM (seed 42) | Random | Greedy |
+|---------|-----------|------------------------|---------------------|--------|--------|
+| Norway  | 0.999 | 0.975 | 0.980 | 0.942 | 0.922 |
+| Canada  | —     | 0.843 | pending | 0.847 | 0.841 |
+| Sweden  | —     | 1.006 | pending | 0.936 | 0.992 |
 
-**Search experiment (50 iterations):** The LLM-guided search improved validation-era Chronos-2 by **6.8%** (MASE 1.94 → 1.81) by discovering oil prices, policy rate, US inflation, and NOK/EUR as covariates. **Test era (2016+):** The agent-tuned config overfits — zero-shot Chronos-2 is more robust to regime changes (COVID, inflation) and beats ARIMA at longer horizons. Model: `amazon/chronos-2` (120M params).
+**Key finding (Norway):** Agent-tuned configs improve validation MASE by 2-8% but frequently fail to generalize to the test era (COVID + post-2022 inflation). Zero-shot Chronos-2 is often more robust across regime changes than tuned pipelines or classical baselines. See `STATUS.md` for full per-country numbers.
+
+Model: `amazon/chronos-2` (120M parameters) via AutoGluon 1.5.0.
 
 ## Links
 

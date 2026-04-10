@@ -1,8 +1,10 @@
 # ROADMAP — Automated Feature Engineering for Macro Forecasting
 
-> **Status:** Active
-> **Last updated:** 2026-03-28
+> **Status:** Superseded — see `paper/REVISION-PLAN-4.md` for current execution spec
+> **Last updated:** 2026-04-10
 > **Collaborators:** Vegard Larsen, Leif Anders Thorsrud
+
+> **Note (2026-04-10):** Phases 0-5 below described the original Norway-only plan and are all complete. The project is now executing `paper/REVISION-PLAN-4.md`, which targets the International Journal of Forecasting with a three-country evaluation (Norway + Canada + Sweden). This ROADMAP is retained as a historical record; see `STATUS.md` for current progress against the revision plan.
 
 ---
 
@@ -118,18 +120,14 @@
 
 **Goal:** Write and submit.
 
-- [ ] Draft introduction and literature review
-- [ ] Write methodology section
-- [ ] Create all tables and figures
-- [ ] Write results and discussion
+- [x] Draft Norway-only manuscript
+- [x] Three rounds of AI-referee review (see `paper/ai-referee-reports/round-{1,2,3}/`)
+- [ ] Three-country rewrite (see `paper/REVISION-PLAN-4.md`, Phase 6)
 - [ ] Internal review (Vegard + Leif)
 - [ ] Circulate to colleagues for feedback
-- [ ] Submit to target journal
+- [ ] Submit to International Journal of Forecasting
 
-**Target journals (in order of ambition):**
-1. Journal of Econometrics
-2. Journal of Applied Econometrics
-3. International Journal of Forecasting
+**Target journal:** International Journal of Forecasting (locked as of 2026-04-01; see REVISION-PLAN-4 §2)
 
 **Working paper series:** CESifo or Norges Bank WP
 

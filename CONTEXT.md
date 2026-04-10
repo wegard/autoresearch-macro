@@ -1,54 +1,57 @@
 # CONTEXT.md — Session Resume
 
-**Last updated:** 2026-03-29
+**Last updated:** 2026-04-10
 
 ## Current state
 
-Search experiment complete: 50 iterations, 6 accepted improvements, **6.8% MASE improvement** over zero-shot baseline. Best config: covariates=[brent_crude, policy_rate, us_cpi, nok_eur], context_length=96, LoRA fine-tune (100 steps, 5e-6 lr).
+Executing `paper/REVISION-PLAN-4.md` — a three-country expansion (Norway + Canada + Sweden) targeting the International Journal of Forecasting. Phases 0-3 are complete. Phase 4 (search experiments) is in progress.
 
-## What happened
+## Phase 4 search matrix
 
-- 2026-03-27: Project initiated. Research design drafted. Autoresearch cloned.
-- 2026-03-28: Full implementation session — data pipeline, baselines, train.py, search.py, evaluate.py, webapp. Fixed SSB table IDs, Norges Bank keys. 90 tests passing.
-- 2026-03-29:
-  - Switched from chronos-bolt-small (20M) to amazon/chronos-2 (120M)
-  - Fixed fine-tuning bugs (wrong param name, module identity, default arg binding, baseline scoring)
-  - Ran first search experiment: 30 iterations
-  - Agent found best config: `covariates=[brent_crude, policy_rate, us_cpi], context_length=96`
-  - MASE improved from 1.9443 (baseline) to 1.8158 (best), a 6.6% improvement
+| Country | Informed LLM | Blind LLM | Random | Greedy |
+|---------|--------------|-----------|--------|--------|
+| Norway  | seeds 42/123/456 | seed 42 (50 iter) | seed 42 | 200 iter |
+| Canada  | seed 42 | pending | seed 42 | 3 iter |
+| Sweden  | seed 42 | pending | seed 42 | 5 iter |
 
-## Search trajectory (50 iterations, 6 accepted)
+**Immediate next steps:**
+1. Blind LLM search for Canada and Sweden (seed 42, 50 iter each)
+2. More greedy iterations for Canada and Sweden
+3. Leave-one-component-out ablation for each country's best config (Phase 5)
+4. Consolidate three-country `forecast_errors.parquet` and regenerate tables
 
-| Iter | Config change | MASE | Status |
-|------|--------------|------|--------|
-| 0 | Baseline | 1.9443 | accepted |
-| 9 | context_length=96 | 1.8635 | accepted (-4.2%) |
-| 15 | + brent_crude | 1.8472 | accepted (-5.0%) |
-| 18 | + policy_rate | 1.8326 | accepted (-5.7%) |
-| 27 | + us_cpi | 1.8158 | accepted (-6.6%) |
-| 39 | + nok_eur | 1.8129 | accepted (-6.8%) |
-| 45 | + LoRA fine-tune (100 steps, 5e-6) | 1.8129 | accepted (-6.8%) |
+## Best configs so far (validation MASE)
 
-44 iterations rejected. Search converged by ~iter 45.
+| Country | Method | MASE | Config |
+|---------|--------|------|--------|
+| Norway | Informed LLM s42 | 0.9745 | `sp500, policy_rate, fed_funds, nok_usd`, ft 500 steps, lr 1e-5 |
+| Norway | Informed LLM s123 | 0.9529 | — |
+| Norway | Informed LLM s456 | 0.9572 | — |
+| Norway | Blind LLM s42 | 0.9798 | `sp500, vix`, ft 100 steps, lr 1e-5 |
+| Norway | Random s42 | 0.9423 | — |
+| Norway | Greedy | 0.9222 | — |
+| Canada | Informed LLM s42 | 0.8425 | — |
+| Sweden | Informed LLM s42 | 1.0056 | — |
 
-## Next steps
+Blind Norway found risk/equity indicators (`sp500 + vix`) without domain hints but missed the monetary and FX covariates that the informed agent picked up.
 
-1. Phase 4: ablation analysis — decompose gains, analyze validation-to-test overfitting
-2. Regenerate forecast visualizations with test-era data
-3. Consider per-variable search (agent-tuned config helps unemployment but hurts others)
-4. Discuss with Leif: test-era overfitting, paper implications
+## Recent engineering fixes (2026-04-08/09)
 
-## Test era results (2016+)
-
-The agent-tuned config does NOT generalize to the test era. At h=12, it's the worst method (RMSE 3.23 vs random walk 2.61). The search overfit to validation-era patterns.
-
-However, zero-shot Chronos-2 beats ARIMA at h=3/6/12 on the test era — the foundation model handles regime changes (COVID, inflation) better than classical methods. Unemployment is the exception where the agent-tuned config is best at all horizons.
+1. **`time_limit` bug in train.py.** AutoGluon 1.5.0 Chronos-2 model loading takes 260-340s on this machine; the prior `time_limit=300` for fine-tune (and `30` for zero-shot) killed the predictor before training started. Raised to 1800s.
+2. **`--tag` flag in search.py.** State files were keyed only by `mode+seed`, so blind/informed runs with the same seed overwrote each other. `--tag blind` now creates `search_state_llm_blind_42.json`.
+3. **Run with `HF_HUB_OFFLINE=1`** to skip HuggingFace HEAD checks — cuts ~30s per model load.
+4. **Install both extras together:** `uv sync --extra ml --extra dev`. Syncing only one extra uninstalls the other.
 
 ## Critical files
 
 | File | Role |
 |------|------|
-| `src/train.py` | Agent sandbox — amazon/chronos-2 via "Chronos-2" key |
-| `src/search.py` | LLM-guided outer loop controller |
-| `results/search_state.json` | Persisted search state (30 iterations) |
-| `results/search_log.jsonl` | Full iteration log (94 entries across all runs) |
+| `paper/REVISION-PLAN-4.md` | Current execution spec (three-country IJF revision) |
+| `STATUS.md` | Phase-by-phase progress + per-country results |
+| `src/search.py` | Search controller — `--country`, `--mode`, `--program`, `--tag`, `--seed` |
+| `src/train.py` | Agent sandbox — Chronos-2 via AutoGluon `"Chronos-2"` key |
+| `src/prepare.py` / `prepare_canada.py` / `prepare_sweden.py` | Country-specific data pipelines (locked) |
+| `configs/manual_economist_benchmarks.yaml` | Locked manual benchmarks per country |
+| `prompts/{blind,informed_*}.md` | LLM search prompts |
+| `metadata/variable_catalog.csv` | Authoritative metadata for all three countries |
+| `results/{norway,canada,sweden}/search_state_*.json` | Per-run search state |

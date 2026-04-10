@@ -1,88 +1,95 @@
 # STATUS.md — Autoresearch Macro
 
-**Stage:** Phase 3 complete (50 iterations), Phase 4 analysis next
-**Target:** TBD
+**Stage:** REVISION-PLAN-4 — three-country expansion for IJF submission
+**Target journal:** International Journal of Forecasting
 **Collaborators:** Leif Anders Thorsrud
-**Last updated:** 2026-03-29
+**Last updated:** 2026-04-10
 
-## Submission history
+## Revision-plan-4 progress
 
-Not yet written.
+| Phase | Description | Status |
+|-------|-------------|--------|
+| 0 | Audit Norway results against paper | Complete |
+| 1 | Unified evaluation pipeline (`build_forecast_errors.py`, `tables/generate_tables.py`) | Complete |
+| 2 | Three-country data layer (Norway, Canada, Sweden) | Complete |
+| 3 | Baseline suite (classical + BVAR + Elastic Net + manual economist benchmark) | Complete |
+| 4 | Search experiments | In progress (see matrix below) |
+| 5 | Mechanism + robustness (ablations, subperiods, re-fit) | Partial — leave-one-out still missing |
+| 6 | Manuscript rebuild | Not started |
+| 7 | IJF reproducibility package | Not started |
 
-## Search experiment results (50 iterations, avg MASE)
+## Search experiment matrix
 
-| Iter | Config change | MASE | vs Baseline |
-|------|--------------|------|-------------|
-| 0 | Baseline (univariate, all context) | 1.9443 | — |
-| 9 | + context_length=96 | 1.8635 | -4.2% |
-| 15 | + brent_crude | 1.8472 | -5.0% |
-| 18 | + policy_rate | 1.8326 | -5.7% |
-| 27 | + us_cpi | 1.8158 | -6.6% |
-| 39 | + nok_eur | 1.8129 | -6.8% |
-| **45** | **+ LoRA fine-tune (100 steps, 5e-6)** | **1.8129** | **-6.8%** |
+| Country | Informed LLM | Blind LLM | Random | Greedy | Manual benchmark |
+|---------|--------------|-----------|--------|--------|------------------|
+| Norway  | seeds 42, 123, 456 (50 iter) | seed 42 (50 iter) | seed 42 (50 iter) | 200 iter | Locked in config |
+| Canada  | seed 42 (50 iter) | — | seed 42 (50 iter) | 3 iter | Locked in config |
+| Sweden  | seed 42 (50 iter) | — | seed 42 (50 iter) | 5 iter | Locked in config |
 
-**Best config:**
-```json
-{
-  "covariates": ["brent_crude", "policy_rate", "us_cpi", "nok_eur"],
-  "context_length": 96,
-  "fine_tune": true,
-  "fine_tune_steps": 100,
-  "fine_tune_lr": 5e-06
-}
-```
+**Outstanding search runs:**
+- Blind LLM search for Canada and Sweden (seed 42, 50 iter each)
+- Additional seeds (123, 456) for Canada/Sweden informed and random search, if compute permits
+- Greedy stepwise search needs more iterations for Canada (currently 3) and Sweden (5)
 
-**Key findings:**
-- 4 covariates optimal: oil, monetary policy, global inflation, exchange rate
-- 96-month (8-year) context window is optimal
-- LoRA fine-tuning works with very conservative settings (100 steps, lr=5e-6)
-- Aggressive fine-tuning (500+ steps, lr>1e-5) consistently hurts
-- Transforms on covariates don't help — raw levels work best
-- The search converged by iteration ~45 — diminishing returns after
+## Norway results snapshot
 
-## Validation era results (2006-2015, average RMSE across targets)
+**Validation era (2006-2015, avg MASE across targets and horizons):**
 
-| Method | h=1 | h=3 | h=6 | h=12 |
-|--------|-----|-----|-----|------|
-| Random walk | 1.202 | 1.533 | 1.958 | 2.683 |
-| Seasonal naive | 2.645 | 2.639 | 2.645 | 3.670 |
-| AR(p) | 1.164 | 1.543 | 1.968 | 2.949 |
-| **ARIMA** | **1.164** | **1.504** | **1.910** | **2.641** |
-| ETS | 1.186 | 1.561 | 2.022 | 2.890 |
-| Chronos-2 (120M) zero-shot | 1.171 | 1.542 | 1.989 | 2.820 |
+| Method | MASE | vs baseline |
+|--------|------|-------------|
+| Zero-shot baseline | 0.9991 | — |
+| Informed LLM (seed 42) | 0.9745 | -2.5% |
+| Informed LLM (seed 123) | 0.9529 | -4.6% |
+| Informed LLM (seed 456) | 0.9572 | -4.2% |
+| Blind LLM (seed 42) | 0.9798 | -1.9% |
+| Random search (seed 42) | 0.9423 | -5.7% |
+| Greedy stepwise | 0.9222 | -7.7% |
 
-## Test era results (2016+, average RMSE across targets)
+**Best informed config (seed 42):** `sp500 + policy_rate + fed_funds + nok_usd`, LoRA fine-tune 500 steps, lr 1e-5
+**Best blind config (seed 42):** `sp500 + vix`, LoRA fine-tune 100 steps, lr 1e-5
 
-| Method | h=1 | h=3 | h=6 | h=12 |
-|--------|-----|-----|-----|------|
-| **Random walk** | **1.413** | **1.759** | **2.115** | **2.609** |
-| ARIMA | 1.450 | 1.797 | 2.284 | 2.815 |
-| Chronos-2 zero-shot | 1.463 | 1.772 | 2.212 | 2.790 |
-| Chronos-2 agent-tuned | 1.461 | 1.847 | 2.346 | 3.230 |
+The blind agent finds equity/risk proxies (`sp500`, `vix`) without hints but does not rediscover monetary/exchange-rate covariates. The informed agent's picks are economically interpretable.
 
-**Key test-era findings:**
-- Random walk is the strongest method on the test era (regime changes favor the naive baseline)
-- Zero-shot Chronos-2 beats ARIMA at h=3, h=6, h=12 — the foundation model handles COVID/inflation shocks better than classical methods
-- Agent-tuned config does NOT generalize — covariates and fine-tuning that helped in 2006-2015 overfit to the validation era
-- Exception: unemployment forecasting improves with the agent-tuned config at all horizons
+## Canada results snapshot (validation MASE)
 
-## Current to-dos
+| Method | MASE |
+|--------|------|
+| Informed LLM (seed 42) | 0.8425 |
+| Random search (seed 42) | 0.8474 |
+| Greedy stepwise | 0.8406 |
 
-- [x] Run best config on test era (2016+) for final results
-- [ ] Phase 4 ablation analysis (decompose gains by covariate, context, fine-tuning)
-- [ ] Regenerate forecast visualizations with best config
-- [ ] Discuss with Leif: results, next steps, paper outline
+## Sweden results snapshot (validation MASE)
+
+| Method | MASE |
+|--------|------|
+| Informed LLM (seed 42) | 1.0056 |
+| Random search (seed 42) | 0.9363 |
+| Greedy stepwise | 0.9919 |
+
+Sweden is the one country where random search currently beats the informed LLM — an interesting heterogeneity result to explore.
 
 ## Model: amazon/chronos-2 (120M)
 
-- **Native covariate support** — both past and known future covariates
-- **LoRA fine-tuning** — default r=8, lora_alpha=16
-- **Cross-learning** — joint predictions across time series
-- Accessed via AutoGluon `"Chronos-2"` model key
+- AutoGluon 1.5.0 via `"Chronos-2"` hyperparameter key
+- Native covariate support (past + known future)
+- LoRA fine-tuning (r=8, α=16)
+- 8,192 context length
+
+## Recent engineering fixes
+
+- **2026-04-08:** `time_limit` raised from 300s → 1800s in `fit_predictor()`. AutoGluon 1.5.0 model loading takes 260-340s, so the old limit killed fine-tune runs before training started.
+- **2026-04-08:** Added `--tag` flag to `search.py` so blind and informed runs with the same seed get separate state files.
+
+## Current to-dos
+
+- [ ] Run blind LLM search for Canada and Sweden
+- [ ] Consolidate three-country `forecast_errors.parquet`
+- [ ] Leave-one-component-out ablation for each country's best config
+- [ ] Regenerate manuscript tables for three-country evaluation
+- [ ] Draft Phase 6 manuscript rewrite
 
 ## Known data limitations
 
-- Industrial production (table 14208) ends 2023M12
-- Unemployment (table 13760) only from 2006M01
-- House prices (seasonally adjusted) only from 2005Q1
-- NOK/EUR only from 1999 (euro introduction)
+- Norway: Industrial production (SSB 14208) ends 2023M12; unemployment (13760) only from 2006M01; house prices (seasonally adjusted) only from 2005Q1
+- Canada: Target choice for industrial output is Monthly GDP at basic prices (Table 36-10-0434-01). See `metadata/canada_target_decision.md`.
+- Sweden: Follows SCB PxWeb API; partner-area activity variable is euro-area GDP (same as Norway)

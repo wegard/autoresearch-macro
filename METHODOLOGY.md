@@ -2,7 +2,9 @@
 
 > Source of truth for the study design. Keep this document up to date when methods change. It will serve as the blueprint for the paper's methodology section.
 
-**Last updated:** 2026-03-29
+**Last updated:** 2026-04-10
+
+> **Note (2026-04-10):** This document currently describes the Norway-only design. The three-country expansion (Norway + Canada + Sweden) specified in `paper/REVISION-PLAN-4.md` is partially implemented: data layer, baselines (incl. BVAR and Elastic Net), and informed/random search runs are complete; blind LLM search is complete for Norway only. The full methodology rewrite is deferred to Phase 6 of REVISION-PLAN-4, once all search runs finish. See `STATUS.md` for the current execution state.
 
 ---
 
@@ -254,3 +256,6 @@ This overfitting finding highlights a fundamental challenge: pipeline optimizati
 ## Changelog
 
 - **2026-03-29:** Initial version. Documented setup as of the 50-iteration search experiment. Added test-era results showing validation-to-test overfitting.
+- **2026-04-08:** Raised AutoGluon `time_limit` from 300s to 1800s in `fit_predictor()`. Under AutoGluon 1.5.0 and Chronos-2 2.2.2, model loading alone takes 260-340s on the current hardware, so the previous limit killed every fine-tune run before training could start (producing empty predictors). Actual training budget is still controlled by `fine_tune_steps`.
+- **2026-04-08:** Added `--tag` flag to `src/search.py`. State and log files are now keyed by `(country, mode, seed, tag)` so informed and blind LLM runs with the same seed no longer overwrite each other.
+- **2026-04-09:** Blind LLM search completed for Norway (50 iterations, seed 42). Best MASE 0.9798 with `sp500 + vix`, LoRA fine-tune 100 steps, lr 1e-5. Compared against informed seed 42 (0.9745 with `sp500, policy_rate, fed_funds, nok_usd`), the blind agent discovers risk/equity proxies without hints but does not rediscover monetary or exchange-rate covariates.

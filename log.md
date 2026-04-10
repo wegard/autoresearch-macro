@@ -133,6 +133,30 @@
 }
 ```
 
+## 2026-04-08 — AutoGluon 1.5.0 fine-tune time_limit bug
+
+**Finding:** After `uv sync --extra ml` pulled AutoGluon 1.5.0, every fine-tune run in the blind Norway search silently produced zero forecasts with "Trainer has no fit models that can predict."
+
+**Root cause:** In 1.5.0, Chronos-2 model loading on this machine takes ~260-340s (HuggingFace cache check + weight load). `train.py` was passing `time_limit=300` for fine-tune and `time_limit=30` for zero-shot, so AutoGluon killed the model before training even started and returned an empty predictor.
+
+**Fix:** Raised `time_limit` to 1800s for both modes. Actual training budget is controlled by `fine_tune_steps`; `time_limit` is just a safety guardrail.
+
+**Side effect:** Setting `HF_HUB_OFFLINE=1` further cuts startup time because AutoGluon skips the HuggingFace HEAD check.
+
+## 2026-04-08 — --tag flag for blind vs informed runs
+
+**Decision:** Added a `--tag` argument to `src/search.py` so blind and informed LLM runs with the same seed write to separate state/log files.
+
+**Reasoning:** The state file was keyed only by `mode + seed`, so `--program prompts/blind.md --seed 42` was resuming the existing informed run rather than starting a fresh blind search. Adding `--tag blind` gives `search_state_llm_blind_42.json`.
+
+## 2026-04-09 — Blind Norway search (50 iterations)
+
+**Setup:** `prompts/blind.md` strips all domain knowledge about the Norwegian economy — the agent only sees generic variable names and must discover useful covariates without hints.
+
+**Result:** Blind search found a 1.9% improvement (baseline 0.9991 → best 0.9798 MASE) and converged on `sp500 + vix` with LoRA fine-tuning (100 steps, lr=1e-5). Informed search at seed 42 reached 0.9745 with the economically interpretable `sp500 + policy_rate + fed_funds + nok_usd`.
+
+**Interpretation:** The domain-blind agent discovered risk/equity indicators on its own, but did not rediscover the monetary and exchange-rate covariates that the informed agent found. This is evidence that domain knowledge helps the agent narrow in on macro-relevant variables — not just any covariate set yields the same validation gains.
+
 ## 2026-03-29 — Test era evaluation
 
 **Result:** The agent-tuned config does not generalize to the test era (2016+).

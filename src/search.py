@@ -426,8 +426,8 @@ def run_and_evaluate(
     child.start()
     child_conn.close()  # Parent doesn't write to the pipe
 
-    # Wait for result with a generous timeout (fine-tuning can take minutes)
-    timeout = 600  # 10 minutes
+    # Wait for result — model loading alone can take 5+ min, fine-tuning adds more
+    timeout = 3600  # 1 hour
     if parent_conn.poll(timeout):
         score = parent_conn.recv()
     else:
@@ -633,6 +633,7 @@ def search_loop(
     country: str = "norway",
     seed: int = 0,
     tag: str | None = None,
+    overwrite: bool = False,
 ) -> None:
     """Run the search loop.
 
@@ -644,9 +645,33 @@ def search_loop(
         country: Country to run search for.
         seed: Random seed for reproducibility.
         tag: Optional tag for distinguishing runs (e.g., "blind").
+        overwrite: If True, allow starting fresh even if a state file with prior
+            results exists (otherwise refuse). Ignored when ``resume`` is True.
     """
     global _current_country
     _current_country = country
+
+    # Parameterized output paths
+    state_path, log_path = _search_paths(country, mode, seed, tag=tag)
+
+    logger.info("Search: country=%s, mode=%s, seed=%d", country, mode, seed)
+    logger.info("  State: %s", state_path)
+    logger.info("  Log: %s", log_path)
+
+    # Refuse to overwrite an existing state file unless --resume or --overwrite.
+    # This prevents accidentally destroying prior search results, and runs the
+    # check BEFORE any heavy imports / model loading so the user gets immediate
+    # feedback. (Sweden lost a 0.9663 informed result this way on 2026-04-08.)
+    if not resume:
+        existing = SearchState.load(state_path)
+        if existing is not None and existing.iteration > 0 and not overwrite:
+            logger.error(
+                "State file already exists at %s with %d iterations and best "
+                "score %.4f. Refusing to overwrite. Use --resume to continue, "
+                "or --overwrite to start fresh and discard prior results.",
+                state_path, existing.iteration, existing.best_score,
+            )
+            return
 
     # Pre-import autogluon in the parent process so forked children inherit
     # the loaded modules. This prevents failures when another uv process
@@ -662,15 +687,8 @@ def search_loop(
     panel = load_country_panel(country)
     available_covariates = panel.covariates()
 
-    # Parameterized output paths
-    state_path, log_path = _search_paths(country, mode, seed, tag=tag)
-
     # Seeded RNG for random/greedy modes
     rng = np.random.default_rng(seed) if seed != 0 else np.random.default_rng()
-
-    logger.info("Search: country=%s, mode=%s, seed=%d", country, mode, seed)
-    logger.info("  State: %s", state_path)
-    logger.info("  Log: %s", log_path)
 
     # Initialize or resume state
     state: SearchState
@@ -942,6 +960,11 @@ def main() -> None:
         "--tag", type=str, default=None,
         help="Optional tag for state/log filenames (e.g., 'blind')",
     )
+    parser.add_argument(
+        "--overwrite", action="store_true",
+        help="Allow starting fresh even if a state file with prior results exists "
+             "(otherwise the run is refused). Ignored when --resume is set.",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -962,6 +985,7 @@ def main() -> None:
         country=args.country,
         seed=args.seed,
         tag=args.tag,
+        overwrite=args.overwrite,
     )
 
 

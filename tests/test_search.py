@@ -131,6 +131,75 @@ class TestSearchState:
         assert SearchState.load() is None
 
 
+class TestSearchLoopOverwriteGuard:
+    """Regression tests for the safety check that prevents accidentally
+    overwriting an existing search state when --resume is not given.
+    Sweden lost a 0.9663 result this way on 2026-04-08."""
+
+    def _make_existing_state(self, tmp_path, monkeypatch):
+        """Set up a fake existing state file with prior progress."""
+        import search
+        monkeypatch.setattr(search, "RESULTS_DIR", tmp_path)
+        state_path = tmp_path / "norway" / "search_state_llm_42.json"
+        state_path.parent.mkdir(parents=True, exist_ok=True)
+        existing = SearchState(
+            iteration=21,
+            best_score=0.9663,
+            baseline_score=1.0056,
+            best_config={"covariates": ["house_prices"], "context_length": 36},
+            start_time="prior-run",
+        )
+        state_path.write_text(existing.to_json())
+        return state_path
+
+    def test_refuses_to_overwrite_existing_state(self, tmp_path, monkeypatch):
+        import search
+        state_path = self._make_existing_state(tmp_path, monkeypatch)
+
+        # If the guard fires, search_loop returns before touching anything else.
+        # Patch load_country_panel to raise so we'd notice if execution proceeds.
+        def _explode(_country):
+            raise AssertionError("search_loop should not have started")
+        monkeypatch.setattr(
+            "baselines.load_country_panel", _explode, raising=False,
+        )
+
+        search.search_loop(
+            country="norway", mode="llm", seed=42, resume=False, overwrite=False,
+        )
+
+        # State file is untouched
+        reloaded = SearchState.from_json(state_path.read_text())
+        assert reloaded.iteration == 21
+        assert reloaded.best_score == 0.9663
+
+    def test_overwrite_flag_allows_fresh_start(self, tmp_path, monkeypatch):
+        import search
+        state_path = self._make_existing_state(tmp_path, monkeypatch)
+
+        # Stub out the heavy stuff so the loop reaches the baseline step.
+        # We want it to *try* to start fresh, then bail at the first eval.
+        class _StubPanel:
+            data = type("D", (), {"columns": []})()
+            def covariates(self):
+                return []
+        monkeypatch.setattr(
+            "baselines.load_country_panel", lambda _c: _StubPanel(), raising=False,
+        )
+        # Prevent actual model invocation: make run_and_evaluate return None,
+        # which causes search_loop to log an error and return cleanly.
+        monkeypatch.setattr(
+            search, "run_and_evaluate",
+            lambda *a, **kw: None,
+        )
+
+        # Should not raise, and should return without honoring the prior state.
+        search.search_loop(
+            country="norway", mode="llm", seed=42,
+            resume=False, overwrite=True, max_iterations=0,
+        )
+
+
 # ---------------------------------------------------------------------------
 # Tests: Prompt building
 # ---------------------------------------------------------------------------

@@ -86,7 +86,8 @@ The blind agent finds equity/risk proxies (`sp500`, `vix`) without hints but doe
 - **2026-04-08:** `time_limit` raised from 300s → 1800s in `fit_predictor()`. AutoGluon 1.5.0 model loading takes 260-340s, so the old limit killed fine-tune runs before training started.
 - **2026-04-08:** Added `--tag` flag to `search.py` so blind and informed runs with the same seed get separate state files.
 - **2026-04-11:** Added overwrite guard to `search.py` (commit 57de78b). The loop now refuses to start a fresh run when a state file with prior progress exists, unless `--overwrite` is passed. This is the foot-gun that destroyed the lost Sweden 0.9663 result.
-- **2026-04-11:** Dropped `retail_sales` from the Sweden panel via `DROPPED_VARIABLES` in `prepare_sweden.py`. Sweden now has 3 targets instead of 4. See `metadata/sweden_target_notes.md`.
+- **2026-04-11:** Dropped `retail_sales` from the Sweden panel via `DROPPED_VARIABLES` in `prepare_sweden.py` (commit 51ffa0d). Sweden now has 3 targets instead of 4. See `metadata/sweden_target_notes.md`.
+- **2026-04-11:** Fixed quick→full eval gating bias. The search now gates promotion to full eval on `quick_score < state.best_quick_score` instead of `< state.best_score`, making the gate direction-agnostic. Audit showed Norway has -3.63% gap (quick better than full, gate was loose), Canada -0.67% (loose), Sweden +2.17% (gate was strict, destroying real improvements). Norway and Canada existing results don't need re-running — their gating was permissive but not destructive. **Sweden informed and blind LLM searches should be re-run** with the new gating.
 
 ## Current to-dos
 

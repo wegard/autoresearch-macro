@@ -92,10 +92,19 @@ class IterationRecord:
 
 @dataclass
 class SearchState:
-    """Persistent state for the search loop."""
+    """Persistent state for the search loop.
+
+    ``best_quick_score`` tracks the *quick-eval* score of the current best
+    config. The search uses this (not best_score, which is the full-eval
+    score) as the gating threshold to decide whether to promote a candidate
+    to full evaluation. This is direction-agnostic to the quick-vs-full
+    baseline gap and was introduced after Sweden's broken gating was found
+    on 2026-04-11.
+    """
 
     iteration: int = 0
     best_score: float = float("inf")
+    best_quick_score: float = float("inf")
     best_config: dict[str, Any] = field(default_factory=dict)
     baseline_score: float = float("inf")
     history: list[IterationRecord] = field(default_factory=list)
@@ -105,6 +114,7 @@ class SearchState:
         data = {
             "iteration": self.iteration,
             "best_score": self.best_score,
+            "best_quick_score": self.best_quick_score,
             "best_config": self.best_config,
             "baseline_score": self.baseline_score,
             "history": [asdict(h) for h in self.history],
@@ -118,12 +128,30 @@ class SearchState:
         state = cls(
             iteration=data["iteration"],
             best_score=data["best_score"],
+            # Backwards compat: old state files don't have best_quick_score.
+            # Default to inf and try to recover from history below.
+            best_quick_score=data.get("best_quick_score", float("inf")),
             best_config=data["best_config"],
             baseline_score=data["baseline_score"],
             start_time=data.get("start_time", ""),
         )
         for h in data.get("history", []):
             state.history.append(IterationRecord(**h))
+
+        # Backwards compat recovery: if best_quick_score is missing, infer it
+        # from the history by finding the accepted record whose full_score
+        # matches best_score (i.e., the iteration that produced the best).
+        # Without this, resumed old runs would treat every gate check as
+        # permissive (inf) and waste compute on full evals that always reject.
+        if state.best_quick_score == float("inf") and state.history:
+            for rec in reversed(state.history):
+                if (rec.status == "accepted"
+                        and rec.full_score is not None
+                        and rec.quick_score is not None
+                        and abs(rec.full_score - state.best_score) < 1e-9):
+                    state.best_quick_score = rec.quick_score
+                    break
+
         return state
 
     def save(self, path: Path | None = None) -> None:
@@ -600,7 +628,11 @@ def propose_greedy_config(
         logger.info("Greedy step: evaluating %d neighbors...", len(candidates))
 
     best_neighbor = None
-    best_quick_score = state.best_score
+    # Compare neighbor quick scores against the best config's quick score,
+    # not its full score. Same reason as the LLM/random gating fix on
+    # 2026-04-11 — when quick eval is biased relative to full eval, gating
+    # against the full score systematically misses improvements.
+    best_quick_score = state.best_quick_score
     best_description = ""
 
     for overrides, description in candidates:
@@ -728,6 +760,7 @@ def search_loop(
 
         state.baseline_score = full_baseline
         state.best_score = full_baseline
+        state.best_quick_score = quick_baseline
         state.best_config = baseline_config
 
         record = IterationRecord(
@@ -821,11 +854,15 @@ def search_loop(
             logger.warning("Quick evaluation failed, skipping.")
             continue
 
-        logger.info("Quick score: %.4f (best: %.4f)", quick_score, state.best_score)
+        logger.info("Quick score: %.4f (best quick: %.4f, best full: %.4f)",
+                    quick_score, state.best_quick_score, state.best_score)
 
-        # 4. If quick eval shows improvement, run full evaluation
+        # 4. If quick eval shows improvement, run full evaluation.
+        # Gate is on best_quick_score (not best_score / full) so the test is
+        # symmetric regardless of whether quick eval is biased high or low
+        # vs full eval — see Sweden investigation 2026-04-11 in log.md.
         full_score = None
-        if quick_score < state.best_score:
+        if quick_score < state.best_quick_score:
             logger.info("Quick eval improved! Running full evaluation...")
             full_score = run_and_evaluate(
                 candidate_config, max_origins=None, panel=panel)
@@ -833,10 +870,12 @@ def search_loop(
             if full_score is not None:
                 logger.info("Full score: %.4f (best: %.4f)", full_score, state.best_score)
 
-        # 5. Accept or reject
+        # 5. Accept or reject. Acceptance is on the FULL score (this is the
+        # real metric); only the gating threshold uses the quick score.
         accepted = False
         if full_score is not None and full_score < state.best_score:
             state.best_score = full_score
+            state.best_quick_score = quick_score
             state.best_config = candidate_config
             accepted = True
             # New best config — all neighbors are fresh again

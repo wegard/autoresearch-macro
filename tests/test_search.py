@@ -93,6 +93,7 @@ class TestSearchState:
         state = SearchState(
             iteration=5,
             best_score=2.5,
+            best_quick_score=2.7,
             best_config={"covariates": ["brent_crude"]},
             baseline_score=3.0,
             start_time="2026-03-28T12:00:00",
@@ -108,9 +109,56 @@ class TestSearchState:
 
         assert loaded.iteration == 5
         assert loaded.best_score == 2.5
+        assert loaded.best_quick_score == 2.7
         assert loaded.best_config == {"covariates": ["brent_crude"]}
         assert len(loaded.history) == 1
         assert loaded.history[0].status == "accepted"
+
+    def test_legacy_state_no_history_defaults_to_inf(self):
+        # Old state files from before 2026-04-11 don't have best_quick_score.
+        # With no history to recover from, the field defaults to inf so the
+        # gate is permissive on the next iteration.
+        legacy_json = (
+            '{"iteration": 5, "best_score": 2.5, '
+            '"best_config": {}, "baseline_score": 3.0, "history": []}'
+        )
+        loaded = SearchState.from_json(legacy_json)
+        assert loaded.best_score == 2.5
+        assert loaded.best_quick_score == float("inf")
+
+    def test_legacy_state_recovers_quick_from_history(self):
+        # When the legacy state has a history, we should recover the
+        # best_quick_score from the iteration whose full_score matches
+        # best_score. This restores correct gating on resumed old runs.
+        legacy_json = json.dumps({
+            "iteration": 3,
+            "best_score": 0.9663,
+            "best_config": {"covariates": ["house_prices"], "context_length": 36},
+            "baseline_score": 1.0056,
+            "history": [
+                {
+                    "iteration": 0, "config": {}, "quick_score": 1.0274,
+                    "full_score": 1.0056, "status": "accepted",
+                    "description": "baseline", "runtime_seconds": 0,
+                    "timestamp": "t0",
+                },
+                {
+                    "iteration": 1, "config": {"foo": 1}, "quick_score": 1.05,
+                    "full_score": None, "status": "rejected",
+                    "description": "noise", "runtime_seconds": 1,
+                    "timestamp": "t1",
+                },
+                {
+                    "iteration": 2, "config": {"covariates": ["house_prices"]},
+                    "quick_score": 0.99, "full_score": 0.9663,
+                    "status": "accepted", "description": "best",
+                    "runtime_seconds": 5, "timestamp": "t2",
+                },
+            ],
+        })
+        loaded = SearchState.from_json(legacy_json)
+        assert loaded.best_score == 0.9663
+        assert loaded.best_quick_score == 0.99
 
     def test_save_and_load(self, tmp_path, monkeypatch):
         import search

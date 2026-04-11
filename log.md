@@ -149,6 +149,28 @@
 
 **Reasoning:** The state file was keyed only by `mode + seed`, so `--program prompts/blind.md --seed 42` was resuming the existing informed run rather than starting a fresh blind search. Adding `--tag blind` gives `search_state_llm_blind_42.json`.
 
+## 2026-04-11 — Sweden investigation: dropped retail_sales, found lost informed result, fixed overwrite foot-gun
+
+**Trigger:** Blind LLM search for Sweden completed 50 iterations and found *no improvement* over the zero-shot baseline (best=baseline=1.0056). The informed LLM result for Sweden also showed 1.0056 with the baseline config. Both LLM agents apparently failed for Sweden, but random search at the same seed found 0.9363 — a 6.9% improvement. Worth investigating.
+
+**Three findings:**
+
+1. **`retail_sales` has no validation-era data for Sweden.** The SCB table `HA/HA0101/HA0101B/Detoms07N` only publishes from 2023-01 onward (39 monthly observations as of 2026-04). Sweden's panel was including `retail_sales` as a target with all-NaN values for the 2006-2015 validation era; the training pipeline silently produced no forecasts for it; the per-target average MASE was computed across only the 3 surviving targets. This was masked from the search logs because the per-iteration scores looked normal — they just weren't averaging over what we thought they were.
+
+   **Fix:** Added `DROPPED_VARIABLES = ["retail_sales"]` to `src/prepare_sweden.py`, filtered at both build and load time. Sweden formally has 3 targets now. Documented in `metadata/sweden_target_notes.md` and `metadata/variable_catalog.csv` (role changed from `target` to `dropped`).
+
+   **Impact:** Sweden's 3-target MASE numbers are not directly comparable to Norway/Canada's 4-target numbers. Cross-country tables in the paper need to handle this asymmetry — likely by also reporting Norway and Canada averaged over the same 3 targets.
+
+2. **The informed LLM did find a Sweden improvement on 2026-04-02 — but it was destroyed.** The original run accepted iteration 21 with `covariates=[house_prices], context_length=36` for a full-eval score of **0.9663** (3.9% improvement over baseline). When the run was relaunched on 2026-04-08 without `--resume`, `search.py` silently re-established the baseline and the 0.9663 result was overwritten. Verified the result is reproducible by re-running the exact config with `train.py` on 2026-04-11 — same 0.9663 to four decimals.
+
+   **Fix:** `search.py` now refuses to start a fresh run when a state file with `iteration > 0` exists, unless an explicit `--overwrite` flag is passed. The check runs *before* the heavy autogluon import for fast feedback. Added two regression tests covering the guard.
+
+3. **Sweden's quick→full eval gating has a structural bias.** The baseline scores 1.0274 on the 20-origin quick eval but 1.0056 on the full 120-origin eval — a 2.1% gap, full is better. The search uses `quick_score < state.best_score` to decide whether to spend a full eval, where `state.best_score` is the current best *full* score. So a candidate has to score below 1.0056 on quick eval to even be evaluated properly — about 2% below the actual quick-eval baseline. In the second informed run and the blind run, **0 of 50** proposals cleared this bar. The two-phase pre-filter is dropping legitimate Sweden candidates en masse.
+
+   **Not fixed yet.** The right fix is non-trivial: either expand quick eval to 40+ origins, change the seed used for subsampling, use a quick-vs-full delta correction, or skip pre-filtering for countries where the gap is large. Worth doing before the manuscript rewrite.
+
+**Knock-on effects to verify before the manuscript:** All Sweden Chronos-2 results computed before 2026-04-11 were based on 3 targets, not 4. The numbers themselves are still correct *within Sweden*, but cross-country tables need a footnote and (ideally) re-tabulation against 3-target Norway/Canada averages.
+
 ## 2026-04-09 — Blind Norway search (50 iterations)
 
 **Setup:** `prompts/blind.md` strips all domain knowledge about the Norwegian economy — the agent only sees generic variable names and must discover useful covariates without hints.

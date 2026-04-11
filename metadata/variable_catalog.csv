@@ -1,0 +1,57 @@
+country,variable_name,role,display_name,source_name,source_series_id,raw_frequency,seasonal_adjustment,publication_lag_days,notes
+canada,brent_crude,candidate,"Brent crude oil price, daily → monthly avg",FRED,DCOILBRENTEU,daily,n/a,,shared global
+canada,credit,candidate,"Household credit, SA (CAD millions)",Statistics Canada,10100118,monthly,varies,,
+canada,euro_area_gdp,candidate,"Euro area real GDP, quarterly",FRED,CLVMNACSCAB1GQEA19,quarterly,n/a,,shared global
+canada,exports,candidate,"Merchandise exports, total, SA, customs basis",Statistics Canada,12100011,monthly,varies,,
+canada,fed_funds,candidate,"Effective federal funds rate, monthly",FRED,FEDFUNDS,monthly,n/a,,shared global
+canada,fx_eur,candidate,CAD/EUR exchange rate,Bank of Canada,FXEURCAD,daily,n/a,,
+canada,fx_usd,candidate,CAD/USD exchange rate,Bank of Canada,FXUSDCAD,daily,n/a,,
+canada,global_epu,candidate,"Global economic policy uncertainty, monthly",FRED,GEPUCURRENT,monthly,n/a,,shared global
+canada,house_prices,candidate,"New housing price index (NHPI), total, Canada",Statistics Canada,18100205,monthly,varies,,
+canada,imports,candidate,"Merchandise imports, total, SA, customs basis",Statistics Canada,12100011,monthly,varies,,
+canada,partner_activity,candidate,US Industrial Production Index,FRED,INDPRO,monthly,n/a,,Canada partner activity
+canada,policy_rate,candidate,Bank of Canada overnight target rate,Bank of Canada,V39079,daily,n/a,,
+canada,sp500,candidate,"NASDAQ Composite index, daily → monthly avg",FRED,NASDAQCOM,daily,n/a,,shared global
+canada,us_cpi,candidate,"US CPI, all items, monthly index",FRED,CPIAUCSL,monthly,n/a,,shared global
+canada,vix,candidate,"CBOE VIX, daily → monthly avg",FRED,VIXCLS,daily,n/a,,shared global
+canada,cpi,target,"CPI, all-items, SA (2002=100)",Statistics Canada,18100006,monthly,varies,,
+canada,industrial_production,target,"Monthly GDP at basic prices, all industries (2017=100)",Statistics Canada,36100434,monthly,varies,,
+canada,retail_sales,target,"Retail trade, Fisher volume index (2017=100)",Statistics Canada,20100067,monthly,varies,,
+canada,unemployment,target,"Unemployment rate, SA, 15+",Statistics Canada,14100287,monthly,varies,,
+norway,brent_crude,candidate,"Brent crude oil price, daily → monthly avg",FRED,DCOILBRENTEU,daily,n/a,,shared global
+norway,credit,candidate,"Domestic credit (C2), 12-month growth (%)",SSB,11599,monthly,varies,,
+norway,euro_area_gdp,candidate,"Euro area real GDP, quarterly",FRED,CLVMNACSCAB1GQEA19,quarterly,n/a,,shared global
+norway,exports,candidate,"Total exports of goods (NOK million), all countries",SSB,08803,monthly,varies,,
+norway,fed_funds,candidate,"Effective federal funds rate, monthly",FRED,FEDFUNDS,monthly,n/a,,shared global
+norway,global_epu,candidate,"Global economic policy uncertainty, monthly",FRED,GEPUCURRENT,monthly,n/a,,shared global
+norway,house_prices,candidate,"House price index, seasonally adjusted (existing dwellings)",SSB,07221,quarterly,varies,,
+norway,imports,candidate,"Total imports of goods (NOK million), all countries",SSB,08803,monthly,varies,,
+norway,nok_eur,candidate,"NOK/EUR exchange rate, daily → monthly avg",Norges Bank,B.EUR.NOK.SP,daily,n/a,,
+norway,nok_usd,candidate,"NOK/USD exchange rate, daily → monthly avg",Norges Bank,B.USD.NOK.SP,daily,n/a,,
+norway,policy_rate,candidate,Norges Bank key policy rate,Norges Bank,B.KPRA..,daily,n/a,,
+norway,sp500,candidate,"NASDAQ Composite index, daily → monthly avg",FRED,NASDAQCOM,daily,n/a,,shared global
+norway,us_cpi,candidate,"US CPI, all items, monthly index",FRED,CPIAUCSL,monthly,n/a,,shared global
+norway,vix,candidate,"CBOE VIX, daily → monthly avg",FRED,VIXCLS,daily,n/a,,shared global
+norway,cpi,target,"Consumer price index, 12-month rate of change (%)",SSB,03013,monthly,varies,,
+norway,industrial_production,target,"Manufacturing production index, seasonally adjusted (2005=100)",SSB,14208,monthly,varies,,
+norway,retail_sales,target,"Retail trade volume index, seasonally adjusted",SSB,07129,monthly,varies,,
+norway,unemployment,target,"Unemployment rate (LFS), seasonally adjusted, 15-74 years",SSB,13760,monthly,varies,,
+sweden,brent_crude,candidate,"Brent crude oil price, daily → monthly avg",FRED,DCOILBRENTEU,daily,n/a,,shared global
+sweden,credit,candidate,MFI lending to households (SEK million),SCB,FM/FM5001/FM5001A/FM5001SDDSMFI,monthly,varies,,
+sweden,euro_area_gdp,candidate,"Euro area real GDP, quarterly",FRED,CLVMNACSCAB1GQEA19,quarterly,n/a,,shared global
+sweden,exports,candidate,Total merchandise exports (SEK million),SCB,HA/HA0201/HA0201A/ImportExportSnabbM,monthly,varies,,
+sweden,fed_funds,candidate,"Effective federal funds rate, monthly",FRED,FEDFUNDS,monthly,n/a,,shared global
+sweden,fx_eur,candidate,SEK/EUR exchange rate,Riksbank,SEKEURPMI,daily,n/a,,
+sweden,fx_usd,candidate,SEK/USD exchange rate,Riksbank,SEKUSDPMI,daily,n/a,,
+sweden,global_epu,candidate,"Global economic policy uncertainty, monthly",FRED,GEPUCURRENT,monthly,n/a,,shared global
+sweden,house_prices,candidate,"House price index, one/two dwelling buildings (quarterly)",SCB,BO/BO0501/BO0501A/FastpiPSRegKv,quarterly,varies,,
+sweden,imports,candidate,Total merchandise imports (SEK million),SCB,HA/HA0201/HA0201A/ImportExportSnabbM,monthly,varies,,
+sweden,policy_rate,candidate,Riksbank repo rate,Riksbank,SECBREPOEFF,daily,n/a,,
+sweden,sp500,candidate,"NASDAQ Composite index, daily → monthly avg",FRED,NASDAQCOM,daily,n/a,,shared global
+sweden,us_cpi,candidate,"US CPI, all items, monthly index",FRED,CPIAUCSL,monthly,n/a,,shared global
+sweden,vix,candidate,"CBOE VIX, daily → monthly avg",FRED,VIXCLS,daily,n/a,,shared global
+sweden,cpi,target,CPI annual changes (%),SCB,PR/PR0101/PR0101A/KPItotM,monthly,varies,,
+sweden,industrial_production,target,"Industrial production index, SA (2015=100)",SCB,NV/NV0402/NV0402A/IPI2010KedjM,monthly,varies,,
+sweden,retail_sales,dropped,"Retail sales volume index, SA",SCB,HA/HA0101/HA0101B/Detoms07N,monthly,varies,,"Dropped from panel — SCB table only publishes from 2023-01, no validation-era coverage. See metadata/sweden_target_notes.md."
+sweden,unemployment,target,"Unemployment rate (LFS, 15-74), SA",SCB,AM/AM0401/AM0401A/AKURLBefM,monthly,varies,,
+

@@ -2,9 +2,9 @@
 
 > Source of truth for the study design. Keep this document up to date when methods change. It will serve as the blueprint for the paper's methodology section.
 
-**Last updated:** 2026-04-10
+**Last updated:** 2026-04-11
 
-> **Note (2026-04-10):** This document currently describes the Norway-only design. The three-country expansion (Norway + Canada + Sweden) specified in `paper/REVISION-PLAN-4.md` is partially implemented: data layer, baselines (incl. BVAR and Elastic Net), and informed/random search runs are complete; blind LLM search is complete for Norway only. The full methodology rewrite is deferred to Phase 6 of REVISION-PLAN-4, once all search runs finish. See `STATUS.md` for the current execution state.
+> **Note (2026-04-11):** This document currently describes the Norway-only design. The three-country expansion (Norway + Canada + Sweden) specified in `paper/REVISION-PLAN-4.md` is partially implemented: data layer, baselines (incl. BVAR and Elastic Net), and informed/random/blind search runs are now complete for all three countries. The full methodology rewrite is deferred to Phase 6 of REVISION-PLAN-4. See `STATUS.md` for the current execution state. Sweden has only 3 of the 4 targets (`retail_sales` is dropped — see `metadata/sweden_target_notes.md`); the cross-country comparison needs to handle this asymmetry.
 
 ---
 
@@ -259,3 +259,8 @@ This overfitting finding highlights a fundamental challenge: pipeline optimizati
 - **2026-04-08:** Raised AutoGluon `time_limit` from 300s to 1800s in `fit_predictor()`. Under AutoGluon 1.5.0 and Chronos-2 2.2.2, model loading alone takes 260-340s on the current hardware, so the previous limit killed every fine-tune run before training could start (producing empty predictors). Actual training budget is still controlled by `fine_tune_steps`.
 - **2026-04-08:** Added `--tag` flag to `src/search.py`. State and log files are now keyed by `(country, mode, seed, tag)` so informed and blind LLM runs with the same seed no longer overwrite each other.
 - **2026-04-09:** Blind LLM search completed for Norway (50 iterations, seed 42). Best MASE 0.9798 with `sp500 + vix`, LoRA fine-tune 100 steps, lr 1e-5. Compared against informed seed 42 (0.9745 with `sp500, policy_rate, fed_funds, nok_usd`), the blind agent discovers risk/equity proxies without hints but does not rediscover monetary or exchange-rate covariates.
+- **2026-04-11:** Blind LLM search completed for Canada (best 0.8360 with `vix` standardized + LoRA 500 steps) and Sweden (no improvement found over 1.0056 baseline within 50 iterations).
+- **2026-04-11:** Investigation of Sweden's no-improvement result revealed two issues:
+  (a) `retail_sales` was silently absent from all Sweden Chronos-2 evaluations because the SCB table only publishes from 2023-01. Sweden now formally has 3 targets instead of 4; the variable is filtered out at panel build/load time via `DROPPED_VARIABLES = ["retail_sales"]` in `prepare_sweden.py`. Sweden MASE numbers are not directly comparable to Norway/Canada (4 targets each).
+  (b) The original 2026-04-02 informed run for Sweden had found a 0.9663 improvement at iteration 21 (`house_prices, ctx=36`), but that result was destroyed when the run was relaunched on 2026-04-08 without `--resume`. `search.py` now refuses to overwrite existing state without an explicit `--overwrite` flag.
+  (c) Sweden's quick-eval baseline (1.0274 over 20 random origins) is 2.1% higher than its full-eval baseline (1.0056 over 120 origins), so the quick→full gating systematically rejects legitimate candidates for Sweden. **Methodology implication:** the two-phase eval pre-filter assumes the 20-origin subsample is representative of the 120-origin full sample, which fails for Sweden. A future fix would either subsample with a country-aware seed, expand the quick-eval window, or skip pre-filtering entirely.

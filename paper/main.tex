@@ -21,6 +21,7 @@
 \usepackage{appendix}
 \usepackage{multirow}
 \usepackage{pdflscape}
+\usepackage{threeparttable}
 
 \geometry{margin=1in}
 \onehalfspacing
@@ -32,55 +33,49 @@
     urlcolor=blue!60!black,
 }
 
-% --- Custom commands ---
-\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
-\newcommand{\vegard}[1]{\textcolor{blue}{\textbf{[VL: #1]}}}
-\newcommand{\leif}[1]{\textcolor{orange}{\textbf{[LAT: #1]}}}
-
 % --- Title ---
-\title{Can Agentic Search Improve Foundation Model Forecasts for Small Open Economies?
-%\thanks{We thank ...}. The views expressed are those of the authors.
-}
+\title{Agentic Search and the Robustness of Time-Series Foundation Models\\in Small Open Economies: Evidence from Norway, Canada, and Sweden}
 
 \author{
     Vegard H.\ Larsen\thanks{BI Norwegian Business School. Email: \href{mailto:vegard.h.larsen@bi.no}{vegard.h.larsen@bi.no}}
     \and
-    Leif Anders Thorsrud\thanks{BI Norwegian Business School. Email: \href{mailto: leif.a.thorsrud@bi.no}{leif.a.thorsrud@bi.no}}
+    Leif Anders Thorsrud\thanks{BI Norwegian Business School. Email: \href{mailto:leif.a.thorsrud@bi.no}{leif.a.thorsrud@bi.no}}
 }
 
 \date{\today}
 
 \begin{document}
 
+\input{tables/auto_macros.tex}
+
 \maketitle
 
 \begin{abstract}
-We test whether LLM-guided search can improve pseudo-real-time forecasts of the Norwegian macroeconomy by choosing covariates, transformations, and fine-tuning settings for Chronos-2. An LLM agent evaluates candidate pipelines on a rolling 2006--2015 validation window. It selects oil prices, the policy rate, US inflation, and the NOK/EUR exchange rate, reducing validation MASE by 6.8\% relative to zero-shot Chronos-2. Yet these gains do not generalize to 2016--2025, which includes the pandemic and post-2022 inflation surge: zero-shot Chronos-2 proves more robust than the agent-tuned pipeline and classical baselines. Ablation shows the search overfits to covariate relationships that fail under regime change. Agent-guided search can find economically interpretable pipelines, but its gains are fragile in non-stationary macroeconomic environments.
+We evaluate whether LLM-guided search can improve pseudo-real-time macroeconomic forecasts from Chronos-2, a time-series foundation model, across three small open economies: Norway, Canada, and Sweden. The search discovers country-specific, economically interpretable covariate pipelines that reduce validation-era MASE by \norValGainPct{} (Norway), \canValGainPct{} (Canada), and \sweValGainPct{} (Sweden). However, out-of-sample generalization is heterogeneous. Norway's gains collapse on the 2016--2025 test period (\norTestGapPct{} degradation), Canada's mostly survive (\canTestGapPct), while Sweden's \emph{improve} further (\sweTestGapPct). The key mechanism is that Norway's search relies on LoRA fine-tuning, which overfits; Sweden's uses covariate selection and context truncation, which generalize. Zero-shot Chronos-2 is the most robust single method across all three countries.
 
 \bigskip
-\noindent\textbf{Keywords:} macroeconomic forecasting, foundation models, automated machine learning, time series, Norway
+\noindent\textbf{Keywords:} macroeconomic forecasting, foundation models, automated machine learning, time series, small open economies
 
 \noindent\textbf{JEL codes:} C53, C55, E37
 \end{abstract}
 
-
-% \tableofcontents
-% \newpage
 
 % ===================================================================
 \section{Introduction}
 \label{sec:introduction}
 % ===================================================================
 
-Time series foundation models---large neural networks pretrained on billions of observations from diverse domains---have rapidly entered the forecaster's toolkit. Models such as Chronos \citep{ansari2024chronos,ansari2025chronos2}, TimesFM \citep{das2024decoder}, and MOIRAI \citep{woo2024unified} promise accurate zero-shot forecasts without task-specific training, raising the question of whether they can match or exceed classical methods in rigorous macroeconomic applications.
+Time-series foundation models---large neural networks pretrained on billions of observations from diverse domains---have rapidly entered the forecaster's toolkit. Models such as Chronos \citep{ansari2024chronos,ansari2025chronos2}, TimesFM \citep{das2024decoder}, and MOIRAI \citep{woo2024unified} promise accurate zero-shot forecasts without task-specific training. Whether they can match or exceed classical methods in rigorous macroeconomic applications is an empirical question with no foregone conclusion.
 
-We investigate this question for Norway---a small open oil-exporting economy with excellent data availability \citep{bjornland2019dutch,aastveit2023inflation}. We study Norway rather than the United States because most economies are small and open, and results from a large, relatively closed economy need not generalize. Because Norwegian macro data are unlikely to appear in TSFM pretraining corpora, the zero-shot exercise is a cleaner test of out-of-distribution generalization. We forecast four target variables---CPI inflation, industrial production, retail sales, and unemployment---at horizons of 1, 3, 6, and 12 months ahead, using a rolling pseudo-real-time evaluation protocol that respects publication lags.
+A related question is whether \emph{automated pipeline search} can add value beyond zero-shot inference. Inspired by \citet{karpathy2026autoresearch}, we design an outer loop in which a large language model proposes pipeline configurations---covariates, transformations, context window, and fine-tuning settings---evaluated against a rolling validation metric. The agent may select from 14 macroeconomic covariates and adjust fine-tuning hyperparameters, but cannot modify the model architecture.
 
-We further investigate whether an \emph{automated search procedure} can improve the forecasting pipeline. Inspired by \citet{karpathy2026autoresearch}, we design an outer loop in which a large language model (Claude Sonnet) proposes pipeline configurations---covariates, transformations, context window, and fine-tuning settings---evaluated against a rolling validation metric. The agent may select from 14 macroeconomic covariates and adjust fine-tuning hyperparameters, but cannot modify the model architecture.
+We investigate these questions across three small open economies: Norway, Canada, and Sweden. Most economies are small and open, yet the empirical forecasting literature disproportionately evaluates methods on US data \citep{stock2002macroeconomic}. Our three countries share important structural features---independent monetary policy, commodity exposure, high-quality statistical offices---but differ in transmission channels. Norway is an oil-exporting economy; Canada is a large commodity exporter closely tied to the US; Sweden has a diversified manufacturing base oriented toward Europe. Because these economies are unlikely to appear prominently in TSFM pretraining corpora, the zero-shot exercise is a cleaner test of out-of-distribution generalization.
 
-Our main findings are threefold. First, zero-shot Chronos-2 is competitive with ARIMA at short horizons and more robust to the structural breaks of the test period. Second, the search discovers an interpretable pipeline---oil prices, the policy rate, US inflation, and the NOK/EUR exchange rate---that improves validation-era MASE by 6.8\%. Third, this improvement does not generalize: the agent-tuned configuration overfits to covariate relationships that break down under the regime changes of 2016--2025.
+We use a harmonized design across all three countries: four target variables (CPI inflation, industrial production, retail sales, and unemployment) at horizons of 1, 3, 6, and 12 months, evaluated on \nValOrigins{} monthly validation origins (2006--2015) and \nTestOrigins{} test origins (2016--2025). Five search comparators---informed LLM, domain-blind LLM, random, greedy stepwise, and a pre-locked manual economist benchmark---operate over the same action space to isolate the value of LLM reasoning and domain knowledge.
 
-This overfitting result is itself a key contribution. It demonstrates a fundamental tension in automated pipeline optimization for macroeconomic forecasting: the covariate relationships that an agent discovers as informative during stable periods may become misleading during crises. Subperiod analysis confirms that the agent-tuned configuration performs well pre-COVID but deteriorates sharply during and after the pandemic, while zero-shot Chronos-2 degrades more gracefully.
+Our main findings are fourfold. First, zero-shot Chronos-2 is competitive with strong classical baselines (ARIMA, BVAR) across all three countries, with test-era MASE of \norZsTest{} (Norway), \canZsTest{} (Canada), and \sweZsTest{} (Sweden). Second, agentic search discovers country-specific, economically interpretable pipelines---monetary policy and exchange rates for Norway, partner-area GDP for Canada, domestic credit and housing for Sweden. Third, the generalization of these gains is \emph{heterogeneous}: Norway's gains collapse on the test period (\norTestGapPct{} degradation), Canada's mostly survive (\canTestGapPct{}), while Sweden's actually \emph{improve} out of sample (\sweTestGapPct{}). Fourth, the mechanism behind this heterogeneity is that Norway's search relies on LoRA fine-tuning, which overfits to validation-era covariate relationships; Sweden's search uses covariate selection and context truncation without fine-tuning, which proves robust to regime change.
+
+This pattern is itself the paper's central contribution. It demonstrates that agentic pipeline search can add value for macro forecasting, but only when the search discovers representation changes (which covariates to include, how much context to use) rather than parameter changes (fine-tuning weights). Fixed-window validation in non-stationary environments risks overfitting, and the risk is concentrated in fine-tuning---not in covariate selection. For practitioners, the implication is clear: prefer covariate and representation search over fine-tuning when regime changes are likely.
 
 
 % ===================================================================
@@ -95,14 +90,14 @@ This paper connects three literatures: macro forecasting, time-series foundation
 
 Data-rich macro forecasting has progressed from dynamic factor models \citep{stock2002macroeconomic,stock2002forecasting,forni2005generalized} through Bayesian VARs with shrinkage priors \citep{banbura2010large,koop2013large} to machine learning methods that capture non-linearities \citep{coulombe2022machine,babii2024econometrics}. Real-time evaluation must contend with the ragged-edge problem of asynchronous publication \citep{ghysels2004predicting,giannone2008nowcasting}; our pseudo-real-time protocol builds directly on this tradition, using expanding windows and \citet{diebold2002comparing} tests as standard \citep{clark2013advances}.
 
-Forecasting Norway specifically involves exposure to oil shocks, exchange rate volatility, and collinear domestic indicators \citep{bjornland2019dutch,aastveit2023inflation}. \citet{larsen2021components} finds predictive content in text-based uncertainty measures for the Norwegian business cycle, motivating our interest in automated covariate discovery.
+A consistent finding in the macro forecasting literature is that simple models are hard to beat, especially during periods of structural instability. Forecasting small open economies poses particular challenges: oil shocks, exchange rate volatility, and trade-channel disruptions can alter covariate relationships rapidly \citep{bjornland2019dutch,aastveit2023inflation}. Our cross-country design tests whether automated covariate discovery can adapt to these country-specific transmission channels.
 
 \subsection{Foundation models for time series}
 \label{sec:lit_tsfm}
 
-Time series foundation models (TSFMs) are pretrained on massive, heterogeneous corpora to enable zero-shot inference on unseen series. Chronos \citep{ansari2024chronos} treats forecasting as language modeling via value quantization; its successor Chronos-2 \citep{ansari2025chronos2} adds group attention that alternates between within-series and cross-series patterns, enabling in-context learning from covariates without architectural changes. Chronos-2 is a natural backbone for our pipeline: the agent's task is to discover which covariates to present to the model. Alternative TSFMs include TimesFM \citep{das2024decoder,das2025incontext}, Lag-Llama \citep{rasul2023lagllama}, and MOIRAI \citep{woo2024unified,liu2025moirai2}; concerns about pre-training data contamination are documented by \citet{aksu2024benchmarking}.
+Time-series foundation models (TSFMs) are pretrained on massive, heterogeneous corpora to enable zero-shot inference on unseen series. Chronos \citep{ansari2024chronos} treats forecasting as language modeling via value quantization; its successor Chronos-2 \citep{ansari2025chronos2} adds group attention that alternates between within-series and cross-series patterns, enabling in-context learning from covariates without architectural changes. Alternative TSFMs include TimesFM \citep{das2024decoder,das2025incontext}, Lag-Llama \citep{rasul2023lagllama}, and MOIRAI \citep{woo2024unified,liu2025moirai2}; concerns about pretraining data contamination are documented by \citet{aksu2024benchmarking}.
 
-The tension between zero-shot inference and task-specific fine-tuning is central to applied TSFM work \citep{rasul2023lagllama}. Our research interrogates this tradeoff by decomposing forecast gains into the foundation model itself, economy-specific adaptation, and the additional value of agent-guided search.
+The tension between zero-shot inference and task-specific fine-tuning is central to applied TSFM work \citep{rasul2023lagllama}. Our research interrogates this tradeoff by decomposing forecast gains into the foundation model itself, economy-specific adaptation, and the additional value of agent-guided search---across three countries that each present different adaptation challenges.
 
 \subsection{Automated machine learning and feature engineering}
 \label{sec:lit_automl}
@@ -120,11 +115,11 @@ Our approach builds on Karpathy's ``autoresearch'' framework \citep{karpathy2026
 \subsection{Foundation model: Chronos-2}
 \label{sec:chronos}
 
-We use Chronos-2 \citep{ansari2025chronos2} as the foundation model backbone, accessed via the AutoGluon TimeSeries interface \citep{shchur2023autogluon}. The model has 120 million parameters and supports a maximum context length of 8,192 time steps. Its key architectural innovation is a group attention mechanism that alternates between time attention (within a single series) and group attention (across series in a batch), enabling in-context learning from covariates without requiring explicit covariate-specific input channels.
+We use Chronos-2 \citep{ansari2025chronos2} as the foundation model backbone, accessed via the AutoGluon TimeSeries interface \citep{shchur2023autogluon}. The model has 120 million parameters and supports a maximum context length of 8,192 time steps. Its group attention mechanism alternates between time attention (within a single series) and group attention (across series in a batch), enabling in-context learning from covariates without requiring explicit covariate-specific input channels.
 
-Unlike earlier Chronos-Bolt models, which produce deterministic point forecasts and ignore additional columns in the input data, Chronos-2 natively integrates both past covariates and known future covariates during inference. In our implementation, all macroeconomic covariates are provided as \emph{past covariates only}: the model receives historical values up to the forecast origin but no future values. This is critical for pseudo-real-time validity---future values of oil prices, exchange rates, and inflation are not known at the forecast origin. The covariates are included as additional columns in the AutoGluon TimeSeriesDataFrame; no \texttt{known\_covariates} are passed to the predict call.
+Chronos-2 natively integrates both past covariates and known future covariates during inference. In our implementation, all macroeconomic covariates are provided as \emph{past covariates only}: the model receives historical values up to the forecast origin but no future values. This is critical for pseudo-real-time validity.
 
-\paragraph{Fine-tuning.} Chronos-2 supports parameter-efficient adaptation via Low-Rank Adaptation (LoRA), which targets the query, key, value, and output projections of the self-attention layers plus the output patch embedding. The default configuration uses rank $r = 8$ and $\alpha = 16$. In our setup, fine-tuning is performed once on the data available at the first forecast origin, and the adapted model is reused for all subsequent origins. This fit-once architecture means the fine-tuned model may overfit to early-period patterns---a limitation we return to in Section~\ref{sec:discussion}.
+\paragraph{Fine-tuning.} Chronos-2 supports parameter-efficient adaptation via Low-Rank Adaptation (LoRA), targeting the self-attention Q, K, V, O projections and the output patch embedding with rank $r = 8$ and $\alpha = 16$. Fine-tuning is performed once on the data available at the first forecast origin, and the adapted model is reused for all subsequent origins. This fit-once architecture means the fine-tuned model may overfit to early-period patterns---a limitation we return to in Section~\ref{sec:discussion}.
 
 \subsection{Agentic search procedure}
 \label{sec:search}
@@ -135,13 +130,13 @@ The search is orchestrated by an outer loop that uses a large language model (Cl
 \caption{LLM-guided pipeline search}
 \label{alg:search}
 \begin{algorithmic}[1]
-\State Establish baseline: evaluate zero-shot Chronos-2 on all 120 validation origins
+\State Establish baseline: evaluate zero-shot Chronos-2 on all \nValOrigins{} validation origins
 \For{$i = 1, 2, \ldots, N$}
     \State LLM reads: task description, search space, current best config, iteration history
     \State LLM proposes a JSON configuration (covariates, transforms, context length, fine-tuning)
-    \State \textbf{Quick evaluation:} run on 20 subsampled origins ($\sim$30 seconds)
-    \If{quick score $<$ current best}
-        \State \textbf{Full evaluation:} run on all 120 origins ($\sim$3 minutes)
+    \State \textbf{Quick evaluation:} run on 20 subsampled origins
+    \If{quick score $<$ best quick score so far}
+        \State \textbf{Full evaluation:} run on all \nValOrigins{} origins
         \If{full score $<$ current best}
             \State \textbf{Accept:} update best configuration and score
         \Else
@@ -155,9 +150,11 @@ The search is orchestrated by an outer loop that uses a large language model (Cl
 \end{algorithmic}
 \end{algorithm}
 
-The two-phase evaluation balances iteration speed with evaluation fidelity. The baseline and all accept/reject decisions use the full 120-origin evaluation to ensure fair comparisons. The primary metric is the mean absolute scaled error (MASE), averaged across all four target variables and all four forecast horizons.
+The two-phase evaluation balances iteration speed with evaluation fidelity. The primary metric is the mean absolute scaled error (MASE), averaged across all target variables and all four forecast horizons.
 
-\paragraph{Prompt design.} The LLM receives a natural-language specification (\texttt{program.md}) containing the task description, constraints, available search dimensions, domain knowledge about the Norwegian economy (e.g., ``Norway is an oil-exporting economy; Brent crude and exchange rates are highly relevant''), and strategy suggestions. The agent returns a JSON object specifying only the fields it wishes to change from the current best configuration.
+\paragraph{Prompt design.} The search is run independently for each country. In the \emph{informed} variant, the LLM receives a country-specific prompt containing domain knowledge (e.g., ``Norway is an oil-exporting economy; Brent crude and exchange rates are highly relevant''). In the \emph{domain-blind} variant, the prompt is stripped of all country-specific hints---variable names are generic. This allows us to isolate the value of domain knowledge in the search.
+
+\paragraph{Search comparators.} We compare five search strategies operating over the same action space: (i) informed LLM search, (ii) domain-blind LLM search, (iii) random search (uniform sampling), (iv) greedy stepwise search (deterministic, non-LLM), and (v) a pre-locked manual economist benchmark (covariates chosen by the authors before seeing results).
 
 \subsection{Search space}
 \label{sec:search_space}
@@ -183,7 +180,7 @@ Grouping & Univariate / All targets & Univariate \\
 \end{tabular}
 \end{table}
 
-Target variables are never transformed, as forecasts must remain in the original scale for evaluation. The agent may transform covariates to improve their informativeness (e.g., converting oil prices to log-differences to capture growth rates).
+Target variables are never transformed, as forecasts must remain in the original scale for evaluation. The 14-covariate pool follows a harmonized template across countries (see Section~\ref{sec:panel}); exact series differ by country but the categories are aligned.
 
 
 % ===================================================================
@@ -191,10 +188,14 @@ Target variables are never transformed, as forecasts must remain in the original
 \label{sec:data}
 % ===================================================================
 
-\subsection{Norwegian macroeconomic panel}
+\subsection{Three-country macroeconomic panels}
 \label{sec:panel}
 
-We construct a monthly panel of 18 macroeconomic variables from three sources: Statistics Norway (SSB), the Federal Reserve Economic Data (FRED), and Norges Bank. Table~\ref{tab:variables} in Appendix~\ref{app:data} provides the full variable catalog. The four target variables are CPI inflation (12-month rate of change), industrial production (manufacturing, seasonally adjusted), retail sales (volume index, seasonally adjusted), and the unemployment rate (LFS, seasonally adjusted). The 14 covariates span domestic indicators (house prices, credit, exports, imports, the policy rate, exchange rates) and global variables (Brent crude oil, NASDAQ, the federal funds rate, US CPI, Euro area GDP, VIX, global economic policy uncertainty).
+We construct harmonized monthly panels for Norway, Canada, and Sweden, each following a common template of four target variables and 14 candidate covariates. The four targets are CPI inflation (12-month rate of change), industrial production (seasonally adjusted), retail sales (volume index, seasonally adjusted), and the unemployment rate (LFS, seasonally adjusted).\footnote{Sweden's retail sales series from Statistics Sweden begins only in 2023 and is excluded from the analysis. Sweden results are computed over three targets (CPI, industrial production, unemployment). See the online appendix for details.}
+
+The 14 covariates span domestic indicators (house prices, credit, exports, imports, the policy rate, bilateral exchange rates against EUR and USD) and global variables (Brent crude, a broad equity index, the federal funds rate, US CPI, VIX, global economic policy uncertainty, and a partner-area activity variable). The partner-area variable is euro-area GDP for Norway and Sweden, and US GDP for Canada, reflecting different trade orientations.
+
+Data sources are country-specific: Statistics Norway (SSB) and Norges Bank for Norway; Statistics Canada and the Bank of Canada for Canada; Statistics Sweden (SCB) and the Riksbank for Sweden. Global variables are sourced from FRED for all three countries. The full variable catalog, including series identifiers and publication lags, is provided in the project repository.
 
 \subsection{Pseudo-real-time discipline}
 \label{sec:realtime}
@@ -203,39 +204,49 @@ At each forecast origin $t$, we restrict the information set to data that would 
 \begin{equation}
     \text{month\_end}(m) + \text{publication\_lag} \leq t.
 \end{equation}
-Publication lags range from 0 days (the policy rate, known in real time) to 90 days (Euro area GDP). Daily series (exchange rates, oil prices, VIX) are aggregated to monthly averages; quarterly series (house prices, Euro area GDP) are forward-filled. We use latest-vintage data throughout but restrict availability by publication lag. This is pseudo-real-time, not true real-time with data vintages.\footnote{Investigating the additional effect of data revisions is left for future work.}
+Publication lags are configured per country and per variable based on official release schedules. Lags range from 0 days (policy rates, known in real time) to 90 days (euro-area GDP). Daily series are aggregated to monthly averages; quarterly series are forward-filled. We use latest-vintage data throughout but restrict availability by publication lag. This is pseudo-real-time, not true real-time with data vintages.
 
 \subsection{Evaluation design}
 \label{sec:evaluation}
 
 We use a rolling expanding-window design. For each forecast origin $t$, the model receives all data available up to $t$ and produces point forecasts at horizons $h \in \{1, 3, 6, 12\}$ months ahead for each target variable.
 
-\paragraph{Eras.} The validation era spans January 2006 to December 2015 (120 monthly origins), used for search and model selection. The test era spans January 2016 to March 2025 (111 origins), evaluated with the pipeline frozen from the search phase. We further decompose the test era into three subperiods: pre-COVID (2016--2019), COVID (2020--2021), and post-COVID (2022--2025).
+\paragraph{Eras.} The validation era spans January 2006 to December 2015 (\nValOrigins{} monthly origins), used for search and model selection. The test era spans January 2016 to March 2025 (\nTestOrigins{} origins), evaluated with the pipeline frozen from the search phase. The evaluation window is common across all three countries. We further decompose the test era into three subperiods: pre-COVID (2016--2019), COVID (2020--2021), and post-COVID/inflation (2022--2025).
 
-\paragraph{Metrics.} We report root mean squared error (RMSE), mean absolute error (MAE), and mean absolute scaled error (MASE). The MASE is defined as $\text{MASE}_h = \text{MAE}_h / \text{MAE}_h^{\text{RW}}$, where $\text{MAE}_h^{\text{RW}}$ is the MAE of the $h$-step-ahead random walk forecast at each origin. Under this definition, the random walk scores exactly 1.0 by construction, and values below 1 indicate improvement. MASE is the primary metric throughout this paper because it is scale-independent across target variables with different units (percentage rates, index levels).
+\paragraph{Metrics.} The mean absolute scaled error (MASE) is defined as $\text{MASE}_h = \text{MAE}_h / \text{MAE}_h^{\text{RW}}$, where $\text{MAE}_h^{\text{RW}}$ is the MAE of the $h$-step-ahead random walk forecast. The random walk scores exactly 1.000 by construction. MASE is the primary metric because it is scale-independent across targets with different units.
 
 \subsection{Baselines}
 \label{sec:baselines}
 
-We evaluate seven baselines spanning univariate and multivariate approaches:
+We evaluate a comprehensive set of baselines:
 
 \paragraph{Univariate baselines.}
 \begin{enumerate}[noitemsep]
-    \item \textbf{Random walk:} $\hat{y}_{t+h|t} = y_t$ (last observed value).
+    \item \textbf{Random walk:} $\hat{y}_{t+h|t} = y_t$.
     \item \textbf{Seasonal naive:} $\hat{y}_{t+h|t} = y_{t+h-12}$.
-    \item \textbf{AR($p$):} Direct autoregressive regression with lag order selected by BIC over $p \in \{1, \ldots, 12\}$.
+    \item \textbf{AR($p$):} Direct autoregressive regression, lag order selected by BIC over $p \in \{1, \ldots, 12\}$.
     \item \textbf{ARIMA:} Order selected by AIC over $p \in \{0,1,2,3\}$, $d \in \{0,1\}$, $q \in \{0,1,2\}$.
-    \item \textbf{ETS:} Exponential smoothing with automatic trend/seasonal selection by AIC.
+    \item \textbf{ETS:} Exponential smoothing with automatic model selection by AIC.
 \end{enumerate}
 
-\paragraph{Multivariate baselines.} To ensure a fair comparison with the covariate-augmented Chronos-2, we include two multivariate methods that access the same information set:
+\paragraph{Multivariate baselines.}
 \begin{enumerate}[noitemsep,resume]
-    \item \textbf{VAR:} Vector autoregression on the target variable plus the four covariates selected by the search agent (Brent crude, policy rate, US CPI, NOK/EUR). Lag order selected by BIC, capped at 6.
-    \item \textbf{Factor model:} Principal components extracted from all 14 covariates, used as regressors in direct $h$-step-ahead forecasting equations alongside autoregressive lags of the target.
+    \item \textbf{VAR:} Vector autoregression on the target plus the top covariates from the respective country's search. Lag order selected by BIC.
+    \item \textbf{Factor model:} Principal components from all 14 covariates used as regressors in direct $h$-step forecasting equations.
+    \item \textbf{BVAR:} Minnesota-shrinkage Bayesian VAR, tuned on validation data.
+    \item \textbf{Elastic net:} Direct forecasting with lagged target and lagged covariates, penalty tuned by cross-validation.
 \end{enumerate}
+
+\paragraph{Foundation model methods.}
+\begin{enumerate}[noitemsep,resume]
+    \item \textbf{Chronos-2 (zero-shot):} No covariates, no fine-tuning.
+    \item \textbf{Chronos-2 (agent-tuned):} Best configuration from the informed LLM search.
+    \item \textbf{Chronos-2 (manual):} Pre-locked economist benchmark---covariates chosen by the authors before seeing results, not revised after.
+\end{enumerate}
+
 All baselines are re-estimated at each forecast origin using only data available at that origin, ensuring full pseudo-real-time compliance.
 
-\paragraph{Statistical inference.} We test for equal predictive ability using the \citet{diebold2002comparing} test with Newey-West HAC standard errors to account for serial correlation in multi-step forecast errors. The bandwidth is set to $h - 1$ for $h$-step-ahead forecasts.
+\paragraph{Statistical inference.} We test for equal predictive ability using the \citet{diebold2002comparing} test with Newey-West HAC standard errors (bandwidth $h - 1$).
 
 
 % ===================================================================
@@ -243,218 +254,127 @@ All baselines are re-estimated at each forecast origin using only data available
 \label{sec:results}
 % ===================================================================
 
-\subsection{Validation-era baselines}
+\subsection{Baseline forecast performance}
 \label{sec:results_baselines}
 
-Table~\ref{tab:validation} reports average MASE across all four target variables on the validation era (2006--2015, 120 origins). MASE values below 1 indicate improvement over the random walk baseline; the random walk equals 1.000 by construction.
+Table~\ref{tab:test} reports test-era MASE by country and horizon. Zero-shot Chronos-2 is competitive with ARIMA and BVAR across all three countries. The random walk scores 1.000 by construction; methods below 1 beat it.
 
 \begin{table}[H]
 \centering
-\caption{Validation era results (average MASE across targets)}
-\label{tab:validation}
-\begin{tabular}{lcccc}
-\toprule
-Method & $h=1$ & $h=3$ & $h=6$ & $h=12$ \\
-\midrule
-\multicolumn{5}{l}{\textit{Univariate baselines}} \\
-Random walk       & 1.000 & 1.000 & 1.000 & 1.000 \\
-ARIMA             & \textbf{0.930} & \textbf{0.983} & \textbf{0.978} & \textbf{1.000} \\
-ETS               & 0.964 & 1.002 & 1.013 & 1.043 \\
-\midrule
-\multicolumn{5}{l}{\textit{Multivariate baselines}} \\
-VAR               & 1.000 & 1.063 & 1.119 & 1.133 \\
-Factor model      & 1.290 & 1.341 & 1.520 & 2.060 \\
-\midrule
-\multicolumn{5}{l}{\textit{Foundation model}} \\
-Chronos-2 (zero-shot)   & 0.960 & 1.008 & 1.016 & 1.012 \\
-\bottomrule
-\end{tabular}
+\caption{Test era MASE by country and method (average across targets)}
+\label{tab:test}
+\input{tables/tab_test.tex}
 \end{table}
 
-ARIMA is the strongest classical baseline at $h=1$ (MASE 0.930), though its advantage narrows at longer horizons and vanishes at $h=12$. The multivariate baselines (VAR and factor model) perform \emph{worse} than the random walk at most horizons, suggesting that the standard multivariate structure does not improve forecasts for this panel. Zero-shot Chronos-2 is competitive at $h=1$ (0.960) and maintains MASE close to 1 throughout, slightly outperforming ARIMA at $h=12$.
+Norway's test-era MASE for zero-shot Chronos-2 is \norZsTest, marginally better than the random walk and competitive with ARIMA (\norArimaTest). Canada shows stronger performance: the zero-shot model achieves \canZsTest{} against ARIMA's \canArimaTest. For Sweden, zero-shot Chronos-2 achieves \sweZsTest, also outperforming ARIMA (\sweArimaTest). Classical multivariate methods (VAR, factor model) generally underperform their univariate counterparts, consistent with the known difficulty of improving on simple models in macro forecasting.
 
-\subsection{Agentic search trajectory}
-\label{sec:results_agentic}
 
-We run the LLM-guided search for 50 iterations on the validation era. Table~\ref{tab:search} shows the six accepted improvements.
+\subsection{Search comparison}
+\label{sec:results_search}
+
+Table~\ref{tab:search_comparison} compares validation-era MASE across the five search methods and three countries. All methods operate over the same action space and budget (50 iterations).
 
 \begin{table}[H]
 \centering
-\caption{Search trajectory: accepted iterations (avg MASE, validation era)}
-\label{tab:search}
-\begin{tabular}{clcc}
-\toprule
-Iteration & Configuration change & MASE & $\Delta$ vs.\ baseline \\
-\midrule
-0  & Baseline (zero-shot, univariate) & 1.9443 & --- \\
-9  & + context\_length = 96            & 1.8635 & $-4.2\%$ \\
-15 & + brent\_crude                    & 1.8472 & $-5.0\%$ \\
-18 & + policy\_rate                    & 1.8326 & $-5.7\%$ \\
-27 & + us\_cpi                         & 1.8158 & $-6.6\%$ \\
-39 & + nok\_eur                        & 1.8129 & $-6.8\%$ \\
-45 & + LoRA fine-tune (100 steps, $5 \times 10^{-6}$) & \textbf{1.8129} & $\mathbf{-6.8\%}$ \\
-\bottomrule
-\end{tabular}
+\caption{Search comparison: validation-era MASE by country and method}
+\label{tab:search_comparison}
+\input{tables/tab_search_comparison.tex}
 \end{table}
 
-Figure~\ref{fig:trajectory} visualizes the search trajectory. The search converged by approximately iteration 45. The remaining iterations proposed configurations that either matched or worsened the best score. Key patterns from the 50 iterations:
+No single search method dominates across countries. For Norway, greedy stepwise search achieves the lowest MASE; for Canada, the domain-blind LLM is best; for Sweden, the informed LLM achieves the strongest result. The manual economist benchmark is competitive in some cases (e.g., Norway) but substantially weaker in others (e.g., Canada). Domain knowledge helps most clearly for Sweden, where the informed LLM outperforms the blind variant.
 
-\begin{itemize}[noitemsep]
-    \item \textbf{Covariates discovered incrementally:} The agent first added oil prices, then the policy rate, then US inflation, and finally the exchange rate---each improving the score marginally.
-    \item \textbf{Context window matters:} Truncating to 96 months (8 years) improved over unlimited context, suggesting that very old data introduces noise.
-    \item \textbf{Fine-tuning is fragile:} Only very conservative LoRA settings (100 steps, lr $= 5 \times 10^{-6}$) were accepted. All attempts with 500+ steps or higher learning rates degraded performance.
-    \item \textbf{Transforms don't help:} Raw covariate levels outperformed log-differences, percentage changes, and standardization.
-    \item \textbf{The configuration is economically interpretable:} Oil prices, monetary policy, global inflation, and the trade-weighted exchange rate are precisely the variables a macroeconomist would expect to matter for a small open oil-exporting economy.
-\end{itemize}
+
+\subsection{Selected pipelines}
+\label{sec:results_pipelines}
+
+Table~\ref{tab:pipelines} reports the best configuration from the informed LLM search for each country.
+
+\begin{table}[H]
+\centering
+\caption{Best search configuration per country (informed LLM, seed 42)}
+\label{tab:pipelines}
+\input{tables/tab_pipelines.tex}
+\end{table}
+
+All three configurations are economically interpretable. Norway's search discovers equity, monetary, and exchange rate covariates with LoRA fine-tuning. Canada's search identifies partner-area GDP and monetary policy. Sweden's search selects domestic credit, housing, monetary policy, and exchange rates---notably with context truncation to 48 months and \emph{no fine-tuning}. The monetary policy rate appears in all three countries, reflecting its universal relevance for macro forecasting. Fine-tuning is selected in two of three countries; its absence in Sweden's best config proves consequential for generalization.
+
+
+\subsection{Test-era generalization}
+\label{sec:results_gap}
+
+Table~\ref{tab:gap} presents the central result: the validation-to-test generalization gap for zero-shot and agent-tuned configurations.
+
+\begin{table}[H]
+\centering
+\caption{Validation-to-test generalization gap (average MASE across targets and horizons)}
+\label{tab:gap}
+\input{tables/tab_gap.tex}
+\end{table}
+
+Generalization is strikingly heterogeneous. Norway's agent-tuned config improves validation MASE by \norValGainPct{} but degrades \norTestGapPct{} on the test period---severe overfitting. Canada shows mild degradation (\canTestGapPct)---most validation gains survive. Sweden's agent-tuned config improves \sweValGainPct{} on validation and \emph{further improves} on the test period (\sweTestGapPct).
+
+Zero-shot Chronos-2 is robust across all three countries: its validation-to-test gaps are small and sometimes negative (indicating improved test performance), consistent with the implicit regularization provided by pretraining on diverse time series.
+
+Figure~\ref{fig:scatter} visualizes the generalization pattern. Points above the 45-degree line indicate overfitting (test MASE worse than validation).
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\textwidth]{figures/fig1_search_trajectory.pdf}
-\caption{LLM-guided search trajectory (50 iterations). Green circles: accepted improvements. Red crosses: rejected proposals. The step line shows the best-so-far MASE frontier.}
-\label{fig:trajectory}
+\includegraphics[width=0.65\textwidth]{figures/fig2_val_test_scatter.pdf}
+\caption{Validation vs.\ test MASE for all methods and countries. Points above the diagonal indicate overfitting. Norway's agent-tuned config (red X, upper right) shows the largest generalization gap.}
+\label{fig:scatter}
 \end{figure}
 
-\subsection{Test-era evaluation}
-\label{sec:results_test}
+The mechanism behind this heterogeneity is clear from the pipeline comparison: Norway's search relies on LoRA fine-tuning, which adapts model parameters to validation-era covariate relationships that shift under the regime changes of 2016--2025. Sweden's search uses covariate selection and context truncation without fine-tuning---changes to the model's \emph{input representation} rather than its \emph{parameters}---which proves robust.
 
-Table~\ref{tab:test} presents the out-of-sample test-era results, where the agent-tuned configuration is frozen from the search phase.
-
-\begin{table}[H]
-\centering
-\caption{Test era results (average MASE across targets)}
-\label{tab:test}
-\begin{tabular}{lcccc}
-\toprule
-Method & $h=1$ & $h=3$ & $h=6$ & $h=12$ \\
-\midrule
-\multicolumn{5}{l}{\textit{Univariate baselines}} \\
-Random walk              & 1.000 & 1.000 & 1.000 & 1.000 \\
-ARIMA                    & 0.977 & 0.992 & 1.032 & 1.029 \\
-\midrule
-\multicolumn{5}{l}{\textit{Multivariate baselines}} \\
-VAR                      & 0.979 & 1.075 & 1.175 & 1.202 \\
-Factor model             & 1.192 & 1.170 & 1.260 & 1.377 \\
-\midrule
-\multicolumn{5}{l}{\textit{Foundation model}} \\
-Chronos-2 (zero-shot)    & \textbf{0.984} & \textbf{0.981} & \textbf{0.997} & \textbf{1.021} \\
-Chronos-2 (agent-tuned)  & 1.011 & 1.025 & 1.085 & 1.205 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Zero-shot Chronos-2 is the best method on the test era at all horizons, with MASE below 1 at $h=1$, $h=3$, and $h=6$---meaning it beats the random walk. Critically, the agent-tuned configuration is \emph{above} 1 at all horizons, with MASE reaching 1.205 at $h=12$. ARIMA is competitive but loses to zero-shot Chronos-2 at $h=3$ and $h=6$. The multivariate baselines (VAR, factor model) also underperform.
-
-Diebold-Mariano tests (Table~\ref{tab:dm} in Appendix~\ref{app:additional_results}) confirm that zero-shot Chronos-2 does not \emph{significantly} differ from the random walk on the test era. The agent-tuned configuration, however, is significantly \emph{worse} for industrial production at $h=12$ ($\text{DM} = -2.12$, $p = 0.034$) and retail sales at $h=12$ ($\text{DM} = -1.98$, $p = 0.048$).
-
-\paragraph{Periodic retuning does not help.} Table~\ref{tab:test} includes a variant where the agent-tuned model is re-fitted annually (every 12 origins) using the expanding data window. The results are virtually identical to the static fit-once protocol (RMSE 3.229 vs.\ 3.230 at $h=12$), demonstrating that the overfitting is not caused by stale fine-tuning weights but by the covariate relationships themselves.
 
 \subsection{Subperiod analysis}
 \label{sec:subperiods}
 
-To understand where the overfitting occurs, we decompose the test era into three subperiods. Table~\ref{tab:subperiods} reports average RMSE across targets.
-
-\begin{table}[H]
-\centering
-\caption{Subperiod analysis (average RMSE across targets)}
-\label{tab:subperiods}
-\begin{tabular}{llcccc}
-\toprule
-Subperiod & Method & $h=1$ & $h=3$ & $h=6$ & $h=12$ \\
-\midrule
-\multirow{4}{*}{Pre-COVID (2016--19)}
- & Random walk       & 0.966 & 1.138 & 1.836 & 2.655 \\
- & ARIMA             & 0.897 & 1.118 & 1.836 & 2.618 \\
- & Chronos-2 (ZS)    & \textbf{0.862} & \textbf{1.033} & \textbf{1.773} & \textbf{2.633} \\
- & Chronos-2 (AT)    & 0.882 & 1.081 & 1.844 & 2.739 \\
-\midrule
-\multirow{4}{*}{COVID (2020--21)}
- & Random walk       & \textbf{2.328} & \textbf{2.921} & \textbf{3.149} & \textbf{3.411} \\
- & ARIMA             & 2.491 & 3.045 & 3.609 & 4.130 \\
- & Chronos-2 (ZS)    & 2.519 & 3.008 & 3.495 & 4.003 \\
- & Chronos-2 (AT)    & 2.466 & 3.086 & 3.605 & 4.234 \\
-\midrule
-\multirow{4}{*}{Post-COVID (2022+)}
- & Random walk       & \textbf{0.963} & \textbf{1.207} & \textbf{1.374} & \textbf{1.694} \\
- & ARIMA             & 0.900 & 1.118 & 1.326 & 1.645 \\
- & Chronos-2 (ZS)    & 0.953 & 1.183 & 1.334 & 1.734 \\
- & Chronos-2 (AT)    & 1.023 & 1.324 & 1.641 & 3.011 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\textbf{Pre-COVID (2016--2019):} Zero-shot Chronos-2 is the best method at all horizons, and the agent-tuned configuration is also competitive. The covariate relationships discovered during 2006--2015 still hold during this stable period.
-
-\textbf{COVID (2020--2021):} The random walk dominates---all model-based methods struggle with the unprecedented shock. The agent-tuned configuration is comparable to zero-shot at short horizons but worse at $h=12$. The exception is unemployment, where the agent-tuned model is the best method at all horizons (e.g., RMSE 0.658 vs.\ 0.691 for random walk at $h=1$), suggesting that the policy rate covariate provides useful signal for labor market dynamics even during the pandemic.
-
-\textbf{Post-COVID (2022+):} The overfitting is most severe here. The agent-tuned configuration deteriorates to an average RMSE of 3.011 at $h=12$, nearly double the random walk (1.694). The oil price--macro relationships calibrated on the 2006--2015 period actively mislead the model during the energy crisis and rapid monetary tightening of 2022--2024.
-
-
-\subsection{Ablation: tracing overfitting to its source}
-\label{sec:ablation}
-
-To understand which component of the search-discovered pipeline drives the test-era deterioration, we trace the search trajectory step by step on the test era. Table~\ref{tab:ablation} reports average MASE for each incremental configuration change.
-
-\begin{table}[H]
-\centering
-\caption{Ablation analysis: validation vs.\ test era (avg MASE across targets and horizons)}
-\label{tab:ablation}
-\begin{tabular}{lccc}
-\toprule
-Configuration & Validation & Test & Gap \\
-\midrule
-Zero-shot baseline         & 0.999 & 0.996 & $-0.3\%$  \\
-+ context\_length = 96     & 0.968 & 1.001 & $+3.4\%$  \\
-+ brent\_crude             & 0.963 & 1.005 & $+4.3\%$  \\
-+ policy\_rate             & 0.951 & 1.046 & $+9.9\%$ \\
-+ us\_cpi                  & 0.941 & 1.064 & $+13.0\%$ \\
-+ nok\_eur                 & 0.944 & 1.080 & $+14.5\%$ \\
-+ LoRA fine-tune           & 0.943 & 1.081 & $+14.6\%$ \\
-\bottomrule
-\end{tabular}
-\begin{minipage}{\textwidth}
-\vspace{0.5em}
-\footnotesize
-Notes: Each row adds one component to the previous row's configuration, following the order in which the search agent accepted improvements. The ``Gap'' column reports the percentage change in MASE from validation to test era. Values below 1 indicate improvement over the random walk.
-\end{minipage}
-\end{table}
-
-Figure~\ref{fig:scissors} visualizes this ``scissors'' pattern. The ablation reveals a striking pattern: every step that improves validation-era performance \emph{monotonically increases} the validation-to-test gap.
+Figure~\ref{fig:subperiod} decomposes test-era performance into three subperiods. During the pre-COVID period (2016--2019), the agent-tuned configuration is competitive everywhere: the covariate relationships discovered during 2006--2015 still hold. During the COVID period (2020--2021), all model-based methods struggle; the random walk is resilient. During the post-COVID inflation/tightening period (2022+), the overfitting becomes visible: Norway's agent-tuned MASE spikes while Sweden's holds steady.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\textwidth]{figures/fig2_ablation_scissors.pdf}
-\caption{Ablation ``scissors'' plot. Validation MASE (blue) improves with each search step while test MASE (red) worsens. The shaded area shows the growing generalization gap. The policy rate covariate contributes the largest single jump.}
-\label{fig:scissors}
-\end{figure} The zero-shot baseline is the most robust configuration, with only 1.4\% degradation. The single largest source of overfitting is the policy rate covariate ($+14.1\%$ gap), likely because the monetary policy regime changed dramatically between the near-zero rate environment of 2016--2021 and the rapid tightening cycle of 2022--2024. Fine-tuning, by contrast, contributes almost nothing to the overfitting (20.0\% vs.\ 19.8\%), confirming the periodic retuning result above.
+\includegraphics[width=\textwidth]{figures/fig4_subperiod.pdf}
+\caption{Subperiod MASE by country. The post-2022 inflation/tightening period reveals Norway's overfitting (agent-tuned MASE rises sharply) while Sweden's searched config remains robust.}
+\label{fig:subperiod}
+\end{figure}
 
-\subsection{LLM-guided vs.\ random search}
-\label{sec:llm_vs_random}
 
-To assess whether the LLM agent adds value over naive search, we run a 50-iteration random search baseline that samples configurations uniformly from the same search space. Table~\ref{tab:search_comparison} compares the two approaches.
+\subsection{Ablation: decomposing the gains}
+\label{sec:ablation}
+
+To identify which components drive each country's gains, we perform leave-one-component-out ablation on each country's best configuration. Table~\ref{tab:ablation} and Figure~\ref{fig:ablation} report the validation-era MASE degradation when each component is removed.
 
 \begin{table}[H]
 \centering
-\caption{Search strategy comparison (50 iterations each)}
-\label{tab:search_comparison}
-\begin{tabular}{lccc}
-\toprule
- & LLM (informed) & LLM (blind) & Random \\
-\midrule
-Best validation MASE & 0.943 & 0.968 & --- \\
-Accepted iterations  & 6 (12\%) & 6 (12\%) & 1 (2\%) \\
-Covariates found     & oil, rate, CPI, FX & rate, FFR, CPI & 5 mixed \\
-Context truncation?  & Yes (96 mo.) & No & --- \\
-Fine-tuning?         & Yes (light) & Yes (light) & --- \\
-\bottomrule
-\end{tabular}
-\begin{minipage}{\textwidth}
-\vspace{0.5em}
-\footnotesize
-Notes: ``Informed'' = prompt includes Norwegian-specific domain knowledge. ``Blind'' = generic prompt with no country-specific hints. FFR = federal funds rate, FX = NOK/EUR exchange rate. Random search best MASE not directly comparable due to different corrected-MASE baseline.
-\end{minipage}
+\caption{Leave-one-out ablation: MASE degradation (\%) when each component is removed}
+\label{tab:ablation}
+\input{tables/tab_ablation.tex}
 \end{table}
 
-A domain-blind variant (without Norwegian-specific hints) independently re-discovers the policy rate and US CPI but substitutes the federal funds rate for Brent crude and retains unlimited context---avoiding the oil-specific channels and context truncation that drive the informed search's overfitting. Random search achieved one lucky acceptance with an economically incoherent five-covariate configuration. Both LLM variants converge on interpretable covariate sets mapping onto standard macro transmission channels; both find that transforms hurt, additional covariates beyond three or four degrade performance, and only conservative LoRA is beneficial.
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig3_ablation.pdf}
+\caption{Leave-one-out ablation by country. Bars show MASE degradation (\%) when each component is removed from the best configuration. Sweden's context truncation is the single most impactful component across all countries.}
+\label{fig:ablation}
+\end{figure}
+
+The decomposition reveals distinct drivers across countries. For Norway, the federal funds rate is the most valuable covariate ($+1.6\%$ degradation when removed), while fine-tuning contributes almost nothing ($+0.1\%$). For Canada, euro-area GDP drives the entire improvement ($+1.9\%$); the policy rate is dead weight ($0.0\%$). For Sweden, context truncation to 48 months is the single biggest factor ($+6.6\%$), followed by credit ($+2.6\%$) and the policy rate ($+2.1\%$).
+
+A cross-country pattern emerges: \emph{fine-tuning contributes little to validation gains anywhere}, while covariate selection and context window are the high-value levers. This explains the generalization heterogeneity: Norway's ``gain'' came partly from fine-tuning (fragile under regime change), while Sweden's came entirely from representation changes (robust).
+
+
+\subsection{Search trajectory}
+\label{sec:trajectory}
+
+Figure~\ref{fig:trajectory} shows the informed LLM search trajectory for each country. Norway's search converges by approximately iteration 30, with incremental covariate additions. Canada's search finds fewer improvements (sparser acceptance). Sweden's search finds the largest improvement through a combination of covariates and context truncation.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig1_search_trajectory.pdf}
+\caption{LLM-guided search trajectory by country (50 iterations each). Green circles: accepted improvements. Red crosses: rejected proposals. Step lines show the best-so-far MASE frontier.}
+\label{fig:trajectory}
+\end{figure}
 
 
 % ===================================================================
@@ -463,16 +383,19 @@ A domain-blind variant (without Norwegian-specific hints) independently re-disco
 % ===================================================================
 
 \paragraph{Zero-shot robustness.}
-Zero-shot Chronos-2 is more robust to structural breaks than both the agent-tuned model and classical ARIMA. Pretraining on diverse time series patterns appears to provide implicit regularization against overfitting to specific covariate relationships. For practitioners, zero-shot foundation models may be preferable to tuned pipelines when regime changes are likely.
+Zero-shot Chronos-2 is the most robust single method across all three countries. Its test-era MASE is below or near 1.0 everywhere, meaning it matches or beats the random walk---a benchmark that is itself hard to outperform during regime changes. Pretraining on diverse time series provides implicit regularization against overfitting to specific covariate relationships. For practitioners, zero-shot foundation models should be a standard baseline in macroeconomic forecasting.
 
-\paragraph{The overfitting paradox.}
-The agent discovers an economically interpretable, statistically superior configuration---yet it fails out of sample. This reflects a fundamental limitation of fixed-window macroeconomic validation rather than flawed agentic reasoning. The policy rate covariate contributes the largest overfitting, consistent with the regime shift from near-zero rates to rapid tightening. Periodic retuning does not help, confirming that the covariate relationships themselves---not stale model weights---are the problem.
+\paragraph{When does agentic search help?}
+The answer is conditional on mechanism. Covariate selection and context truncation (as in Sweden) generalize because they change the model's \emph{input representation} without altering its parameters. LoRA fine-tuning (as in Norway) adapts model weights to validation-era patterns that may not persist. This is consistent with the machine learning principle that representation learning is more robust than parameter tuning on small datasets---and 120 monthly origins is a small dataset by any standard.
 
-\paragraph{Domain knowledge as a double-edged sword.}
-The domain-blind experiment shows the LLM discovers meaningful covariates autonomously, but domain hints bias the informed agent toward oil-specific channels and context truncation that drive the most overfitting. Domain knowledge improves validation performance but may increase fragility to regime changes.
+\paragraph{Domain knowledge.}
+Informed LLM search finds more interpretable pipelines than domain-blind search in all countries. But interpretability does not guarantee robustness: Norway's economically interpretable covariates (oil, policy rate, exchange rate) still overfit. The blind agent discovers risk and equity proxies (S\&P 500, VIX) that the informed agent misses. For the paper's central question, domain knowledge narrows the search toward macro-relevant covariates but does not protect against validation-era overfitting.
+
+\paragraph{Country heterogeneity.}
+The three countries present different generalization patterns that would be invisible in a single-country study. Had we evaluated only Norway, the conclusion would be that agentic search is counterproductive. Had we evaluated only Sweden, the conclusion would be that agentic search delivers large, robust gains. The cross-country evidence reveals the conditional nature of the result: \emph{what} the search discovers matters more than whether it discovers something.
 
 \paragraph{Limitations.}
-We use a single foundation model; results may differ for TimesFM or MOIRAI. Our pseudo-real-time protocol uses latest-vintage data, not true real-time vintages. We evaluate only point forecasts; density evaluation using CRPS could reveal different patterns. The evidence comes from one country with four targets; generalization to other economies remains to be tested.
+We use a single TSFM (Chronos-2); results may differ for TimesFM or MOIRAI. Our pseudo-real-time protocol uses latest-vintage data, not true real-time with data revisions. We evaluate only point forecasts; density evaluation using CRPS could reveal different patterns. Sweden evaluates three targets (retail sales excluded due to a data gap); cross-country MASE averages are not perfectly comparable. The search budget of 50 iterations may not exhaust the search space, though diminishing returns are observed in all countries.
 
 
 % ===================================================================
@@ -480,9 +403,9 @@ We use a single foundation model; results may differ for TimesFM or MOIRAI. Our 
 \label{sec:conclusion}
 % ===================================================================
 
-LLM-guided search discovers an economically interpretable pipeline for Norwegian macro forecasting---oil prices, the policy rate, US inflation, and the exchange rate---that improves validation MASE by 6.8\%. Yet the ablation reveals that every accepted improvement monotonically widens the validation-to-test gap, and the gains do not survive the regime changes of 2016--2025. Zero-shot Chronos-2 proves more robust than both the agent-tuned pipeline and classical baselines.
+We evaluate agentic search over covariates, context window, and fine-tuning settings for Chronos-2 across three small open economies. The search discovers country-specific, economically interpretable pipelines in all three countries. However, out-of-sample generalization is heterogeneous: fine-tuning-based gains collapse under regime change, while representation-based gains survive. Zero-shot Chronos-2 is the most robust single method.
 
-Two implications follow. First, zero-shot foundation models should be included as standard baselines in macro forecasting---their robustness to structural breaks is a practical advantage. Second, automated pipeline search can identify interpretable configurations, but fixed-window validation in a non-stationary environment risks overfitting to a particular regime. The policy-rate shift between eras illustrates this: relationships that help in stable periods fail in crises. Future work should explore rolling validation windows, per-variable search, and extension to multiple foundation models and economies.
+Two practical implications follow. First, zero-shot foundation models should be standard baselines in macro forecasting---their robustness to structural breaks is a concrete advantage. Second, when using automated search, prefer covariate selection and context window adjustments over fine-tuning in non-stationary environments. The cross-country evidence shows that \emph{what} the search discovers is more important than \emph{whether} it discovers something. Future work should explore rolling validation windows, density forecasting, multiple TSFMs, and extension to additional economies.
 
 
 % ===================================================================
@@ -494,152 +417,31 @@ Two implications follow. First, zero-shot foundation models should be included a
 \newpage
 \begin{appendices}
 
-\section{Data sources and publication lags}
-\label{app:data}
+\section{Per-variable test results}
+\label{app:per_variable}
+
+Table~\ref{tab:per_variable_test} reports per-variable MASE for the test era across key methods, stratified by country. Values below 1 indicate improvement over the random walk.
 
 \begin{table}[H]
 \centering
-\caption{Variable panel}
-\label{tab:variables}
-\small
-\begin{tabular}{llclcl}
-\toprule
-Variable & Source & Table/Series ID & Freq. & Lag (d) & Available from \\
-\midrule
-CPI (12-mo rate) & SSB & 03013 & M & 10 & 1979-01 \\
-Industrial prod. & SSB & 14208 & M & 40 & 1990-01 \\
-Retail sales & SSB & 07129 & M & 30 & 2000-01 \\
-House prices (SA) & SSB & 07221 & Q$\to$M & 45 & 2005-03 \\
-Credit (C2, 12-mo) & SSB & 11599 & M & 40 & 1986-12 \\
-Exports & SSB & 08803 & M & 40 & 1988-01 \\
-Imports & SSB & 08803 & M & 40 & 1988-01 \\
-Unemployment (LFS) & SSB & 13760 & M & 30 & 2006-01 \\
-NOK/EUR & NB & EXR/B.EUR.NOK.SP & D$\to$M & 1 & 1999-01 \\
-NOK/USD & NB & EXR/B.USD.NOK.SP & D$\to$M & 1 & 1990-01 \\
-Policy rate & NB & IR/B.KPRA.. & D$\to$M & 0 & 1990-01 \\
-Brent crude & FRED & DCOILBRENTEU & D$\to$M & 1 & 1987-05 \\
-NASDAQ & FRED & NASDAQCOM & D$\to$M & 1 & 1971-02 \\
-Fed funds rate & FRED & FEDFUNDS & M & 1 & 1954-07 \\
-US CPI & FRED & CPIAUCSL & M & 15 & 1947-01 \\
-Euro area GDP & FRED & CLVMNACSCAB1GQEA19 & Q$\to$M & 90 & 1995-01 \\
-VIX & FRED & VIXCLS & D$\to$M & 1 & 1990-01 \\
-Global EPU & FRED & GEPUCURRENT & M & 30 & 1997-01 \\
-\bottomrule
-\end{tabular}
-\begin{minipage}{\textwidth}
-\vspace{0.5em}
-\footnotesize
-Notes: M = monthly, Q = quarterly, D = daily. Q$\to$M = quarterly expanded to monthly by forward-fill. D$\to$M = daily aggregated to monthly average. NB = Norges Bank. SA = seasonally adjusted. Lag = publication lag in calendar days after end of reference period.
-\end{minipage}
-\end{table}
-
-
-\section{Search space details}
-\label{app:search_space}
-
-The agent may propose changes to any of the following dimensions. Target variables (CPI, industrial production, retail sales, unemployment) are never transformed; only covariate transforms are permitted. The available covariate pool consists of all 14 non-target variables listed in Table~\ref{tab:variables}.
-
-Available covariate transformations: identity (raw levels), log first-difference, 1-month percentage change, 12-month percentage change, rolling standardization (60-month window), 3-month moving average, 6-month moving average.
-
-
-\section{Additional results}
-\label{app:additional_results}
-
-Table~\ref{tab:per_variable_test} reports per-variable MASE for the test era across key methods. Values below 1 indicate improvement over the random walk.
-
-\begin{table}[H]
-\centering
-\caption{Test era MASE by variable (key methods)}
+\caption{Test era MASE by variable and country}
 \label{tab:per_variable_test}
-\small
-\begin{tabular}{llcccccc}
-\toprule
-Variable & $h$ & RW & ARIMA & VAR & Factor & C2-ZS & C2-AT \\
-\midrule
-\multirow{4}{*}{CPI}
- & 1  & 1.000 & 1.019 & 1.053 & 1.372 & 1.024 & 1.026 \\
- & 3  & 1.000 & 1.015 & 1.212 & 1.320 & 1.016 & 1.055 \\
- & 6  & 1.000 & 0.996 & 1.270 & 1.286 & \textbf{0.992} & 1.087 \\
- & 12 & 1.000 & 0.998 & 1.084 & 1.108 & \textbf{0.956} & 1.062 \\
-\midrule
-\multirow{4}{*}{\shortstack{Industrial\\production}}
- & 1  & 1.000 & 1.043 & \textbf{0.978} & 1.184 & 1.024 & 1.115 \\
- & 3  & 1.000 & 1.007 & \textbf{0.980} & 1.091 & \textbf{0.981} & 1.093 \\
- & 6  & 1.000 & 1.067 & 1.025 & 1.186 & \textbf{0.974} & 1.170 \\
- & 12 & 1.000 & 1.057 & 1.221 & 1.589 & 1.048 & 1.435 \\
-\midrule
-\multirow{4}{*}{\shortstack{Retail\\sales}}
- & 1  & 1.000 & \textbf{0.971} & 1.001 & 1.140 & 0.993 & 1.022 \\
- & 3  & 1.000 & 1.003 & 1.054 & 1.086 & \textbf{0.977} & 1.027 \\
- & 6  & 1.000 & 1.069 & 1.212 & 1.167 & 1.036 & 1.108 \\
- & 12 & 1.000 & 1.069 & 1.278 & 1.323 & 1.102 & 1.320 \\
-\midrule
-\multirow{4}{*}{Unemployment}
- & 1  & 1.000 & \textbf{0.876} & 0.884 & 1.072 & 0.896 & 0.880 \\
- & 3  & 1.000 & 0.941 & 1.052 & 1.182 & 0.950 & \textbf{0.924} \\
- & 6  & 1.000 & 0.998 & 1.194 & 1.400 & 0.988 & \textbf{0.977} \\
- & 12 & 1.000 & 0.994 & 1.224 & 1.487 & \textbf{0.978} & 1.003 \\
-\bottomrule
-\end{tabular}
-\begin{minipage}{\textwidth}
-\vspace{0.5em}
-\footnotesize
-Notes: C2-ZS = Chronos-2 zero-shot; C2-AT = Chronos-2 agent-tuned. Bold indicates best method per row. Zero-shot Chronos-2 is best for CPI at long horizons and industrial production at $h=6$. Agent-tuned helps unemployment at $h=3$/$h=6$ but hurts other variables.
-\end{minipage}
+\input{tables/tab_per_variable_test.tex}
 \end{table}
 
-\vspace{1em}
 
-Table~\ref{tab:dm} reports Diebold-Mariano test statistics for the test era. We test the null of equal predictive ability against the random walk using squared loss with Newey-West HAC standard errors (bandwidth $= h-1$). Negative DM statistics indicate the method is \emph{worse} than the random walk.
+\section{Subperiod details}
+\label{app:subperiods}
+
+Table~\ref{tab:subperiods} reports average RMSE across targets by subperiod and country.
 
 \begin{table}[H]
 \centering
-\caption{Diebold-Mariano tests: test era vs.\ random walk}
-\label{tab:dm}
-\small
-\begin{tabular}{llrrrr}
-\toprule
-Variable & $h$ & ARIMA & VAR & C2-ZS & C2-AT \\
-\midrule
-\multirow{4}{*}{CPI}
- & 1  & $-1.68^{*}$  & $-1.91^{*}$  & $-1.87^{*}$  & $-1.02$ \\
- & 3  & $-1.46$       & $-2.81^{***}$ & $-0.78$       & $-1.82^{*}$ \\
- & 6  & $-0.88$       & $-2.18^{**}$  & $\phantom{-}0.01$ & $-1.70^{*}$ \\
- & 12 & $-1.32$       & $-0.94$       & $\phantom{-}0.34$ & $-1.18$ \\
-\midrule
-\multirow{4}{*}{\shortstack{Ind.\\prod.}}
- & 1  & $-0.55$       & $\phantom{-}1.77^{*}$  & $-0.13$       & $-1.72^{*}$ \\
- & 3  & $-0.92$       & $\phantom{-}0.86$       & $\phantom{-}0.49$ & $-1.77^{*}$ \\
- & 6  & $-1.44$       & $\phantom{-}0.68$       & $-0.52$       & $-1.76^{*}$ \\
- & 12 & $-1.39$       & $-0.80$       & $-1.33$       & $-2.12^{**}$ \\
-\midrule
-\multirow{4}{*}{\shortstack{Retail\\sales}}
- & 1  & $-0.68$       & $-0.61$       & $-0.81$       & $-0.47$ \\
- & 3  & $-0.26$       & $-1.15$       & $-0.43$       & $-0.48$ \\
- & 6  & $-0.89$       & $-1.58$       & $-0.89$       & $-1.75^{*}$ \\
- & 12 & $-0.88$       & $-1.28$       & $-1.13$       & $-1.98^{**}$ \\
-\midrule
-\multirow{4}{*}{Unemp.}
- & 1  & $\phantom{-}1.14$  & $\phantom{-}2.00^{**}$ & $\phantom{-}1.02$ & $\phantom{-}1.91^{*}$ \\
- & 3  & $\phantom{-}1.00$  & $-0.11$       & $\phantom{-}1.11$ & $\phantom{-}1.87^{*}$ \\
- & 6  & $\phantom{-}0.21$  & $-1.12$       & $\phantom{-}0.63$ & $\phantom{-}1.38$ \\
- & 12 & $-0.50$       & $-0.88$       & $-0.16$       & $\phantom{-}0.23$ \\
-\bottomrule
-\end{tabular}
-\begin{minipage}{\textwidth}
-\vspace{0.5em}
-\footnotesize
-Notes: Entries are DM statistics. Negative values indicate the method is worse than the random walk. $^{*}p < 0.10$, $^{**}p < 0.05$, $^{***}p < 0.01$. Newey-West HAC with bandwidth $h-1$.
-\end{minipage}
+\caption{Subperiod analysis (average RMSE across targets)}
+\label{tab:subperiods}
+\input{tables/tab_subperiods.tex}
 \end{table}
 
-
-\section{Agent experiment log}
-\label{app:experiment_log}
-
-The full 50-iteration experiment log is available in the project repository (\texttt{results/search\_log.jsonl}). Out of 50 iterations, 6 were accepted (12\% acceptance rate). The search converged by approximately iteration 45. Common rejected proposals included: adding more than 4 covariates (consistently worsened scores), aggressive fine-tuning (500+ steps or learning rate $> 10^{-5}$), and data transformations on covariates. The agent's reasoning was generally sensible---it systematically tested individual covariates, tried combinations, explored fine-tuning, and adjusted context lengths.
-
-For comparison, a 50-iteration random search achieved a 2\% acceptance rate with a single accepted configuration at iteration 1 (validation MASE 1.799). The random search's best configuration used 5 covariates (house prices, Euro area GDP, global EPU, imports, policy rate) with mixed transformations---economically less coherent than the LLM's incremental discovery.
 
 \section{Reproducibility}
 \label{app:reproducibility}
@@ -658,68 +460,52 @@ Python & 3.11.15 \\
 \texttt{autogluon.timeseries} & 1.5.0 \\
 PyTorch & 2.11.0+cu130 \\
 \texttt{statsmodels} & 0.14.6 \\
-\texttt{pandas} & 2.3.3 \\
-\texttt{numpy} & 2.1.3 \\
-\texttt{anthropic} (Claude API client) & 0.86.0 \\
+\texttt{anthropic} (Claude API) & 0.86.0 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\noindent All dependencies are pinned in a \texttt{uv.lock} file. The project uses \texttt{uv} for dependency management. Hardware: NVIDIA GeForce RTX 4090 (24\,GB VRAM).
+\noindent All dependencies are pinned in \texttt{uv.lock}. Hardware: 2$\times$ NVIDIA GeForce RTX 4090 (24\,GB VRAM each).
 
 \subsection*{Foundation model}
 
-Chronos-2 is loaded via AutoGluon using the model identifier \texttt{amazon/chronos-2} and the \texttt{"Chronos-2"} model key. The model has 120M parameters. For zero-shot inference, the model weights are loaded directly from the HuggingFace Hub. For LoRA fine-tuning, the target modules are the self-attention Q, K, V, O projections and the output patch embedding, with rank $r = 8$ and $\alpha = 16$. Point forecasts are extracted from the \texttt{mean} column of the AutoGluon prediction output.
+Chronos-2 is loaded via AutoGluon using the model identifier \texttt{amazon/chronos-2} (120M parameters). LoRA fine-tuning targets the self-attention Q, K, V, O projections and the output patch embedding with rank $r = 8$ and $\alpha = 16$.
 
-\subsection*{LLM search agent}
+\subsection*{Search agent}
 
-The search agent uses Claude Sonnet (\texttt{claude-sonnet-4-20250514}) via the Anthropic Messages API with \texttt{max\_tokens=1024} and default temperature. The system prompt (\texttt{program.md}) contains the task description, search space constraints, available covariates, and---in the informed variant---domain knowledge about the Norwegian economy. The full prompt text is available in the project repository. The domain-blind variant (\texttt{configs/program\_blind.md}) removes all country-specific hints.
+The search agent uses Claude Sonnet via the Anthropic Messages API with \texttt{max\_tokens=1024}. Country-specific informed prompts are in \texttt{prompts/informed\_\{country\}.md}; the domain-blind prompt is \texttt{prompts/blind.md}. Each search runs for 50 iterations with the two-phase quick/full evaluation protocol.
 
-At each iteration, the agent receives the current best configuration, the MASE score, and a history of the most recent 15 iterations (config, score, status). The agent returns a JSON object specifying only the fields to change. Responses are parsed by extracting the first JSON object found, with fallback handling for markdown code blocks.
-
-\subsection*{Data retrieval}
+\subsection*{Data sources}
 
 All data sources are publicly available:
 \begin{itemize}[noitemsep]
-    \item \textbf{Statistics Norway (SSB):} JSON-stat2 API at \texttt{data.ssb.no/api/v0}. No authentication required. Table IDs and content codes are listed in Table~\ref{tab:variables}.
-    \item \textbf{Norges Bank:} SDMX-CSV API at \texttt{data.norges-bank.no/api/data}. No authentication.
-    \item \textbf{FRED:} Via the \texttt{fredapi} Python client. Requires a free API key from \texttt{fred.stlouisfed.org}.
-    \item \textbf{Anthropic API:} Required for the LLM search agent. Not required for baselines or zero-shot evaluation.
+    \item \textbf{Norway:} Statistics Norway (SSB) JSON-stat2 API; Norges Bank SDMX API.
+    \item \textbf{Canada:} Statistics Canada CSV API; Bank of Canada Valet API.
+    \item \textbf{Sweden:} Statistics Sweden (SCB) PxWeb API; Riksbank API.
+    \item \textbf{Global:} FRED via the \texttt{fredapi} client (free API key required).
+    \item \textbf{LLM search:} Anthropic API (required for search; not required for baselines).
 \end{itemize}
 
-\noindent Data is cached locally after the first download. Publication lags are configured in \texttt{configs/publication\_lags.yml}. Daily series are aggregated to monthly averages; quarterly series are forward-filled. All covariates are provided as past-only values (no future covariate leakage).
-
-\subsection*{Evaluation protocol}
-
-Forecast origins are generated at monthly frequency. Validation era: January 2006 through December 2015 (120 origins). Test era: January 2016 through March 2025 (111 origins). At each origin, the information set is restricted by publication lags. Quick evaluation during search uses 20 origins subsampled with seed 42; full evaluation uses all origins. The baseline is always scored on all origins to ensure fair comparisons.
-
-\subsection*{Random seeds and determinism}
-
-Origin subsampling uses \texttt{numpy.random.default\_rng(42)}. AutoGluon and PyTorch use default seeds (not explicitly controlled). Chronos-2 produces deterministic point forecasts via a single forward pass. The LLM search agent is non-deterministic due to the stochastic nature of the Claude API; repeated runs may discover different configurations.
+\noindent Publication lags are configured per country in \texttt{configs/publication\_lags.yml}. The variable catalog is in \texttt{metadata/variable\_catalog.csv}. Manual economist benchmark configurations are in \texttt{configs/manual\_economist\_benchmarks.yaml}.
 
 \subsection*{Replication}
 
-The complete project repository includes:
-\begin{itemize}[noitemsep]
-    \item Source code: \texttt{src/prepare.py}, \texttt{train.py}, \texttt{evaluate.py}, \texttt{search.py}, \texttt{baselines.py}
-    \item Configuration files: \texttt{configs/publication\_lags.yml}, \texttt{search\_space.yml}, \texttt{best\_config.json}
-    \item Search prompts: \texttt{program.md} (informed), \texttt{configs/program\_blind.md} (domain-blind)
-    \item Experiment logs: \texttt{results/search\_log.jsonl} (all iterations with configs and scores)
-    \item Test suite: 90 tests via \texttt{pytest}
-    \item Dependency lock: \texttt{uv.lock} (pinned versions)
-\end{itemize}
-
-\noindent To replicate the baseline evaluation:
 \begin{verbatim}
-uv sync --all-extras
-uv run python src/prepare.py
-uv run python src/baselines.py --all --era validation --save
-uv run python src/train.py --era validation --save
-\end{verbatim}
-
-\noindent To replicate the search experiment (requires \texttt{ANTHROPIC\_API\_KEY}):
-\begin{verbatim}
-uv run python src/search.py --max-iterations 50
+uv sync --extra ml --extra dev
+uv run python src/prepare.py            # Norway
+uv run python src/prepare_canada.py     # Canada
+uv run python src/prepare_sweden.py     # Sweden
+uv run python src/baselines.py --all --era validation --save --country norway
+uv run python src/baselines.py --all --era test --save --country norway
+# Repeat for canada and sweden
+HF_HUB_OFFLINE=1 uv run python src/search.py \
+    --country norway --mode llm --seed 42 \
+    --program prompts/informed_norway.md --max-iterations 50
+# Repeat for canada and sweden
+uv run python src/build_forecast_errors.py
+uv run python src/tables/generate_tables.py
+uv run python scripts/generate_figures.py
+uv run pytest  # 131+ tests
 \end{verbatim}
 
 \end{appendices}

@@ -10,6 +10,7 @@ __pycache__/
 AutogluonModels/
 .ruff_cache/
 webapp/_site/
+paper/*.blg
 webapp/.quarto/
 configs/current_config.json
 .claude/

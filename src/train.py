@@ -267,7 +267,7 @@ def fit_predictor(
         hyperparameters["Chronos-2"]["fine_tune_steps"] = fine_tune_steps
         hyperparameters["Chronos-2"]["fine_tune_lr"] = learning_rate
 
-    time_limit = 1800 if fine_tune else 120
+    time_limit = 1800
     predictor = TimeSeriesPredictor(
         prediction_length=prediction_length,
         eval_metric="MASE",

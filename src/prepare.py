@@ -84,13 +84,24 @@ ALL_VARIABLES: list[str] = TARGET_VARIABLES + [
 # ---------------------------------------------------------------------------
 
 
-def load_publication_lags() -> dict[str, int]:
-    """Load publication lags (in days) from configs/publication_lags.yml."""
+def load_publication_lags(country: str | None = None) -> dict[str, int]:
+    """Load publication lags (in days) from configs/publication_lags.yml.
+
+    Args:
+        country: If specified, load per-country section and merge with
+            global series. If None, load top-level keys (backward compat).
+    """
     lag_file = CONFIGS_DIR / "publication_lags.yml"
     if lag_file.exists():
         with open(lag_file) as f:
-            lags = yaml.safe_load(f)
-        return {k: int(v) for k, v in lags.items()}
+            all_lags = yaml.safe_load(f)
+        if country and country in all_lags:
+            # Start with global series (top-level scalars), overlay country-specific
+            result = {k: int(v) for k, v in all_lags.items() if not isinstance(v, dict)}
+            result.update({k: int(v) for k, v in all_lags[country].items()})
+            return result
+        # Backward compat: return only top-level scalar keys
+        return {k: int(v) for k, v in all_lags.items() if not isinstance(v, dict)}
     logger.warning("publication_lags.yml not found, using built-in defaults")
     return _default_publication_lags()
 

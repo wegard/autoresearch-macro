@@ -1,7 +1,7 @@
-"""Prepare project data for the web dashboard.
+"""Prepare project data for the web dashboard (three-country edition).
 
-Reads results, panel data, and search logs from the project and writes
-JSON files that D3.js / Observable Plot can consume directly.
+Reads forecast_errors.parquet, search logs, configs, and ablation results
+and writes JSON files that Observable Plot / OJS can consume directly.
 
 Usage:
     uv run python webapp/_data/prepare_results.py
@@ -12,192 +12,376 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 RESULTS_DIR = PROJECT_ROOT / "results"
-DATA_DIR = PROJECT_ROOT / "data" / "processed"
+FE_PATH = RESULTS_DIR / "forecast_errors.parquet"
 OUTPUT_DIR = Path(__file__).resolve().parent
 
+COUNTRIES = ["norway", "canada", "sweden"]
+COUNTRY_DISPLAY = {"norway": "Norway", "canada": "Canada", "sweden": "Sweden"}
+COUNTRY_TARGETS: dict[str, list[str]] = {
+    "norway": ["cpi", "industrial_production", "retail_sales", "unemployment"],
+    "canada": ["cpi", "industrial_production", "retail_sales", "unemployment"],
+    "sweden": ["cpi", "industrial_production", "unemployment"],
+}
+HORIZONS = [1, 3, 6, 12]
 
-def prepare_combined_metrics() -> None:
-    """Combine metrics from all evaluated methods into one JSON file."""
-    validation_dir = RESULTS_DIR / "validation"
-    if not validation_dir.exists():
-        print("No validation results found, skipping metrics.")
-        return
+METHOD_DISPLAY: dict[str, str] = {
+    "random_walk": "Random Walk",
+    "seasonal_naive": "Seasonal Naive",
+    "ar": "AR(p)",
+    "arima": "ARIMA",
+    "ets": "ETS",
+    "var": "VAR",
+    "factor": "Factor Model",
+    "bvar": "BVAR",
+    "elastic_net": "Elastic Net",
+    "zero_shot": "Chronos-2 (zero-shot)",
+    "agent_tuned": "Chronos-2 (agent-tuned)",
+    "manual_economist": "Chronos-2 (manual)",
+}
 
-    combined: dict = {"methods": []}
+METHOD_CATEGORY: dict[str, str] = {
+    "random_walk": "naive",
+    "seasonal_naive": "naive",
+    "ar": "classical",
+    "arima": "classical",
+    "ets": "classical",
+    "var": "multivariate",
+    "factor": "multivariate",
+    "bvar": "multivariate",
+    "elastic_net": "ml",
+    "zero_shot": "foundation",
+    "agent_tuned": "foundation",
+    "manual_economist": "foundation",
+}
 
-    for method_dir in sorted(validation_dir.iterdir()):
-        if not method_dir.is_dir():
+SUBPERIOD_BOUNDS: dict[str, tuple[str, str]] = {
+    "pre_covid": ("2016-01-01", "2019-12-31"),
+    "covid": ("2020-01-01", "2021-12-31"),
+    "post_covid": ("2022-01-01", "2025-12-31"),
+}
+
+# Primary search state files per country
+SEARCH_STATE_FILES: dict[str, str] = {
+    "norway": "search_state_llm_42.json",
+    "canada": "search_state_llm_42.json",
+    "sweden": "search_state_llm_fixedgate_42.json",
+}
+
+SEARCH_LOG_FILES: dict[str, str] = {
+    "norway": "search_log_llm_42.jsonl",
+    "canada": "search_log_llm_42.jsonl",
+    "sweden": "search_log_llm_fixedgate_42.jsonl",
+}
+
+
+def load_errors() -> pd.DataFrame:
+    df = pd.read_parquet(FE_PATH)
+    df["origin_date"] = pd.to_datetime(df["origin_date"])
+    return df
+
+
+def _compute_mase_series(
+    method_df: pd.DataFrame, rw_df: pd.DataFrame, targets: list[str],
+) -> dict[str, dict[int, float]]:
+    """Compute MASE per target per horizon."""
+    result: dict[str, dict[int, float]] = {}
+    for target in targets:
+        result[target] = {}
+        for h in HORIZONS:
+            m_sub = method_df[(method_df["target"] == target) & (method_df["horizon"] == h)]
+            r_sub = rw_df[(rw_df["target"] == target) & (rw_df["horizon"] == h)]
+            if m_sub.empty or r_sub.empty:
+                continue
+            shared = m_sub[["origin_date", "abs_error"]].merge(
+                r_sub[["origin_date", "abs_error"]],
+                on="origin_date", suffixes=("_m", "_rw"),
+            )
+            if shared.empty:
+                continue
+            rw_mae = shared["abs_error_rw"].mean()
+            if rw_mae > 0:
+                result[target][h] = float(shared["abs_error_m"].mean() / rw_mae)
+    return result
+
+
+def _compute_rmse_series(
+    method_df: pd.DataFrame, targets: list[str],
+) -> dict[str, dict[int, float]]:
+    """Compute RMSE per target per horizon."""
+    result: dict[str, dict[int, float]] = {}
+    for target in targets:
+        result[target] = {}
+        for h in HORIZONS:
+            sub = method_df[(method_df["target"] == target) & (method_df["horizon"] == h)]
+            if sub.empty:
+                continue
+            result[target][h] = float(np.sqrt(sub["sq_error"].mean()))
+    return result
+
+
+def prepare_metrics(df: pd.DataFrame) -> None:
+    """Generate per-country, per-era metrics for all methods."""
+    records: list[dict] = []
+
+    for country in COUNTRIES:
+        targets = COUNTRY_TARGETS[country]
+        for era in ["validation", "test"]:
+            mask = df["country"] == country
+            mask = mask & (df["is_validation"] if era == "validation" else df["is_test"])
+            era_df = df[mask]
+
+            rw = era_df[era_df["model_variant"] == "random_walk"]
+
+            methods = era_df[["model_family", "model_variant"]].drop_duplicates()
+            for _, row in methods.iterrows():
+                family, variant = row["model_family"], row["model_variant"]
+                method_df = era_df[
+                    (era_df["model_family"] == family) & (era_df["model_variant"] == variant)
+                ]
+
+                mase_by_target = _compute_mase_series(method_df, rw, targets)
+                rmse_by_target = _compute_rmse_series(method_df, targets)
+
+                for target in targets:
+                    for h in HORIZONS:
+                        mase_val = mase_by_target.get(target, {}).get(h)
+                        rmse_val = rmse_by_target.get(target, {}).get(h)
+                        if mase_val is None and rmse_val is None:
+                            continue
+                        records.append({
+                            "country": country,
+                            "era": era,
+                            "method": variant,
+                            "display_name": METHOD_DISPLAY.get(variant, variant),
+                            "family": family,
+                            "category": METHOD_CATEGORY.get(variant, "other"),
+                            "target": target,
+                            "horizon": h,
+                            "mase": round(mase_val, 4) if mase_val is not None else None,
+                            "rmse": round(rmse_val, 4) if rmse_val is not None else None,
+                        })
+
+    (OUTPUT_DIR / "metrics.json").write_text(json.dumps(records, indent=2))
+    print(f"Wrote metrics.json ({len(records)} records)")
+
+
+def prepare_subperiod_metrics(df: pd.DataFrame) -> None:
+    """Generate subperiod test-era metrics."""
+    test = df[df["is_test"]]
+    records: list[dict] = []
+
+    for country in COUNTRIES:
+        targets = COUNTRY_TARGETS[country]
+        c_test = test[test["country"] == country]
+        c_rw = c_test[c_test["model_variant"] == "random_walk"]
+
+        for sp_name, (sp_start, sp_end) in SUBPERIOD_BOUNDS.items():
+            sp_data = c_test[
+                (c_test["origin_date"] >= sp_start) & (c_test["origin_date"] <= sp_end)
+            ]
+            sp_rw = c_rw[
+                (c_rw["origin_date"] >= sp_start) & (c_rw["origin_date"] <= sp_end)
+            ]
+
+            methods = sp_data[["model_family", "model_variant"]].drop_duplicates()
+            for _, row in methods.iterrows():
+                family, variant = row["model_family"], row["model_variant"]
+                method_df = sp_data[
+                    (sp_data["model_family"] == family) & (sp_data["model_variant"] == variant)
+                ]
+
+                mase_by_target = _compute_mase_series(method_df, sp_rw, targets)
+                rmse_by_target = _compute_rmse_series(method_df, targets)
+
+                for target in targets:
+                    for h in HORIZONS:
+                        mase_val = mase_by_target.get(target, {}).get(h)
+                        rmse_val = rmse_by_target.get(target, {}).get(h)
+                        if mase_val is None and rmse_val is None:
+                            continue
+                        records.append({
+                            "country": country,
+                            "subperiod": sp_name,
+                            "method": variant,
+                            "display_name": METHOD_DISPLAY.get(variant, variant),
+                            "category": METHOD_CATEGORY.get(variant, "other"),
+                            "target": target,
+                            "horizon": h,
+                            "mase": round(mase_val, 4) if mase_val is not None else None,
+                            "rmse": round(rmse_val, 4) if rmse_val is not None else None,
+                        })
+
+    (OUTPUT_DIR / "subperiod_metrics.json").write_text(json.dumps(records, indent=2))
+    print(f"Wrote subperiod_metrics.json ({len(records)} records)")
+
+
+def prepare_gap_data(df: pd.DataFrame) -> None:
+    """Generate validation-to-test gap data per country."""
+    records: list[dict] = []
+
+    for country in COUNTRIES:
+        targets = COUNTRY_TARGETS[country]
+        for family, variant, label in [
+            ("chronos2", "zero_shot", "Zero-shot"),
+            ("chronos2", "agent_tuned", "Agent-tuned"),
+        ]:
+            for era in ["validation", "test"]:
+                mask = (df["country"] == country) & (df["model_family"] == family) & (df["model_variant"] == variant)
+                mask = mask & (df["is_validation"] if era == "validation" else df["is_test"])
+                era_df = df[mask]
+                rw_mask = (df["country"] == country) & (df["model_variant"] == "random_walk")
+                rw_mask = rw_mask & (df["is_validation"] if era == "validation" else df["is_test"])
+                rw_df = df[rw_mask]
+
+                mase_by_target = _compute_mase_series(era_df, rw_df, targets)
+                # Average across targets and horizons
+                all_vals = [v for t in mase_by_target.values() for v in t.values()]
+                avg = float(np.mean(all_vals)) if all_vals else None
+
+                h12_vals = [mase_by_target.get(t, {}).get(12) for t in targets]
+                h12_vals = [v for v in h12_vals if v is not None]
+                h12_avg = float(np.mean(h12_vals)) if h12_vals else None
+
+                records.append({
+                    "country": country,
+                    "config": label,
+                    "era": era,
+                    "avg_mase": round(avg, 3) if avg is not None else None,
+                    "h12_mase": round(h12_avg, 3) if h12_avg is not None else None,
+                })
+
+    (OUTPUT_DIR / "gap_data.json").write_text(json.dumps(records, indent=2))
+    print(f"Wrote gap_data.json ({len(records)} records)")
+
+
+def prepare_search_trajectories() -> None:
+    """Load informed-LLM search trajectories per country."""
+    all_data: dict[str, list] = {}
+
+    for country in COUNTRIES:
+        log_file = RESULTS_DIR / country / SEARCH_LOG_FILES[country]
+        if not log_file.exists():
+            all_data[country] = []
             continue
-        metrics_path = method_dir / "metrics.json"
-        config_path = method_dir / "config.json"
-        if not metrics_path.exists():
+        iterations = []
+        for line in log_file.read_text().strip().split("\n"):
+            if line.strip():
+                iterations.append(json.loads(line))
+        all_data[country] = iterations
+
+    (OUTPUT_DIR / "search_trajectories.json").write_text(json.dumps(all_data, indent=2))
+    total = sum(len(v) for v in all_data.values())
+    print(f"Wrote search_trajectories.json ({total} iterations across {len(COUNTRIES)} countries)")
+
+
+def prepare_pipeline_configs() -> None:
+    """Load best config per country from search state files."""
+    configs: dict[str, dict] = {}
+
+    for country in COUNTRIES:
+        state_file = RESULTS_DIR / country / SEARCH_STATE_FILES[country]
+        if not state_file.exists():
             continue
-
-        metrics = json.loads(metrics_path.read_text())
-        config = json.loads(config_path.read_text()) if config_path.exists() else {}
-
-        entry = {
-            "name": method_dir.name,
-            "display_name": _display_name(method_dir.name),
-            "category": _categorize(method_dir.name),
-            "runtime_seconds": config.get("runtime_seconds", 0),
-            "metrics": metrics.get("metrics", {}),
-            "summary": metrics.get("summary", {}),
+        state = json.loads(state_file.read_text())
+        configs[country] = {
+            "display_name": COUNTRY_DISPLAY[country],
+            "best_score": state.get("best_score"),
+            "best_config": state.get("best_config", {}),
+            "iterations": state.get("iteration", 0),
         }
-        combined["methods"].append(entry)
 
-    (OUTPUT_DIR / "combined_metrics.json").write_text(
-        json.dumps(combined, indent=2)
-    )
-    print(f"Wrote combined_metrics.json ({len(combined['methods'])} methods)")
+    (OUTPUT_DIR / "pipeline_configs.json").write_text(json.dumps(configs, indent=2))
+    print(f"Wrote pipeline_configs.json ({len(configs)} countries)")
 
 
-def prepare_panel_timeseries() -> None:
-    """Export macro panel as JSON time series for D3."""
-    parquet_path = DATA_DIR / "macro_panel.parquet"
-    if not parquet_path.exists():
-        print("No panel data found, skipping timeseries.")
-        return
+def prepare_ablation_data() -> None:
+    """Load leave-one-out ablation results per country."""
+    all_data: dict[str, dict] = {}
 
-    df = pd.read_parquet(parquet_path)
-
-    # Convert to records format: [{date, var1, var2, ...}]
-    # Sample to monthly (already monthly, but ensure clean dates)
-    records = []
-    for date, row in df.iterrows():
-        record = {"date": date.strftime("%Y-%m-%d")}
-        for col in df.columns:
-            val = row[col]
-            record[col] = round(float(val), 4) if pd.notna(val) else None
-        records.append(record)
-
-    (OUTPUT_DIR / "panel_timeseries.json").write_text(
-        json.dumps(records)
-    )
-    print(f"Wrote panel_timeseries.json ({len(records)} months, {len(df.columns)} variables)")
-
-
-def prepare_variable_metadata() -> None:
-    """Export variable metadata for the data page."""
-    meta_path = DATA_DIR / "panel_meta.json"
-    if not meta_path.exists():
-        print("No panel metadata found, skipping.")
-        return
-
-    raw = json.loads(meta_path.read_text())
-
-    variables = []
-    for col in raw.get("columns", []):
-        meta = raw.get("metadata", {}).get(col, {})
-        lag = raw.get("publication_lags", {}).get(col, 30)
-        first = raw.get("first_available", {}).get(col)
-
-        variables.append({
-            "name": col,
-            "display_name": col.replace("_", " ").title(),
-            "description": meta.get("description", ""),
-            "source": meta.get("source", "unknown"),
-            "publication_lag_days": lag,
-            "first_available": first,
-            "is_target": col in ["cpi", "industrial_production", "retail_sales", "unemployment"],
-        })
-
-    (OUTPUT_DIR / "variable_metadata.json").write_text(
-        json.dumps(variables, indent=2)
-    )
-    print(f"Wrote variable_metadata.json ({len(variables)} variables)")
-
-
-def prepare_search_trajectory() -> None:
-    """Export search log as JSON array for the search trajectory chart."""
-    log_path = RESULTS_DIR / "search_log.jsonl"
-    if not log_path.exists():
-        print("No search log found, skipping trajectory.")
-        return
-
-    iterations = []
-    for line in log_path.read_text().strip().split("\n"):
-        if line.strip():
-            iterations.append(json.loads(line))
-
-    (OUTPUT_DIR / "search_trajectory.json").write_text(
-        json.dumps(iterations, indent=2)
-    )
-    print(f"Wrote search_trajectory.json ({len(iterations)} iterations)")
-
-
-def prepare_test_metrics() -> None:
-    """Combine test-era metrics (including subperiods) into one JSON file."""
-    test_dir = RESULTS_DIR / "test"
-    if not test_dir.exists():
-        print("No test results found, skipping test metrics.")
-        return
-
-    combined: dict = {"methods": []}
-
-    for method_dir in sorted(test_dir.iterdir()):
-        if not method_dir.is_dir():
+    for country in COUNTRIES:
+        abl_path = RESULTS_DIR / country / "ablation_leave_one_out.json"
+        if not abl_path.exists():
             continue
-        metrics_path = method_dir / "metrics.json"
-        if not metrics_path.exists():
-            continue
-
-        metrics = json.loads(metrics_path.read_text())
-
-        entry = {
-            "name": method_dir.name,
-            "display_name": _display_name(method_dir.name),
-            "category": _categorize(method_dir.name),
-            "metrics": metrics.get("metrics", {}),
-            "summary": metrics.get("summary", {}),
-            "subperiod_metrics": metrics.get("subperiod_metrics", {}),
+        abl = json.loads(abl_path.read_text())
+        all_data[country] = {
+            "display_name": COUNTRY_DISPLAY[country],
+            "reference_score": abl.get("reference_score") or abl.get("best_score"),
+            "ablations": abl.get("ablations", []),
         }
-        combined["methods"].append(entry)
 
-    (OUTPUT_DIR / "test_metrics.json").write_text(
-        json.dumps(combined, indent=2)
-    )
-    print(f"Wrote test_metrics.json ({len(combined['methods'])} methods)")
+    (OUTPUT_DIR / "ablation_data.json").write_text(json.dumps(all_data, indent=2))
+    print(f"Wrote ablation_data.json ({len(all_data)} countries)")
 
 
-def _display_name(method_name: str) -> str:
-    names = {
-        "random_walk": "Random Walk",
-        "seasonal_naive": "Seasonal Naive",
-        "ar": "AR(p)",
-        "arima": "ARIMA",
-        "ets": "ETS",
-        "chronos2_zs": "Chronos-2 (zero-shot)",
-        "chronos2_ft": "Chronos-2 (agent-tuned)",
-    }
-    return names.get(method_name, method_name)
+def prepare_search_comparison(df: pd.DataFrame) -> None:
+    """Generate search method comparison data per country."""
 
+    def _load_score(country: str, mode: str, seed: int, tag: str | None = None) -> float | None:
+        suffix = f"{mode}_{tag}_{seed}" if tag else f"{mode}_{seed}"
+        path = RESULTS_DIR / country / f"search_state_{suffix}.json"
+        if not path.exists():
+            return None
+        return json.loads(path.read_text()).get("best_score")
 
-def _categorize(method_name: str) -> str:
-    if method_name in ("random_walk", "seasonal_naive"):
-        return "naive"
-    if method_name in ("ar", "arima", "ets"):
-        return "classical"
-    if method_name.startswith("chronos"):
-        return "foundation"
-    return "other"
+    def _avg_mase(country: str, family: str, variant: str, era: str) -> float | None:
+        targets = COUNTRY_TARGETS[country]
+        mask = (df["country"] == country) & (df["model_family"] == family) & (df["model_variant"] == variant)
+        mask = mask & (df["is_validation"] if era == "validation" else df["is_test"])
+        method_df = df[mask]
+        rw_mask = (df["country"] == country) & (df["model_variant"] == "random_walk")
+        rw_mask = rw_mask & (df["is_validation"] if era == "validation" else df["is_test"])
+        rw_df = df[rw_mask]
+        mase = _compute_mase_series(method_df, rw_df, targets)
+        vals = [v for t in mase.values() for v in t.values()]
+        return round(float(np.mean(vals)), 3) if vals else None
+
+    search_methods = [
+        ("Informed LLM", lambda c: _load_score(c, "llm", 42) if c != "sweden"
+         else _load_score(c, "llm", 42, tag="fixedgate")),
+        ("Blind LLM", lambda c: _load_score(c, "llm", 42, tag="blind") if c != "sweden"
+         else _load_score(c, "llm", 42, tag="blind_fixedgate")),
+        ("Random", lambda c: _load_score(c, "random", 42)),
+        ("Greedy", lambda c: _load_score(c, "greedy", 0)),
+        ("Manual economist", lambda c: _avg_mase(c, "chronos2", "manual_economist", "validation")),
+        ("Zero-shot baseline", lambda c: _avg_mase(c, "chronos2", "zero_shot", "validation")),
+    ]
+
+    records: list[dict] = []
+    for name, score_fn in search_methods:
+        for country in COUNTRIES:
+            score = score_fn(country)
+            records.append({
+                "method": name,
+                "country": country,
+                "display_country": COUNTRY_DISPLAY[country],
+                "val_mase": score,
+            })
+
+    (OUTPUT_DIR / "search_comparison.json").write_text(json.dumps(records, indent=2))
+    print(f"Wrote search_comparison.json ({len(records)} records)")
 
 
 def main() -> None:
-    print(f"Preparing data for web dashboard...")
+    print(f"Preparing data for web dashboard (three-country)...")
     print(f"  Project root: {PROJECT_ROOT}")
     print(f"  Output dir: {OUTPUT_DIR}")
     print()
 
-    prepare_combined_metrics()
-    prepare_test_metrics()
-    prepare_variable_metadata()
-    prepare_panel_timeseries()
-    prepare_search_trajectory()
+    df = load_errors()
+    print(f"  Loaded {len(df)} forecast error records\n")
+
+    prepare_metrics(df)
+    prepare_subperiod_metrics(df)
+    prepare_gap_data(df)
+    prepare_search_trajectories()
+    prepare_pipeline_configs()
+    prepare_ablation_data()
+    prepare_search_comparison(df)
 
     print("\nDone.")
 

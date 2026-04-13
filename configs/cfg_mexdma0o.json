@@ -1,0 +1,10 @@
+{
+  "covariates": [],
+  "transforms": {},
+  "context_length": null,
+  "fine_tune": false,
+  "fine_tune_steps": 1000,
+  "fine_tune_lr": 1e-05,
+  "grouping": "univariate",
+  "num_samples": 20
+}

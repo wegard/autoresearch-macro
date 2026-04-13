@@ -1,0 +1,10 @@
+{
+  "covariates": ["policy_rate", "fed_funds", "us_cpi"],
+  "transforms": {},
+  "context_length": null,
+  "fine_tune": true,
+  "fine_tune_steps": 500,
+  "fine_tune_lr": 5e-06,
+  "grouping": "univariate",
+  "num_samples": 20
+}

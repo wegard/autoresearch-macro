@@ -1,8 +1,8 @@
 # Publication lags in days after end of reference period.
-# These are approximate — refine based on actual SSB release calendars.
-# See PREPARE-SPEC.md §2.3 for details.
+# See PREPARE-SPEC.md §2.3 and REVISION-PLAN-4.md §6 for details.
 
-# Norwegian series
+# --- Norway (SSB, Norges Bank) ---
+# Top-level keys kept for backward compatibility with existing code.
 cpi: 10                      # ~10 days after month end
 unemployment: 30             # ~1 month lag
 industrial_production: 40    # ~40 days
@@ -15,7 +15,7 @@ policy_rate: 0               # known in real time
 nok_eur: 1                   # next business day
 nok_usd: 1
 
-# Global series
+# Global series (shared across all countries)
 brent_crude: 1
 sp500: 1
 fed_funds: 1
@@ -23,3 +23,45 @@ us_cpi: 15
 vix: 1
 global_epu: 30
 euro_area_gdp: 90            # ~3 months lag for quarterly GDP
+partner_activity: 90         # conservative default for partner GDP/activity
+
+# --- Per-country sections ---
+
+norway:
+  cpi: 10
+  unemployment: 30
+  industrial_production: 40
+  retail_sales: 30
+  house_prices: 45
+  credit: 40
+  exports: 40
+  imports: 40
+  policy_rate: 0
+  fx_eur: 1
+  fx_usd: 1
+
+canada:
+  cpi: 18                    # StatCan CPI release ~18 days after month end
+  unemployment: 8            # LFS ~8 days (released first Friday after ref month)
+  industrial_production: 60  # monthly GDP by industry ~60 days
+  retail_sales: 50           # ~50 days
+  house_prices: 50           # NHPI ~50 days
+  credit: 50                 # ~50 days
+  exports: 40                # merchandise trade ~40 days
+  imports: 40
+  policy_rate: 0             # BoC rate decisions are real-time
+  fx_eur: 1
+  fx_usd: 1
+
+sweden:
+  cpi: 12                    # SCB flash CPI ~12 days
+  unemployment: 22           # LFS ~22 days
+  industrial_production: 40  # IPI ~40 days
+  retail_sales: 28           # ~28 days
+  house_prices: 45           # quarterly, ~45 days after quarter end
+  credit: 30                 # MFI lending ~30 days
+  exports: 35                # trade ~35 days
+  imports: 35
+  policy_rate: 0             # Riksbank repo rate is real-time
+  fx_eur: 1
+  fx_usd: 1

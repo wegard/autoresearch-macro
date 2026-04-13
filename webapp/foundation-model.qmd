@@ -5,58 +5,75 @@ subtitle: "From zero-shot to agent-tuned foundation model forecasting"
 
 ```{ojs}
 //| echo: false
-metrics = FileAttachment("_data/combined_metrics.json").json()
+metrics = FileAttachment("_data/metrics.json").json()
+gapData = FileAttachment("_data/gap_data.json").json()
+pipelineConfigs = FileAttachment("_data/pipeline_configs.json").json()
+Plot = import("https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm")
 ```
 
 ## What is Chronos-2?
 
 Chronos-2 is a **time series foundation model** by Amazon, pretrained on billions of time series observations from diverse domains. It produces probabilistic forecasts by tokenizing time series values and using a transformer architecture.
 
-We use **Chronos-2 Bolt Small** (~20M parameters) via AutoGluon TimeSeries, which provides a clean interface for both zero-shot inference and fine-tuning.
+We use **Chronos-2** (120M parameters) via AutoGluon TimeSeries, which provides a clean interface for both zero-shot inference and LoRA fine-tuning. Unlike earlier Chronos-Bolt models, Chronos-2 natively integrates covariate information during inference.
 
 ### The pipeline the agent controls
 
 ```
 Available data (at forecast origin)
-    ↓
-Covariate selection ← agent chooses
-    ↓
-Data transformations ← agent chooses (log_diff, pct_change, etc.)
-    ↓
-Context window ← agent sets length
-    ↓
-Chronos-2 model (architecture FIXED)
-    ↓
-Fine-tuning settings ← agent chooses (on/off, LR, steps)
-    ↓
-Probabilistic forecast → point forecast (mean)
+    |
+Covariate selection       <- agent chooses
+    |
+Data transformations      <- agent chooses (log_diff, pct_change, etc.)
+    |
+Context window            <- agent sets length
+    |
+Chronos-2 model (architecture FIXED, 120M params)
+    |
+Fine-tuning settings      <- agent chooses (on/off, LR, steps)
+    |
+Probabilistic forecast -> point forecast (mean)
 ```
 
-## Zero-shot performance
+## Zero-shot performance across countries
 
-With no covariates and no fine-tuning, Chronos-2 relies purely on the shape of each target series to forecast:
+```{ojs}
+//| echo: false
+viewof selectedCountry = Inputs.radio(
+  ["norway", "canada", "sweden"],
+  {label: "Country", value: "norway",
+   format: v => ({"norway": "Norway", "canada": "Canada", "sweden": "Sweden"})[v]}
+)
+
+countryTargets = ({
+  "norway": ["cpi", "industrial_production", "retail_sales", "unemployment"],
+  "canada": ["cpi", "industrial_production", "retail_sales", "unemployment"],
+  "sweden": ["cpi", "industrial_production", "unemployment"]
+})
+```
+
+With no covariates and no fine-tuning, Chronos-2 relies purely on the shape of each target series:
 
 ```{ojs}
 //| echo: false
 //| label: fig-zs-vs-arima
-//| fig-cap: "Zero-shot Chronos-2 vs ARIMA across target variables (RMSE, validation era)."
+//| fig-cap: "Zero-shot Chronos-2 vs ARIMA across target variables (MASE, validation era). MASE < 1 beats the random walk."
 
 {
-  const selected = metrics.methods.filter(m =>
-    ["arima", "chronos2_zs"].includes(m.name)
+  const selected = metrics.filter(d =>
+    d.country === selectedCountry && d.era === "validation"
+    && ["arima", "zero_shot"].includes(d.method)
   );
 
-  const vars = ["cpi", "industrial_production", "retail_sales", "unemployment"];
-  const data = selected.flatMap(m =>
-    vars.flatMap(v =>
-      Object.entries(m.metrics[v] || {}).map(([h, vals]) => ({
-        method: m.display_name,
-        variable: v.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
-        horizon: +h,
-        rmse: vals.rmse
-      }))
-    )
-  );
+  const targets = countryTargets[selectedCountry];
+  const data = selected
+    .filter(d => targets.includes(d.target) && d.mase != null)
+    .map(d => ({
+      method: d.display_name,
+      variable: d.target.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
+      horizon: d.horizon,
+      mase: d.mase
+    }));
 
   return Plot.plot({
     height: 400,
@@ -64,15 +81,21 @@ With no covariates and no fine-tuning, Chronos-2 relies purely on the shape of e
     marginBottom: 50,
     facet: {data, x: "variable"},
     x: {label: "Horizon", ticks: [1, 3, 6, 12]},
-    y: {label: "RMSE", grid: true},
+    y: {label: "MASE", grid: true},
     fx: {label: null},
+    color: {
+      domain: ["ARIMA", "Chronos-2 (zero-shot)"],
+      range: ["#2ecc71", "#9b59b6"],
+      legend: true
+    },
     marks: [
+      Plot.ruleY([1.0], {stroke: "#999", strokeDasharray: "4,4"}),
       Plot.line(data, {
-        x: "horizon", y: "rmse", stroke: "method",
+        x: "horizon", y: "mase", stroke: "method",
         strokeWidth: 2, fx: "variable", curve: "monotone-x"
       }),
       Plot.dot(data, {
-        x: "horizon", y: "rmse", fill: "method",
+        x: "horizon", y: "mase", fill: "method",
         r: 3, fx: "variable", tip: true
       })
     ]
@@ -80,77 +103,69 @@ With no covariates and no fine-tuning, Chronos-2 relies purely on the shape of e
 }
 ```
 
-**Observation:** Chronos-2 zero-shot is competitive with ARIMA at h=1 for most variables, but degrades at longer horizons. This suggests the model captures short-term dynamics but lacks the economy-specific knowledge needed for multi-step forecasting.
-
 ## The foundation model ladder
 
-The research tests a three-way decomposition of forecast improvement:
-
-1. **Foundation model effect:** Does Chronos-2 zero-shot beat classical methods?
-2. **Fine-tuning effect:** Does economy-specific training improve over zero-shot?
-3. **Agentic search effect:** Does LLM-guided search beat manual pipeline choices?
+The three-step comparison: does zero-shot beat classical? Does agent-tuning improve over zero-shot? Does it survive out of sample?
 
 ```{ojs}
 //| echo: false
 //| label: fig-ladder
-//| fig-cap: "Average RMSE at h=12 — the foundation model ladder. Lower is better."
+//| fig-cap: "Average MASE: validation vs test for key configurations, per country."
 
 {
-  // Build the ladder data from available methods
-  const horizonKey = "12";
-  const ladderMethods = [
-    {name: "random_walk", label: "Naive\n(Random Walk)", step: 0},
-    {name: "arima", label: "Classical\n(ARIMA)", step: 1},
-    {name: "chronos2_zs", label: "Chronos-2\n(Zero-shot)", step: 2},
-  ];
-
-  const data = ladderMethods.map(lm => {
-    const m = metrics.methods.find(mm => mm.name === lm.name);
-    return {
-      label: lm.label,
-      step: lm.step,
-      rmse: m ? (m.summary[horizonKey]?.avg_rmse || 0) : 0
-    };
-  }).filter(d => d.rmse > 0);
+  const data = gapData.map(d => ({
+    country: d.country.charAt(0).toUpperCase() + d.country.slice(1),
+    config: d.config,
+    era: d.era === "validation" ? "Val" : "Test",
+    mase: d.avg_mase
+  }));
 
   return Plot.plot({
-    height: 300,
+    height: 350,
     marginLeft: 60,
-    marginBottom: 80,
-    x: {label: null, domain: data.map(d => d.label), padding: 0.3},
-    y: {label: "Average RMSE (h=12)", grid: true, domain: [0, 3.5]},
+    marginBottom: 50,
+    x: {label: null, padding: 0.3},
+    y: {label: "Average MASE", grid: true, domain: [0.7, 1.15]},
+    fx: {label: null},
+    color: {
+      domain: ["Val", "Test"],
+      range: ["#3498db", "#e74c3c"],
+      legend: true
+    },
     marks: [
-      Plot.barY(data, {
-        x: "label", y: "rmse",
-        fill: d => ["#95a5a6", "#2ecc71", "#9b59b6"][d.step],
+      Plot.ruleY([1.0], {stroke: "#999", strokeDasharray: "6,4"}),
+      Plot.barY(data, Plot.groupX({y: "identity"}, {
+        x: "config", y: "mase", fill: "era", fx: "country",
         tip: true
-      }),
-      Plot.text(data, {
-        x: "label", y: "rmse", text: d => d.rmse.toFixed(2),
-        dy: -10, fontSize: 13, fontWeight: "bold"
-      })
+      }))
     ]
   });
 }
 ```
 
-::: {.callout-tip}
-## What comes next
-The bars for **Fine-tuned** and **Agent-tuned** Chronos-2 will appear here once those experiments are run. The search loop (`search.py`) automates the agent-tuned experiments.
-:::
+## Best discovered pipelines
 
-## Search space
+```{ojs}
+//| echo: false
+{
+  const rows = ["norway", "canada", "sweden"].map(c => {
+    const cfg = pipelineConfigs[c];
+    if (!cfg) return null;
+    const bc = cfg.best_config;
+    return {
+      Country: c.charAt(0).toUpperCase() + c.slice(1),
+      Covariates: bc.covariates?.join(", ") || "---",
+      Context: bc.context_length || "all",
+      "Fine-tune": bc.fine_tune ? `Yes (${bc.fine_tune_steps})` : "No",
+      "Val MASE": cfg.best_score.toFixed(3)
+    };
+  }).filter(Boolean);
 
-The agent can explore these dimensions:
+  return Inputs.table(rows, {
+    columns: ["Country", "Covariates", "Context", "Fine-tune", "Val MASE"],
+    width: {Country: 80, Covariates: 250, Context: 60}
+  });
+}
+```
 
-| Dimension | Range | Notes |
-|-----------|-------|-------|
-| Covariates | 0-10 from 14 available | Oil, FX, rates, global macro |
-| Transforms | 7 options per variable | log_diff, pct_change, standardize, MA |
-| Context length | 24-128 months or unlimited | How far back to look |
-| Fine-tuning | On/off | Economy-specific training |
-| Learning rate | 1e-5 to 1e-3 | If fine-tuning |
-| Fine-tune steps | 50-500 | If fine-tuning |
-| Grouping | Univariate or joint | One model per target vs shared |
-
-This creates a large combinatorial space that manual tuning cannot exhaustively explore.
+**Key insight:** Norway and Canada rely on fine-tuning (500 steps). Sweden achieves strong results through covariate selection and context truncation alone --- and its gains generalize better to the test era.

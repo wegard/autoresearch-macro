@@ -4,7 +4,7 @@ project:
 
 website:
   title: "Autoresearch Macro"
-  description: "Agentic search over forecasting pipelines for the Norwegian macroeconomy"
+  description: "Agentic search over forecasting pipelines for macroeconomic data from Norway, Canada, and Sweden"
   navbar:
     background: dark
     left:

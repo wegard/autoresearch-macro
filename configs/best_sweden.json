@@ -1,0 +1,19 @@
+{
+  "covariates": [
+    "policy_rate",
+    "fx_usd",
+    "house_prices",
+    "credit"
+  ],
+  "transforms": {
+    "fx_usd": "log_diff",
+    "house_prices": "pct_change_12",
+    "credit": "pct_change_12"
+  },
+  "context_length": 48,
+  "fine_tune": false,
+  "fine_tune_steps": 1000,
+  "fine_tune_lr": 1e-05,
+  "grouping": "univariate",
+  "num_samples": 20
+}

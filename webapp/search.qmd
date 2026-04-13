@@ -5,14 +5,10 @@ subtitle: "LLM-guided exploration of the forecasting pipeline"
 
 ```{ojs}
 //| echo: false
-// Try to load search trajectory (may not exist yet)
-searchData = {
-  try {
-    return await FileAttachment("_data/search_trajectory.json").json();
-  } catch(e) {
-    return [];
-  }
-}
+searchData = FileAttachment("_data/search_trajectories.json").json()
+searchComparison = FileAttachment("_data/search_comparison.json").json()
+pipelineConfigs = FileAttachment("_data/pipeline_configs.json").json()
+Plot = import("https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm")
 ```
 
 ## How the search works
@@ -20,41 +16,53 @@ searchData = {
 The outer loop uses **Claude** (Sonnet) to propose pipeline configurations. Each iteration:
 
 ```
-┌─────────────────────────────────────────┐
-│  Claude reads: program.md + history     │
-│  → proposes config as JSON              │
-├─────────────────────────────────────────┤
-│  Quick eval (20 origins, ~30s)          │
-│  → if worse: reject immediately         │
-├─────────────────────────────────────────┤
-│  Full eval (120 origins, ~3min)         │
-│  → if better: ACCEPT, update best       │
-│  → if worse: REJECT                     │
-├─────────────────────────────────────────┤
-│  Log iteration, save state, continue    │
-└─────────────────────────────────────────┘
++------------------------------------------+
+|  Claude reads: program.md + history      |
+|  -> proposes config as JSON              |
++------------------------------------------+
+|  Quick eval (20 origins, ~30s)           |
+|  -> if worse: reject immediately         |
++------------------------------------------+
+|  Full eval (120 origins, ~3min)          |
+|  -> if better: ACCEPT, update best       |
+|  -> if worse: REJECT                     |
++------------------------------------------+
+|  Log iteration, save state, continue     |
++------------------------------------------+
 ```
 
-The agent receives domain knowledge (Norway is an oil economy, CPI responds to exchange rates, etc.) and adapts its proposals based on what worked in previous iterations.
+The agent receives country-specific domain knowledge and adapts its proposals based on what worked in previous iterations.
+
+## Country
+
+```{ojs}
+//| echo: false
+viewof selectedCountry = Inputs.radio(
+  ["norway", "canada", "sweden"],
+  {label: "Country", value: "norway",
+   format: v => ({"norway": "Norway", "canada": "Canada", "sweden": "Sweden"})[v]}
+)
+```
 
 ## Search trajectory
 
 ```{ojs}
 //| echo: false
+//| label: fig-trajectory
+//| fig-cap: "Search trajectory for the selected country. Green = accepted, red = rejected, orange = error. Green line shows the best score achieved so far."
+
 {
-  if (searchData.length === 0) {
+  const countryData = searchData[selectedCountry] || [];
+
+  if (countryData.length === 0) {
     return html`
       <div class="chart-container" style="text-align:center; padding:3rem;">
-        <p style="font-size:1.2rem; color:#666;">No search results yet.</p>
-        <p style="color:#999;">Run the search loop to see the trajectory here:</p>
-        <code style="background:#f8f9fa; padding:0.5rem 1rem; border-radius:4px;">
-          uv run python src/search.py --max-iterations 10
-        </code>
+        <p style="font-size:1.2rem; color:#666;">No search results for this country.</p>
       </div>
     `;
   }
 
-  const data = searchData.map(d => ({
+  const data = countryData.map(d => ({
     iteration: d.iteration,
     score: d.full_score || d.quick_score,
     status: d.status,
@@ -75,15 +83,13 @@ The agent receives domain knowledge (Norway is an oil economy, CPI responds to e
     x: {label: "Iteration"},
     y: {label: "Score (avg MASE)", grid: true},
     marks: [
-      // All attempts
       Plot.dot(data, {
         x: "iteration", y: "score",
         fill: d => d.status === "accepted" ? "#2ecc71" : d.status === "rejected" ? "#e74c3c" : "#f39c12",
         r: 5,
         tip: true,
-        title: d => `Iter ${d.iteration}\nScore: ${d.score.toFixed(4)}\nStatus: ${d.status}\n${d.description}`
+        title: d => `Iter ${d.iteration}\nScore: ${d.score.toFixed(4)}\nStatus: ${d.status}\n${d.description || ''}`
       }),
-      // Best frontier
       Plot.line(bestLine, {
         x: "iteration", y: "score",
         stroke: "#2ecc71", strokeWidth: 2, curve: "step-after"
@@ -101,17 +107,19 @@ The agent receives domain knowledge (Norway is an oil economy, CPI responds to e
 ```{ojs}
 //| echo: false
 {
-  if (searchData.length === 0) {
+  const countryData = searchData[selectedCountry] || [];
+
+  if (countryData.length === 0) {
     return html`<p style="color:#999;">No iterations to display.</p>`;
   }
 
-  return Inputs.table(searchData.map(d => ({
+  return Inputs.table(countryData.map(d => ({
     "#": d.iteration,
     Status: d.status,
-    "Quick Score": d.quick_score?.toFixed(4) || "—",
-    "Full Score": d.full_score?.toFixed(4) || "—",
-    "Time (s)": d.runtime_seconds?.toFixed(1) || "—",
-    Description: d.description
+    "Quick Score": d.quick_score?.toFixed(4) || "---",
+    "Full Score": d.full_score?.toFixed(4) || "---",
+    "Time (s)": d.runtime_seconds?.toFixed(1) || "---",
+    Description: d.description || ""
   })), {
     rows: 20,
     sort: "#",
@@ -121,13 +129,31 @@ The agent receives domain knowledge (Norway is an oil economy, CPI responds to e
 ```
 
 
-## What the agent discovers
+## Search method comparison
 
-::: {.callout-note}
-This section will be populated after running the search experiment. Key analyses:
+How do different search strategies compare across all three countries?
 
-- Which covariates appear most frequently in accepted configs?
-- What transformations does the agent prefer?
-- Does the agent converge or keep exploring?
-- Are the discovered configurations economically interpretable?
-:::
+```{ojs}
+//| echo: false
+{
+  const methods = ["Informed LLM", "Blind LLM", "Random", "Greedy", "Manual economist", "Zero-shot baseline"];
+  const rows = methods.map(m => {
+    const row = {Method: m};
+    for (const c of ["norway", "canada", "sweden"]) {
+      const d = searchComparison.find(r => r.method === m && r.country === c);
+      row[c.charAt(0).toUpperCase() + c.slice(1)] = d?.val_mase?.toFixed(3) || "---";
+    }
+    return row;
+  });
+  return Inputs.table(rows, {
+    columns: ["Method", "Norway", "Canada", "Sweden"],
+    width: {Method: 160}
+  });
+}
+```
+
+**Key findings:**
+
+- All search strategies improve over the zero-shot baseline in every country
+- No single search strategy dominates across all countries
+- The manual economist benchmark is consistently among the weakest --- automated search outperforms hand-selected configurations

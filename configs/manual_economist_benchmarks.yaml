@@ -1,0 +1,61 @@
+# Manual economist benchmark configurations for Chronos-2.
+#
+# These represent what a domain-expert macroeconomist would choose
+# as covariates and settings WITHOUT any automated search.
+# They must be locked BEFORE seeing country-specific results.
+#
+# REVISION-PLAN-4 §7.4: "Do not revise the manual benchmark after seeing results."
+#
+# STATUS: DRAFT — requires human review and approval before use.
+# Once approved, remove this status line and do not modify.
+
+norway:
+  covariates:
+    - policy_rate       # Norges Bank key rate — primary monetary policy lever
+    - brent_crude       # Oil price — Norway is a major oil exporter
+    - nok_eur           # NOK/EUR exchange rate — key trade channel
+    - us_cpi            # US inflation — global price pressure proxy
+  transforms: {}        # No transforms — use raw levels
+  context_length: 64    # ~5 years of lookback
+  fine_tune: false      # No fine-tuning — test zero-shot + covariates only
+  fine_tune_steps: 0
+  fine_tune_lr: 0.0
+  grouping: univariate
+  num_samples: 20
+  rationale: >
+    Standard macro transmission channels for a small open oil-exporting economy:
+    monetary policy, oil price, trade-weighted exchange rate, and global inflation.
+
+canada:
+  covariates:
+    - policy_rate       # Bank of Canada overnight rate
+    - fx_usd            # CAD/USD — dominant bilateral trade channel
+    - partner_activity  # US industrial production — main trading partner
+    - us_cpi            # US inflation — imported price pressure
+  transforms: {}
+  context_length: 64
+  fine_tune: false
+  fine_tune_steps: 0
+  fine_tune_lr: 0.0
+  grouping: univariate
+  num_samples: 20
+  rationale: >
+    Canada's macro fundamentals are dominated by the US link: monetary policy,
+    the bilateral exchange rate, US real activity, and US inflation.
+
+sweden:
+  covariates:
+    - policy_rate       # Riksbank repo rate
+    - fx_eur            # SEK/EUR — EU is Sweden's main trade partner
+    - euro_area_gdp     # Euro area real activity — demand channel
+    - us_cpi            # US inflation — global price pressure proxy
+  transforms: {}
+  context_length: 64
+  fine_tune: false
+  fine_tune_steps: 0
+  fine_tune_lr: 0.0
+  grouping: univariate
+  num_samples: 20
+  rationale: >
+    Sweden as an EU-adjacent small open economy: monetary policy, EUR exchange rate,
+    euro area demand, and global inflation via US CPI.

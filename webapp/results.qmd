@@ -1,45 +1,96 @@
 ---
 title: "Results"
-subtitle: "Complete comparison across all methods"
+subtitle: "Complete three-country comparison"
 ---
 
 ```{ojs}
 //| echo: false
-metrics = FileAttachment("_data/combined_metrics.json").json()
+metrics = FileAttachment("_data/metrics.json").json()
+subperiodData = FileAttachment("_data/subperiod_metrics.json").json()
+gapData = FileAttachment("_data/gap_data.json").json()
+ablationData = FileAttachment("_data/ablation_data.json").json()
+searchComparison = FileAttachment("_data/search_comparison.json").json()
+pipelineConfigs = FileAttachment("_data/pipeline_configs.json").json()
+Plot = import("https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm")
 ```
 
-## Validation era (2006-2015)
+```{ojs}
+//| echo: false
+viewof selectedCountry = Inputs.radio(
+  ["norway", "canada", "sweden"],
+  {label: "Country", value: "norway",
+   format: v => ({"norway": "Norway", "canada": "Canada", "sweden": "Sweden"})[v]}
+)
 
-All results below are from the **rolling pseudo-real-time validation** with 120 monthly forecast origins.
+countryTargets = ({
+  "norway": ["cpi", "industrial_production", "retail_sales", "unemployment"],
+  "canada": ["cpi", "industrial_production", "retail_sales", "unemployment"],
+  "sweden": ["cpi", "industrial_production", "unemployment"]
+})
+```
+
+---
+
+## Best pipeline discovered
+
+```{ojs}
+//| echo: false
+{
+  const cfg = pipelineConfigs[selectedCountry];
+  if (!cfg) return html`<p>No config available.</p>`;
+  const bc = cfg.best_config;
+  const covs = bc.covariates?.join(", ") || "none";
+  const tx = bc.transforms && Object.keys(bc.transforms).length > 0
+    ? Object.entries(bc.transforms).map(([k,v]) => `${k}: ${v}`).join(", ")
+    : "none";
+  const ctx = bc.context_length || "unlimited";
+  const ft = bc.fine_tune ? `Yes (${bc.fine_tune_steps} steps, lr=${bc.fine_tune_lr})` : "No";
+
+  return html`
+    <table class="table table-sm">
+      <tr><td><strong>Covariates</strong></td><td>${covs}</td></tr>
+      <tr><td><strong>Transforms</strong></td><td>${tx}</td></tr>
+      <tr><td><strong>Context length</strong></td><td>${ctx}</td></tr>
+      <tr><td><strong>Fine-tuning</strong></td><td>${ft}</td></tr>
+      <tr><td><strong>Val. MASE</strong></td><td>${cfg.best_score.toFixed(3)}</td></tr>
+    </table>
+  `;
+}
+```
+
+---
+
+## Validation era (2006--2015)
+
+All results below are from the **rolling pseudo-real-time validation** with 120 monthly forecast origins. MASE is shown (< 1 beats random walk).
 
 ### Summary table
 
 ```{ojs}
 //| echo: false
-viewof resultMetric = Inputs.radio(
-  ["rmse", "mae", "mase"],
-  {label: "Metric", value: "rmse"}
-)
-```
-
-```{ojs}
-//| echo: false
 {
-  const mk = `avg_${resultMetric}`;
-  const horizons = [1, 3, 6, 12];
+  const valMetrics = metrics.filter(d =>
+    d.country === selectedCountry && d.era === "validation"
+  );
 
-  const rows = metrics.methods.map(m => {
-    const row = {Method: m.display_name, Category: m.category};
-    for (const h of horizons) {
-      row[`h=${h}`] = m.summary[String(h)]?.[mk]?.toFixed(3) || "—";
+  const methodOrder = ["random_walk", "arima", "bvar", "var", "factor", "zero_shot"];
+  const methodSet = new Set(valMetrics.map(d => d.method));
+  const methods = methodOrder.filter(m => methodSet.has(m));
+
+  const rows = methods.map(method => {
+    const mData = valMetrics.filter(d => d.method === method);
+    const row = {Method: mData[0]?.display_name || method};
+    for (const h of [1, 3, 6, 12]) {
+      const hVals = mData.filter(d => d.horizon === h).map(d => d.mase).filter(v => v != null);
+      const avg = hVals.length > 0 ? hVals.reduce((a,b) => a+b, 0) / hVals.length : null;
+      row[`h=${h}`] = avg != null ? avg.toFixed(3) : "---";
     }
     return row;
   });
 
   return Inputs.table(rows, {
-    sort: "h=12",
-    columns: ["Method", "Category", ...horizons.map(h => `h=${h}`)],
-    width: {Method: 180, Category: 90}
+    columns: ["Method", "h=1", "h=3", "h=6", "h=12"],
+    width: {Method: 200}
   });
 }
 ```
@@ -49,36 +100,31 @@ viewof resultMetric = Inputs.radio(
 ```{ojs}
 //| echo: false
 //| label: fig-heatmap
-//| fig-cap: "Performance heatmap — all methods, variables, and horizons. Darker green = better (lower error)."
+//| fig-cap: "Validation MASE heatmap --- all methods, variables, and horizons. Darker green = lower MASE (better)."
 
 {
-  const mk = resultMetric;
-  const vars = ["cpi", "industrial_production", "retail_sales", "unemployment"];
+  const valMetrics = metrics.filter(d =>
+    d.country === selectedCountry && d.era === "validation"
+  );
+
+  const vars = countryTargets[selectedCountry];
   const horizons = [1, 3, 6, 12];
+  const methodOrder = ["random_walk", "arima", "bvar", "var", "factor", "zero_shot"];
 
-  const data = metrics.methods.flatMap(m =>
-    vars.flatMap(v =>
-      horizons.map(h => {
-        const val = m.metrics[v]?.[String(h)]?.[mk];
-        return {
-          method: m.display_name,
-          variable: v.replace(/_/g, " "),
-          horizon: h,
-          value: val || null,
-          label: `h=${h}`
-        };
-      })
-    )
-  ).filter(d => d.value != null);
+  const data = valMetrics
+    .filter(d => methodOrder.includes(d.method) && vars.includes(d.target) && d.mase != null)
+    .map(d => ({
+      method: d.display_name,
+      cell: `${d.target.replace(/_/g, " ")} h=${d.horizon}`,
+      value: d.mase
+    }));
 
-  // Compute cell key for faceting
-  const cells = data.map(d => ({
-    ...d,
-    cell: `${d.variable} h=${d.horizon}`
-  }));
+  const methodNames = methodOrder
+    .map(m => valMetrics.find(d => d.method === m)?.display_name)
+    .filter(Boolean);
 
   return Plot.plot({
-    height: 350,
+    height: 300,
     marginLeft: 180,
     marginBottom: 50,
     padding: 0.05,
@@ -90,21 +136,108 @@ viewof resultMetric = Inputs.radio(
     },
     y: {
       label: null,
-      domain: metrics.methods.map(m => m.display_name).reverse()
+      domain: methodNames.slice().reverse()
     },
     color: {
       scheme: "greens",
       reverse: true,
-      label: mk.toUpperCase(),
+      label: "MASE",
       legend: true
     },
     marks: [
-      Plot.cell(cells, {
+      Plot.cell(data, {
         x: "cell",
         y: "method",
         fill: "value",
         tip: true,
-        title: d => `${d.method}\n${d.variable} h=${d.horizon}\n${mk}: ${d.value.toFixed(4)}`
+        title: d => `${d.method}\n${d.cell}\nMASE: ${d.value.toFixed(4)}`
+      })
+    ]
+  });
+}
+```
+
+---
+
+## Test era (2016--2025)
+
+Out-of-sample evaluation on **111 monthly origins** (2016-01 to 2025-03). The agent-tuned config was locked from the search --- no further optimization.
+
+### Full test-era comparison
+
+```{ojs}
+//| echo: false
+{
+  const testMetrics = metrics.filter(d =>
+    d.country === selectedCountry && d.era === "test"
+  );
+
+  const methodOrder = ["random_walk", "arima", "bvar", "var", "factor", "zero_shot", "agent_tuned"];
+  const methodSet = new Set(testMetrics.map(d => d.method));
+  const methods = methodOrder.filter(m => methodSet.has(m));
+
+  const rows = methods.map(method => {
+    const mData = testMetrics.filter(d => d.method === method);
+    const row = {Method: mData[0]?.display_name || method};
+    for (const h of [1, 3, 6, 12]) {
+      const hVals = mData.filter(d => d.horizon === h).map(d => d.mase).filter(v => v != null);
+      const avg = hVals.length > 0 ? hVals.reduce((a,b) => a+b, 0) / hVals.length : null;
+      row[`h=${h}`] = avg != null ? avg.toFixed(3) : "---";
+    }
+    return row;
+  });
+
+  return Inputs.table(rows, {
+    columns: ["Method", "h=1", "h=3", "h=6", "h=12"],
+    width: {Method: 220}
+  });
+}
+```
+
+```{ojs}
+//| echo: false
+//| label: fig-test-lines
+//| fig-cap: "Test-era MASE by horizon for key methods. MASE < 1 (dashed) beats the random walk."
+
+{
+  const testMetrics = metrics.filter(d =>
+    d.country === selectedCountry && d.era === "test"
+  );
+
+  const showMethods = ["random_walk", "arima", "bvar", "zero_shot", "agent_tuned"];
+
+  const grouped = {};
+  for (const d of testMetrics) {
+    if (!showMethods.includes(d.method)) continue;
+    const key = `${d.method}_${d.horizon}`;
+    if (!grouped[key]) grouped[key] = {method: d.display_name, horizon: d.horizon, category: d.category, vals: []};
+    if (d.mase != null) grouped[key].vals.push(d.mase);
+  }
+
+  const data = Object.values(grouped)
+    .filter(g => g.vals.length > 0)
+    .map(g => ({...g, mase: g.vals.reduce((a,b) => a+b, 0) / g.vals.length}))
+    .filter(d => d.mase < 3);
+
+  return Plot.plot({
+    height: 400,
+    marginLeft: 60,
+    marginBottom: 45,
+    x: {label: "Forecast horizon (months)", ticks: [1, 3, 6, 12]},
+    y: {label: "Average MASE", grid: true},
+    color: {
+      domain: ["Random Walk", "ARIMA", "BVAR", "Chronos-2 (zero-shot)", "Chronos-2 (agent-tuned)"],
+      range: ["#95a5a6", "#2ecc71", "#3498db", "#9b59b6", "#e74c3c"]
+    },
+    marks: [
+      Plot.ruleY([1.0], {stroke: "#999", strokeDasharray: "6,4"}),
+      Plot.line(data, {
+        x: "horizon", y: "mase", stroke: "method",
+        strokeWidth: 2.5, curve: "monotone-x"
+      }),
+      Plot.dot(data, {
+        x: "horizon", y: "mase", fill: "method",
+        r: 5, tip: true
       })
     ]
   });
@@ -112,111 +245,9 @@ viewof resultMetric = Inputs.radio(
 ```
 
 
-### Per-variable breakdown
-
-```{ojs}
-//| echo: false
-viewof detailVar = Inputs.select(
-  ["cpi", "industrial_production", "retail_sales", "unemployment"],
-  {label: "Variable", format: v => v.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
-)
-```
-
-```{ojs}
-//| echo: false
-//| label: fig-detail-bars
-//| fig-cap: "Method comparison for the selected variable across horizons."
-
-{
-  const mk = resultMetric;
-  const horizons = [1, 3, 6, 12];
-
-  const data = metrics.methods.flatMap(m =>
-    horizons.map(h => ({
-      method: m.display_name,
-      horizon: `h=${h}`,
-      value: m.metrics[detailVar]?.[String(h)]?.[mk] || 0
-    }))
-  );
-
-  return Plot.plot({
-    height: 350,
-    marginLeft: 60,
-    marginBottom: 50,
-    x: {label: null},
-    y: {label: mk.toUpperCase(), grid: true},
-    fx: {label: null},
-    color: {legend: true},
-    marks: [
-      Plot.barY(data, Plot.groupX({y: "identity"}, {
-        x: "method",
-        y: "value",
-        fill: "method",
-        fx: "horizon",
-        tip: true
-      }))
-    ]
-  });
-}
-```
-
-
-## Validation-era findings
-
-1. **ARIMA is the benchmark to beat** — best classical method at all horizons
-2. **Zero-shot Chronos-2 is competitive at h=1** but deteriorates at longer horizons
-3. **Random walk remains a strong baseline** especially at h=12
-
----
-
-## Test era (2016+)
-
-```{ojs}
-//| echo: false
-testMetrics = FileAttachment("_data/test_metrics.json").json()
-subperiodData = FileAttachment("_data/subperiod_metrics.json").json()
-```
-
-Out-of-sample evaluation on 111 monthly origins (2016-01 to 2025-03). The agent-tuned config was locked from the search — no further optimization.
-
-### Full test-era comparison
-
-```{ojs}
-//| echo: false
-viewof testMetric = Inputs.radio(
-  ["rmse", "mae", "mase"],
-  {label: "Metric", value: "rmse"}
-)
-```
-
-```{ojs}
-//| echo: false
-{
-  const mk = `avg_${testMetric}`;
-  const horizons = [1, 3, 6, 12];
-  const methods = testMetrics.methods.filter(m =>
-    ["random_walk", "arima", "chronos2_zs", "chronos2_ft"].includes(m.name)
-  );
-
-  const rows = methods.map(m => {
-    const row = {Method: m.display_name};
-    for (const h of horizons) {
-      row[`h=${h}`] = m.summary[String(h)]?.[mk]?.toFixed(3) || "—";
-    }
-    return row;
-  });
-
-  return Inputs.table(rows, {
-    sort: "h=12",
-    columns: ["Method", ...horizons.map(h => `h=${h}`)],
-    width: {Method: 200}
-  });
-}
-```
-
 ### Subperiod breakdown
 
-The test era spans three distinct macroeconomic regimes. Select a subperiod to see which methods handle each regime best.
+The test era spans three distinct macroeconomic regimes.
 
 ```{ojs}
 //| echo: false
@@ -233,25 +264,20 @@ viewof selectedSubperiod = Inputs.select(
 //| fig-cap: "Average RMSE across target variables by method and horizon for the selected subperiod."
 
 {
-  const mk = testMetric;
-  const horizons = [1, 3, 6, 12];
-  const methodOrder = ["random_walk", "arima", "chronos2_zs", "chronos2_ft"];
+  const showMethods = ["random_walk", "arima", "zero_shot", "agent_tuned"];
   const methodNames = {
     random_walk: "Random Walk", arima: "ARIMA",
-    chronos2_zs: "Chronos-2 (zero-shot)", chronos2_ft: "Chronos-2 (agent-tuned)"
+    zero_shot: "Chronos-2 (zero-shot)", agent_tuned: "Chronos-2 (agent-tuned)"
   };
+  const targets = countryTargets[selectedCountry];
 
-  const vars = ["cpi", "industrial_production", "retail_sales", "unemployment"];
-
-  // Compute avg across variables for the selected subperiod
-  const data = methodOrder.flatMap(method => {
-    return horizons.map(h => {
-      const vals = vars.map(v => {
-        const row = subperiodData.find(r =>
-          r.method === method && r.subperiod === selectedSubperiod && r.variable === v && r.horizon === h
-        );
-        return row?.[mk];
-      }).filter(v => v != null);
+  const data = showMethods.flatMap(method => {
+    return [1, 3, 6, 12].map(h => {
+      const vals = subperiodData
+        .filter(r => r.country === selectedCountry && r.subperiod === selectedSubperiod
+          && r.method === method && r.horizon === h && targets.includes(r.target))
+        .map(r => r.rmse)
+        .filter(v => v != null);
       return {
         method: methodNames[method],
         horizon: h,
@@ -265,7 +291,7 @@ viewof selectedSubperiod = Inputs.select(
     marginLeft: 60,
     marginBottom: 45,
     x: {label: "Forecast horizon (months)", ticks: [1, 3, 6, 12]},
-    y: {label: `Average ${mk.toUpperCase()}`, grid: true},
+    y: {label: "Average RMSE", grid: true},
     color: {
       domain: Object.values(methodNames),
       range: ["#95a5a6", "#2ecc71", "#9b59b6", "#e74c3c"]
@@ -284,64 +310,198 @@ viewof selectedSubperiod = Inputs.select(
 }
 ```
 
-### Per-variable subperiod detail
+---
+
+## Validation-to-test gap
+
+The central question: do validation-era gains survive out of sample?
 
 ```{ojs}
 //| echo: false
-viewof testDetailVar = Inputs.select(
-  ["cpi", "industrial_production", "retail_sales", "unemployment"],
-  {label: "Variable", format: v => v.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
-)
+//| label: fig-gap
+//| fig-cap: "MASE on validation vs test era, by country and config. Bars above the dashed line (MASE=1) are worse than the random walk."
+
+{
+  const data = gapData.map(d => ({
+    country: d.country.charAt(0).toUpperCase() + d.country.slice(1),
+    config: d.config,
+    era: d.era === "validation" ? "Validation" : "Test",
+    mase: d.avg_mase
+  }));
+
+  return Plot.plot({
+    height: 380,
+    marginLeft: 60,
+    marginBottom: 50,
+    x: {label: null, padding: 0.2},
+    y: {label: "Average MASE", grid: true, domain: [0.7, 1.2]},
+    fx: {label: null},
+    color: {
+      domain: ["Validation", "Test"],
+      range: ["#3498db", "#e74c3c"],
+      legend: true
+    },
+    marks: [
+      Plot.ruleY([1.0], {stroke: "#999", strokeDasharray: "6,4", strokeWidth: 1}),
+      Plot.barY(data, Plot.groupX({y: "identity"}, {
+        x: "config", y: "mase", fill: "era", fx: "country",
+        tip: true
+      }))
+    ]
+  });
+}
 ```
 
 ```{ojs}
 //| echo: false
 {
-  const mk = testMetric;
-  const methodOrder = ["random_walk", "arima", "chronos2_zs", "chronos2_ft"];
-  const methodNames = {
-    random_walk: "Random Walk", arima: "ARIMA",
-    chronos2_zs: "Chronos-2 (zero-shot)", chronos2_ft: "Chronos-2 (agent-tuned)"
-  };
+  const rows = ["norway", "canada", "sweden"].map(c => {
+    const zsVal = gapData.find(d => d.country === c && d.config === "Zero-shot" && d.era === "validation");
+    const zsTest = gapData.find(d => d.country === c && d.config === "Zero-shot" && d.era === "test");
+    const atVal = gapData.find(d => d.country === c && d.config === "Agent-tuned" && d.era === "validation");
+    const atTest = gapData.find(d => d.country === c && d.config === "Agent-tuned" && d.era === "test");
 
-  const filtered = subperiodData.filter(r =>
-    r.subperiod === selectedSubperiod && r.variable === testDetailVar && methodOrder.includes(r.method)
-  ).map(r => ({
-    method: methodNames[r.method],
-    horizon: r.horizon,
-    value: r[mk]
+    const atGap = atVal && atTest && atVal.avg_mase > 0
+      ? ((atTest.avg_mase - atVal.avg_mase) / atVal.avg_mase * 100)
+      : null;
+
+    return {
+      Country: c.charAt(0).toUpperCase() + c.slice(1),
+      "ZS Val": zsVal?.avg_mase?.toFixed(3) || "---",
+      "ZS Test": zsTest?.avg_mase?.toFixed(3) || "---",
+      "AT Val": atVal?.avg_mase?.toFixed(3) || "---",
+      "AT Test": atTest?.avg_mase?.toFixed(3) || "---",
+      "Gap (%)": atGap != null ? `${atGap > 0 ? "+" : ""}${atGap.toFixed(1)}%` : "---",
+      "AT h=12 Test": atTest?.h12_mase?.toFixed(3) || "---"
+    };
+  });
+
+  return Inputs.table(rows, {
+    columns: ["Country", "ZS Val", "ZS Test", "AT Val", "AT Test", "Gap (%)", "AT h=12 Test"],
+    width: {Country: 80}
+  });
+}
+```
+
+**Key pattern:** Norway's agent-tuned config (which relies on fine-tuning) degrades +11% on the test era. Sweden's config (covariate selection without fine-tuning) actually improves by 1.2%.
+
+---
+
+## Ablation: what components matter?
+
+Leave-one-out analysis: remove each component from the best config and measure the degradation in validation MASE.
+
+```{ojs}
+//| echo: false
+//| label: fig-ablation
+//| fig-cap: "Leave-one-out ablation. Bars show % change in MASE when each component is removed. Positive = worse."
+
+{
+  const abl = ablationData[selectedCountry];
+  if (!abl || !abl.ablations) return html`<p>No ablation data available.</p>`;
+
+  const data = abl.ablations.map(a => ({
+    component: a.name.replace("drop_", "").replace(/_/g, " "),
+    degradation: a.degradation_pct || 0,
+    score: a.score
   }));
 
   return Plot.plot({
-    height: 340,
-    marginLeft: 60,
+    height: Math.max(250, data.length * 35 + 80),
+    marginLeft: 140,
     marginBottom: 45,
-    x: {label: "Horizon", ticks: [1, 3, 6, 12]},
-    y: {label: mk.toUpperCase(), grid: true},
-    color: {
-      domain: Object.values(methodNames),
-      range: ["#95a5a6", "#2ecc71", "#9b59b6", "#e74c3c"]
-    },
+    x: {label: "Change in MASE (%)", grid: true},
+    y: {label: null, domain: data.map(d => d.component)},
     marks: [
-      Plot.line(filtered, {
-        x: "horizon", y: "value", stroke: "method",
-        strokeWidth: 2, curve: "monotone-x"
+      Plot.ruleX([0], {stroke: "#999"}),
+      Plot.barX(data, {
+        x: "degradation", y: "component",
+        fill: d => d.degradation > 0 ? "#e74c3c" : "#2ecc71",
+        tip: true,
+        title: d => `${d.component}\nMASE: ${d.score?.toFixed(3) || '---'}\nDeg: ${d.degradation?.toFixed(2)}%`
       }),
-      Plot.dot(filtered, {
-        x: "horizon", y: "value", fill: "method",
-        r: 4, tip: true
+      Plot.text(data, {
+        x: "degradation", y: "component",
+        text: d => `${d.degradation > 0 ? "+" : ""}${d.degradation?.toFixed(2)}%`,
+        dx: d => d.degradation >= 0 ? 5 : -5,
+        textAnchor: d => d.degradation >= 0 ? "start" : "end",
+        fontSize: 11
       })
     ]
   });
 }
 ```
 
+Reference (full config) MASE: **`{ojs} ablationData[selectedCountry]?.reference_score?.toFixed(3) || "---"`**
 
-## Test-era findings
+---
 
-1. **Random walk dominates** the full test era — regime changes (COVID, inflation) favor the naive baseline
-2. **Zero-shot Chronos-2 beats ARIMA** at h=3, h=6, h=12 — the foundation model is more robust to structural breaks
-3. **Agent-tuned config overfits** — covariates and fine-tuning from validation era hurt on the test era, especially at long horizons
-4. **Pre-COVID (2016-19):** Zero-shot Chronos-2 is the best method — the agent-tuned config also does well
-5. **COVID (2020-21):** Random walk wins — all models struggle with the unprecedented shock. Agent-tuned config helps for unemployment.
-6. **Post-COVID (2022+):** ARIMA and random walk recover. Agent-tuned config is the worst — overfitting is most severe here
+## Search method comparison
+
+How do different search strategies compare on validation MASE?
+
+```{ojs}
+//| echo: false
+//| label: fig-search-comparison
+//| fig-cap: "Validation MASE by search method and country. Lower is better."
+
+{
+  const methods = ["Informed LLM", "Blind LLM", "Random", "Greedy", "Manual economist", "Zero-shot baseline"];
+  const data = searchComparison
+    .filter(d => d.val_mase != null)
+    .map(d => ({
+      method: d.method,
+      country: d.display_country,
+      mase: d.val_mase
+    }));
+
+  return Plot.plot({
+    height: 380,
+    marginLeft: 120,
+    marginBottom: 50,
+    x: {label: "Validation MASE", grid: true},
+    y: {label: null, domain: methods},
+    fx: {label: null},
+    color: {
+      domain: ["Norway", "Canada", "Sweden"],
+      range: ["#3498db", "#e74c3c", "#f39c12"],
+      legend: true
+    },
+    marks: [
+      Plot.dot(data, {
+        x: "mase", y: "method", fill: "country",
+        r: 6, tip: true
+      }),
+      // Connect with thin lines per country
+      Plot.line(data.filter(d => d.country === "Norway"), {
+        x: "mase", y: "method", stroke: "#3498db", strokeWidth: 0.5, strokeOpacity: 0.3
+      }),
+      Plot.line(data.filter(d => d.country === "Canada"), {
+        x: "mase", y: "method", stroke: "#e74c3c", strokeWidth: 0.5, strokeOpacity: 0.3
+      }),
+      Plot.line(data.filter(d => d.country === "Sweden"), {
+        x: "mase", y: "method", stroke: "#f39c12", strokeWidth: 0.5, strokeOpacity: 0.3
+      })
+    ]
+  });
+}
+```
+
+```{ojs}
+//| echo: false
+{
+  const methods = ["Informed LLM", "Blind LLM", "Random", "Greedy", "Manual economist", "Zero-shot baseline"];
+  const rows = methods.map(m => {
+    const row = {Method: m};
+    for (const c of ["norway", "canada", "sweden"]) {
+      const d = searchComparison.find(r => r.method === m && r.country === c);
+      row[c.charAt(0).toUpperCase() + c.slice(1)] = d?.val_mase?.toFixed(3) || "---";
+    }
+    return row;
+  });
+  return Inputs.table(rows, {
+    columns: ["Method", "Norway", "Canada", "Sweden"],
+    width: {Method: 160}
+  });
+}
+```

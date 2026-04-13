@@ -1,0 +1,15 @@
+{
+  "covariates": [
+    "brent_crude",
+    "policy_rate"
+  ],
+  "transforms": {
+    "brent_crude": "log_diff"
+  },
+  "context_length": null,
+  "fine_tune": true,
+  "fine_tune_steps": 500,
+  "fine_tune_lr": 1e-05,
+  "grouping": "univariate",
+  "num_samples": 20
+}

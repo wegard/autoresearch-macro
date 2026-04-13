@@ -1,0 +1,13 @@
+{
+  "covariates": [
+    "sp500",
+    "vix"
+  ],
+  "transforms": {},
+  "context_length": null,
+  "fine_tune": true,
+  "fine_tune_steps": 500,
+  "fine_tune_lr": 1e-05,
+  "grouping": "univariate",
+  "num_samples": 20
+}

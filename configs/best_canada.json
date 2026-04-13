@@ -1,0 +1,15 @@
+{
+  "covariates": [
+    "policy_rate",
+    "euro_area_gdp"
+  ],
+  "transforms": {
+    "euro_area_gdp": "log_diff"
+  },
+  "context_length": null,
+  "fine_tune": true,
+  "fine_tune_steps": 500,
+  "fine_tune_lr": 1e-05,
+  "grouping": "univariate",
+  "num_samples": 20
+}

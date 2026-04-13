@@ -1,0 +1,4 @@
+country,variable_name,series_description,source,series_id,rationale
+norway,euro_area_gdp,Euro area real GDP (chain-linked volumes),FRED,CLVMNACSCAB1GQEA19,Norway's main trading partner is the EU/EEA
+sweden,euro_area_gdp,Euro area real GDP (chain-linked volumes),FRED,CLVMNACSCAB1GQEA19,Sweden's main trading partner is the EU
+canada,partner_activity,US Industrial Production Index,FRED,INDPRO,Canada's dominant trading partner is the US (~75% of exports)

@@ -37,6 +37,21 @@ from prepare import (
 
 logger = logging.getLogger(__name__)
 
+COUNTRIES = ["norway", "canada", "sweden"]
+
+
+def load_country_panel(country: str) -> MacroPanel:
+    """Load the macro panel for a specific country."""
+    if country == "norway":
+        return load_panel()
+    elif country == "sweden":
+        from prepare_sweden import load_panel_sweden
+        return load_panel_sweden()
+    elif country == "canada":
+        from prepare_canada import load_panel_canada
+        return load_panel_canada()
+    raise ValueError(f"Unknown country: {country}")
+
 
 # ---------------------------------------------------------------------------
 # Baseline protocol
@@ -441,10 +456,19 @@ class VARBaseline:
 
     name = "var"
 
+    # Default covariates (Norway); override via constructor for other countries
     COVARIATES = ["brent_crude", "policy_rate", "us_cpi", "nok_eur"]
 
-    def __init__(self, max_lag: int = 6) -> None:
+    # Per-country covariate pools
+    COUNTRY_COVARIATES: dict[str, list[str]] = {
+        "norway": ["brent_crude", "policy_rate", "us_cpi", "nok_eur"],
+        "canada": ["brent_crude", "policy_rate", "us_cpi", "fx_usd"],
+        "sweden": ["brent_crude", "policy_rate", "us_cpi", "fx_eur"],
+    }
+
+    def __init__(self, max_lag: int = 6, country: str = "norway") -> None:
         self.max_lag = max_lag
+        self.COVARIATES = self.COUNTRY_COVARIATES.get(country, self.COVARIATES)
 
     def forecast_origin(
         self,
@@ -576,18 +600,230 @@ class FactorModelBaseline:
 
 
 # ---------------------------------------------------------------------------
+# BVAR with Minnesota shrinkage
+# ---------------------------------------------------------------------------
+
+
+class BVARBaseline:
+    """Bayesian VAR with Minnesota-style shrinkage.
+
+    Implements a simplified Minnesota prior via ridge regression:
+    - Own lags shrunk toward random walk (1 at lag 1, 0 at higher lags)
+    - Cross-variable lags shrunk toward 0 with tighter penalty
+    - Lag decay: higher lags get more shrinkage
+    """
+
+    name = "bvar"
+
+    COUNTRY_COVARIATES = VARBaseline.COUNTRY_COVARIATES
+
+    def __init__(
+        self,
+        max_lag: int = 6,
+        tightness: float = 0.1,
+        cross_tightness: float = 0.5,
+        country: str = "norway",
+    ) -> None:
+        self.max_lag = max_lag
+        self.tightness = tightness
+        self.cross_tightness = cross_tightness
+        self.COVARIATES = self.COUNTRY_COVARIATES.get(
+            country, self.COUNTRY_COVARIATES["norway"]
+        )
+
+    def forecast_origin(
+        self,
+        origin: ForecastOrigin,
+        target: str,
+        horizons: list[int],
+    ) -> dict[int, float]:
+        if target not in origin.available_data.columns:
+            return {}
+
+        covs = [c for c in self.COVARIATES if c in origin.available_data.columns]
+        var_cols = [target] + covs
+        df = origin.available_data[var_cols].dropna()
+
+        if len(df) < self.max_lag + 20:
+            return {}
+
+        n_vars = len(var_cols)
+        p = min(self.max_lag, max(1, len(df) // (3 * n_vars)))
+
+        # Build VAR data matrices
+        Y = df.values[p:]  # (T-p, n_vars)
+        T = Y.shape[0]
+        X_parts = [np.ones((T, 1))]  # intercept
+        for lag in range(1, p + 1):
+            X_parts.append(df.values[p - lag: -lag if lag < len(df) - p else T + p - lag])
+        X = np.hstack(X_parts)  # (T, 1 + p*n_vars)
+
+        # Minnesota prior: construct diagonal penalty matrix
+        k = X.shape[1]
+        penalty = np.zeros(k)
+        penalty[0] = 0  # no penalty on intercept
+        for lag in range(1, p + 1):
+            for v in range(n_vars):
+                idx = 1 + (lag - 1) * n_vars + v
+                if idx >= k:
+                    break
+                lag_decay = lag ** 2
+                if v == 0:
+                    # Own variable lag — shrink toward RW (lighter penalty)
+                    penalty[idx] = lag_decay / (self.tightness ** 2)
+                else:
+                    # Cross-variable — tighter shrinkage
+                    penalty[idx] = lag_decay / (self.tightness * self.cross_tightness) ** 2
+
+        # Minnesota prior mean: RW for own lag 1, 0 elsewhere
+        prior_mean = np.zeros(k)
+        if k > 1:
+            prior_mean[1] = 1.0  # target variable, lag 1 → random walk
+
+        # Ridge regression: (X'X + diag(penalty)) beta = X'y + diag(penalty)*prior_mean
+        XtX = X.T @ X + np.diag(penalty)
+        target_idx = 0  # target is first column
+        y = Y[:, target_idx]
+        Xty = X.T @ y + penalty * prior_mean
+
+        try:
+            beta = np.linalg.solve(XtX, Xty)
+        except np.linalg.LinAlgError:
+            return {}
+
+        # Iterated forecasts
+        last_vals = df.values[-p:]  # (p, n_vars)
+        results: dict[int, float] = {}
+        current = last_vals.copy()
+        for h in range(1, max(horizons) + 1):
+            x_new = np.ones(k)
+            for lag in range(p):
+                row_idx = len(current) - 1 - lag
+                if row_idx >= 0:
+                    x_new[1 + lag * n_vars: 1 + (lag + 1) * n_vars] = current[row_idx]
+            pred = float(x_new @ beta)
+            # Append prediction (only target updated, covariates held constant)
+            new_row = current[-1].copy()
+            new_row[target_idx] = pred
+            current = np.vstack([current, new_row])
+            if h in horizons:
+                results[h] = pred
+
+        return results
+
+
+# ---------------------------------------------------------------------------
+# Elastic Net direct forecasting
+# ---------------------------------------------------------------------------
+
+
+class ElasticNetBaseline:
+    """Elastic Net direct h-step forecasting with lagged features.
+
+    For each horizon, fits a separate ElasticNetCV model using
+    lagged target + lagged covariates as features.
+    """
+
+    name = "elastic_net"
+
+    COUNTRY_COVARIATES = VARBaseline.COUNTRY_COVARIATES
+
+    def __init__(
+        self,
+        max_lag: int = 12,
+        country: str = "norway",
+    ) -> None:
+        self.max_lag = max_lag
+        self.COVARIATES = self.COUNTRY_COVARIATES.get(
+            country, self.COUNTRY_COVARIATES["norway"]
+        )
+
+    def forecast_origin(
+        self,
+        origin: ForecastOrigin,
+        target: str,
+        horizons: list[int],
+    ) -> dict[int, float]:
+        from sklearn.linear_model import ElasticNetCV
+
+        if target not in origin.available_data.columns:
+            return {}
+
+        covs = [c for c in self.COVARIATES if c in origin.available_data.columns]
+        cols = [target] + covs
+        df = origin.available_data[cols].dropna()
+
+        min_obs = self.max_lag + max(horizons) + 20
+        if len(df) < min_obs:
+            return {}
+
+        results: dict[int, float] = {}
+        for h in horizons:
+            # Build feature matrix: lagged values
+            features: list[pd.Series] = []
+            for lag in range(1, self.max_lag + 1):
+                for col in cols:
+                    features.append(df[col].shift(lag + h - 1).rename(f"{col}_lag{lag}"))
+
+            feat_df = pd.concat(features, axis=1).dropna()
+            y = df[target].loc[feat_df.index]
+
+            if len(feat_df) < 30:
+                continue
+
+            X = feat_df.values
+            y_arr = y.values
+
+            try:
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    model = ElasticNetCV(
+                        l1_ratio=[0.1, 0.5, 0.9, 0.99],
+                        cv=5,
+                        max_iter=10000,
+                        n_jobs=1,
+                    )
+                model.fit(X, y_arr)
+
+                # Predict using last available values
+                x_new_parts: list[float] = []
+                for lag in range(1, self.max_lag + 1):
+                    for col in cols:
+                        idx = len(df) - lag
+                        if idx >= 0:
+                            x_new_parts.append(float(df[col].iloc[idx]))
+                        else:
+                            x_new_parts.append(0.0)
+
+                x_new = np.array(x_new_parts).reshape(1, -1)
+                results[h] = float(model.predict(x_new)[0])
+            except Exception:
+                continue
+
+        return results
+
+
+# ---------------------------------------------------------------------------
 # Runner
 # ---------------------------------------------------------------------------
 
-AVAILABLE_METHODS: dict[str, BaselineMethod] = {
-    "random_walk": RandomWalk(),
-    "seasonal_naive": SeasonalNaive(),
-    "ar": AutoregressiveAR(),
-    "arima": ARIMABaseline(),
-    "ets": ETSBaseline(),
-    "var": VARBaseline(),
-    "factor": FactorModelBaseline(),
-}
+def get_available_methods(country: str = "norway") -> dict[str, BaselineMethod]:
+    """Get baseline methods instantiated for a specific country."""
+    return {
+        "random_walk": RandomWalk(),
+        "seasonal_naive": SeasonalNaive(),
+        "ar": AutoregressiveAR(),
+        "arima": ARIMABaseline(),
+        "ets": ETSBaseline(),
+        "var": VARBaseline(country=country),
+        "factor": FactorModelBaseline(),
+        "bvar": BVARBaseline(country=country),
+        "elastic_net": ElasticNetBaseline(country=country),
+    }
+
+
+# Backward compat: default Norway methods
+AVAILABLE_METHODS: dict[str, BaselineMethod] = get_available_methods("norway")
 
 
 def run_baseline(
@@ -595,6 +831,7 @@ def run_baseline(
     panel: MacroPanel,
     era: str = "validation",
     horizons: list[int] | None = None,
+    country: str = "norway",
 ) -> ForecastResult:
     """Run a baseline method on all origins and all target variables.
 
@@ -625,17 +862,18 @@ def run_baseline(
     runtime = time.time() - start
 
     logger.info(
-        "Baseline %s: %d targets, %d origins, %.1fs",
-        method.name, len(point_forecasts), len(origins), runtime,
+        "Baseline %s (%s): %d targets, %d origins, %.1fs",
+        method.name, country, len(point_forecasts), len(origins), runtime,
     )
 
     return ForecastResult(
         method_name=method.name,
         point_forecasts=point_forecasts,
-        config={"method": method.name, "horizons": horizons},
+        config={"method": method.name, "horizons": horizons, "country": country},
         runtime_seconds=runtime,
         era=era,
         horizons=horizons,
+        country=country,
     )
 
 
@@ -648,8 +886,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Run baseline forecasts",
     )
+    all_method_names = list(get_available_methods().keys())
     parser.add_argument(
-        "--method", type=str, choices=list(AVAILABLE_METHODS.keys()),
+        "--method", type=str, choices=all_method_names,
         help="Which baseline to run",
     )
     parser.add_argument(
@@ -659,6 +898,10 @@ def main() -> None:
     parser.add_argument(
         "--era", type=str, default="validation", choices=["validation", "test"],
         help="Evaluation era (default: validation)",
+    )
+    parser.add_argument(
+        "--country", type=str, default="norway", choices=COUNTRIES,
+        help="Country to run baselines for (default: norway)",
     )
     parser.add_argument(
         "--save", action="store_true",
@@ -672,20 +915,21 @@ def main() -> None:
         datefmt="%H:%M:%S",
     )
 
-    panel = load_panel()
+    panel = load_country_panel(args.country)
+    methods = get_available_methods(args.country)
 
     methods_to_run: list[BaselineMethod] = []
     if args.all:
-        methods_to_run = list(AVAILABLE_METHODS.values())
+        methods_to_run = list(methods.values())
     elif args.method:
-        methods_to_run = [AVAILABLE_METHODS[args.method]]
+        methods_to_run = [methods[args.method]]
     else:
         parser.print_help()
         return
 
     for method in methods_to_run:
-        logger.info("Running baseline: %s", method.name)
-        fr = run_baseline(method, panel, era=args.era)
+        logger.info("Running baseline: %s (%s)", method.name, args.country)
+        fr = run_baseline(method, panel, era=args.era, country=args.country)
         eval_result = evaluate(fr, panel)
         print(format_results_table(eval_result))
 

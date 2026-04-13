@@ -1,0 +1,9 @@
+\begin{tabular}{lllclr}
+\toprule
+Country & Covariates & Transforms & Ctx & Fine-tune & Val.\ MASE \\
+\midrule
+Norway & sp500, policy\_rate, fed\_funds, nok\_usd & --- & all & Yes (500) & 0.975 \\
+Canada & policy\_rate, euro\_area\_gdp & euro\_area\_gdp: log\_diff & all & Yes (500) & 0.843 \\
+Sweden & policy\_rate, fx\_usd, house\_prices, credit & fx\_usd: log\_diff, house\_prices: pct\_change\_12, credit: pct\_change\_12 & 48 & No & 0.913 \\
+\bottomrule
+\end{tabular}

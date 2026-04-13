@@ -1,0 +1,35 @@
+\begin{tabular}{llcccc}
+\toprule
+Country & Method & $h{=}1$ & $h{=}3$ & $h{=}6$ & $h{=}12$ \\
+\midrule
+\multirow{9}{*}{Norway} & Random walk & 1.000 & 1.000 & 1.000 & 1.000 \\
+ & ARIMA & \textbf{0.977} & 0.992 & 1.032 & 1.029 \\
+ & BVAR & 1.003 & 1.031 & 1.109 & 1.160 \\
+ & Elastic net & 0.995 & 1.061 & 1.268 & 1.468 \\
+ & VAR & 0.979 & 1.075 & 1.175 & 1.202 \\
+ & Factor model & 1.192 & 1.170 & 1.260 & 1.377 \\
+ & Chronos-2 (zero-shot) & 0.984 & \textbf{0.981} & \textbf{0.997} & \textbf{1.021} \\
+ & Chronos-2 (agent-tuned) & 1.011 & 1.025 & 1.085 & 1.205 \\
+ & Chronos-2 (manual) & 0.995 & 1.019 & 1.080 & 1.130 \\
+\midrule
+\multirow{9}{*}{Canada} & Random walk & 1.000 & 1.000 & 1.000 & 1.000 \\
+ & ARIMA & 1.024 & 1.006 & 0.982 & 0.964 \\
+ & BVAR & 1.071 & 1.124 & 1.246 & 2.433 \\
+ & Elastic net & 1.080 & 1.232 & 1.147 & 0.933 \\
+ & VAR & 1.007 & 1.222 & 1.844 & 21.635 \\
+ & Factor model & 1.459 & 1.340 & 1.161 & 0.978 \\
+ & Chronos-2 (zero-shot) & 0.978 & 0.930 & 0.865 & 0.779 \\
+ & Chronos-2 (agent-tuned) & \textbf{0.947} & \textbf{0.914} & \textbf{0.854} & \textbf{0.763} \\
+ & Chronos-2 (manual) & 0.954 & 0.923 & 0.873 & 0.839 \\
+\midrule
+\multirow{9}{*}{Sweden} & Random walk & 1.000 & 1.000 & 1.000 & 1.000 \\
+ & ARIMA & 0.945 & 0.960 & 0.985 & 1.002 \\
+ & BVAR & 0.966 & 0.953 & 0.949 & 0.945 \\
+ & Elastic net & 0.928 & 0.951 & 1.023 & 1.180 \\
+ & VAR & 0.927 & 0.965 & 1.016 & 1.066 \\
+ & Factor model & 1.279 & 1.191 & 1.349 & 1.426 \\
+ & Chronos-2 (zero-shot) & \textbf{0.895} & 0.925 & 0.922 & 1.010 \\
+ & Chronos-2 (agent-tuned) & 0.929 & \textbf{0.893} & \textbf{0.887} & \textbf{0.899} \\
+ & Chronos-2 (manual) & 0.916 & 0.908 & 0.910 & 0.908 \\
+\bottomrule
+\end{tabular}

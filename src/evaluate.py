@@ -74,6 +74,7 @@ class ForecastResult:
     timestamp: datetime = field(default_factory=datetime.now)
     era: str = "validation"
     horizons: list[int] = field(default_factory=lambda: list(HORIZONS))
+    country: str = "norway"
 
 
 @dataclass
@@ -190,7 +191,8 @@ def save_result(
     """Save forecast and evaluation results to disk.
 
     Directory structure:
-        results/{era}/{method_name}/
+        results/{country}/{era}/{method_name}/   (when country != "norway")
+        results/{era}/{method_name}/             (backward compat for Norway)
             config.json
             metrics.json
             point_forecasts.parquet   (one column per variable-horizon)
@@ -198,13 +200,18 @@ def save_result(
     """
     if base_dir is None:
         base_dir = RESULTS_DIR
-    out_dir = base_dir / forecast_result.era / forecast_result.method_name
+    country = getattr(forecast_result, "country", "norway")
+    if country and country != "norway":
+        out_dir = base_dir / country / forecast_result.era / forecast_result.method_name
+    else:
+        out_dir = base_dir / forecast_result.era / forecast_result.method_name
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # Config
     config_out = {
         "method_name": forecast_result.method_name,
         "era": forecast_result.era,
+        "country": country,
         "horizons": forecast_result.horizons,
         "runtime_seconds": forecast_result.runtime_seconds,
         "timestamp": forecast_result.timestamp.isoformat(),

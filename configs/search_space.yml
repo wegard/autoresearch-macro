@@ -2,7 +2,7 @@
 # Defines valid parameter ranges that the search agent can explore.
 
 covariates:
-  # Pool of available covariates (from panel.covariates())
+  # Default pool (Norway, backward compatible)
   pool:
     - house_prices
     - credit
@@ -20,6 +20,55 @@ covariates:
     - euro_area_gdp
   min_selected: 0
   max_selected: 10
+
+  # Per-country pools (generic variable names for search-space alignment)
+  norway:
+    - house_prices
+    - credit
+    - exports
+    - imports
+    - nok_eur
+    - nok_usd
+    - policy_rate
+    - brent_crude
+    - sp500
+    - fed_funds
+    - us_cpi
+    - vix
+    - global_epu
+    - euro_area_gdp
+
+  canada:
+    - house_prices
+    - credit
+    - exports
+    - imports
+    - fx_eur
+    - fx_usd
+    - policy_rate
+    - brent_crude
+    - sp500
+    - fed_funds
+    - us_cpi
+    - vix
+    - global_epu
+    - partner_activity
+
+  sweden:
+    - house_prices
+    - credit
+    - exports
+    - imports
+    - fx_eur
+    - fx_usd
+    - policy_rate
+    - brent_crude
+    - sp500
+    - fed_funds
+    - us_cpi
+    - vix
+    - global_epu
+    - euro_area_gdp
 
 transforms:
   # Available transformation functions

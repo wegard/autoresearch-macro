@@ -140,6 +140,11 @@ def fmt(val: float, bold: bool = False) -> str:
     return rf"\textbf{{{s}}}" if bold else s
 
 
+def tex_escape(s: str) -> str:
+    """Escape underscores and other LaTeX-special chars in table text."""
+    return s.replace("_", r"\_").replace("%", r"\%").replace("&", r"\&")
+
+
 def _sweden_footnote() -> str:
     return (
         r"\footnotesize Sweden averages over 3 targets "
@@ -308,10 +313,10 @@ def generate_pipelines_table(df: pd.DataFrame) -> str:
         if country not in configs:
             continue
         cfg = configs[country]
-        covs = ", ".join(cfg.get("covariates", [])) or "---"
+        covs = tex_escape(", ".join(cfg.get("covariates", []))) or "---"
         transforms = cfg.get("transforms", {})
         if transforms:
-            tx_parts = [f"{k}: {v}" for k, v in transforms.items()]
+            tx_parts = [f"{tex_escape(k)}: {tex_escape(v)}" for k, v in transforms.items()]
             tx_str = ", ".join(tx_parts)
         else:
             tx_str = "---"
@@ -404,7 +409,7 @@ def generate_ablation_table(df: pd.DataFrame) -> str:
         )
 
         for entry in abl["ablations"]:
-            name = entry["name"].replace("drop_", "").replace("_", " ")
+            name = tex_escape(entry["name"].replace("drop_", "").replace("_", " "))
             score = entry.get("score", float("nan"))
             deg = entry.get("degradation_pct")
             deg_str = f"{deg:+.2f}\\%" if deg is not None else "---"

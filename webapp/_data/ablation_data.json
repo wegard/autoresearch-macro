@@ -1,0 +1,346 @@
+{
+  "norway": {
+    "display_name": "Norway",
+    "reference_score": 0.9745498574440841,
+    "ablations": [
+      {
+        "name": "drop_sp500",
+        "config": {
+          "covariates": [
+            "policy_rate",
+            "fed_funds",
+            "nok_usd"
+          ],
+          "transforms": {},
+          "context_length": null,
+          "fine_tune": true,
+          "fine_tune_steps": 500,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 0.9723981241710844,
+        "degradation_pct": -0.22079252862885218,
+        "runtime_seconds": 233.94976830482483
+      },
+      {
+        "name": "drop_policy_rate",
+        "config": {
+          "covariates": [
+            "sp500",
+            "fed_funds",
+            "nok_usd"
+          ],
+          "transforms": {},
+          "context_length": null,
+          "fine_tune": true,
+          "fine_tune_steps": 500,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 0.9840331963776678,
+        "degradation_pct": 0.9730994121178548,
+        "runtime_seconds": 346.10558438301086
+      },
+      {
+        "name": "drop_fed_funds",
+        "config": {
+          "covariates": [
+            "sp500",
+            "policy_rate",
+            "nok_usd"
+          ],
+          "transforms": {},
+          "context_length": null,
+          "fine_tune": true,
+          "fine_tune_steps": 500,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 0.9899669023853123,
+        "degradation_pct": 1.5819657479261156,
+        "runtime_seconds": 294.7927324771881
+      },
+      {
+        "name": "drop_nok_usd",
+        "config": {
+          "covariates": [
+            "sp500",
+            "policy_rate",
+            "fed_funds"
+          ],
+          "transforms": {},
+          "context_length": null,
+          "fine_tune": true,
+          "fine_tune_steps": 500,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 0.979753529952933,
+        "degradation_pct": 0.5339565204489773,
+        "runtime_seconds": 386.19146037101746
+      },
+      {
+        "name": "drop_fine_tune",
+        "config": {
+          "covariates": [
+            "sp500",
+            "policy_rate",
+            "fed_funds",
+            "nok_usd"
+          ],
+          "transforms": {},
+          "context_length": null,
+          "fine_tune": false,
+          "fine_tune_steps": 500,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 0.9752111682607879,
+        "degradation_pct": 0.06785807946637407,
+        "runtime_seconds": 236.0068383216858
+      },
+      {
+        "name": "drop_all_covariates",
+        "config": {
+          "covariates": [],
+          "transforms": {},
+          "context_length": null,
+          "fine_tune": true,
+          "fine_tune_steps": 500,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 1.0034005571998308,
+        "degradation_pct": 2.9604129060582274,
+        "runtime_seconds": 345.3713638782501
+      }
+    ]
+  },
+  "canada": {
+    "display_name": "Canada",
+    "reference_score": 0.8425042836590703,
+    "ablations": [
+      {
+        "name": "drop_policy_rate",
+        "config": {
+          "covariates": [
+            "euro_area_gdp"
+          ],
+          "transforms": {
+            "euro_area_gdp": "log_diff"
+          },
+          "context_length": null,
+          "fine_tune": true,
+          "fine_tune_steps": 500,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 0.8425042836590703,
+        "degradation_pct": 0.0,
+        "runtime_seconds": 189.99308681488037
+      },
+      {
+        "name": "drop_euro_area_gdp",
+        "config": {
+          "covariates": [
+            "policy_rate"
+          ],
+          "transforms": {},
+          "context_length": null,
+          "fine_tune": true,
+          "fine_tune_steps": 500,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 0.8588181316799928,
+        "degradation_pct": 1.936351937591347,
+        "runtime_seconds": 189.10189986228943
+      },
+      {
+        "name": "drop_fine_tune",
+        "config": {
+          "covariates": [
+            "policy_rate",
+            "euro_area_gdp"
+          ],
+          "transforms": {
+            "euro_area_gdp": "log_diff"
+          },
+          "context_length": null,
+          "fine_tune": false,
+          "fine_tune_steps": 500,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 0.859110534476009,
+        "degradation_pct": 1.971058324453423,
+        "runtime_seconds": 93.63232445716858
+      },
+      {
+        "name": "drop_all_covariates",
+        "config": {
+          "covariates": [],
+          "transforms": {},
+          "context_length": null,
+          "fine_tune": true,
+          "fine_tune_steps": 500,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 0.8588181316799928,
+        "degradation_pct": 1.936351937591347,
+        "runtime_seconds": 186.98477506637573
+      }
+    ]
+  },
+  "sweden": {
+    "display_name": "Sweden",
+    "reference_score": 0.9133094217354628,
+    "ablations": [
+      {
+        "name": "drop_policy_rate",
+        "config": {
+          "covariates": [
+            "fx_usd",
+            "house_prices",
+            "credit"
+          ],
+          "transforms": {
+            "fx_usd": "log_diff",
+            "house_prices": "pct_change_12",
+            "credit": "pct_change_12"
+          },
+          "context_length": 48,
+          "fine_tune": false,
+          "fine_tune_steps": 1000,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 0.932748255762096,
+        "degradation_pct": 2.1283952145917477,
+        "runtime_seconds": 90.13786029815674
+      },
+      {
+        "name": "drop_fx_usd",
+        "config": {
+          "covariates": [
+            "policy_rate",
+            "house_prices",
+            "credit"
+          ],
+          "transforms": {
+            "house_prices": "pct_change_12",
+            "credit": "pct_change_12"
+          },
+          "context_length": 48,
+          "fine_tune": false,
+          "fine_tune_steps": 1000,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 0.9227898445364312,
+        "degradation_pct": 1.0380296726769525,
+        "runtime_seconds": 90.32774305343628
+      },
+      {
+        "name": "drop_house_prices",
+        "config": {
+          "covariates": [
+            "policy_rate",
+            "fx_usd",
+            "credit"
+          ],
+          "transforms": {
+            "fx_usd": "log_diff",
+            "credit": "pct_change_12"
+          },
+          "context_length": 48,
+          "fine_tune": false,
+          "fine_tune_steps": 1000,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 0.9159472410309617,
+        "degradation_pct": 0.2888198930967477,
+        "runtime_seconds": 91.24970483779907
+      },
+      {
+        "name": "drop_credit",
+        "config": {
+          "covariates": [
+            "policy_rate",
+            "fx_usd",
+            "house_prices"
+          ],
+          "transforms": {
+            "fx_usd": "log_diff",
+            "house_prices": "pct_change_12"
+          },
+          "context_length": 48,
+          "fine_tune": false,
+          "fine_tune_steps": 1000,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 0.9374414151901506,
+        "degradation_pct": 2.642258240239364,
+        "runtime_seconds": 90.33338522911072
+      },
+      {
+        "name": "drop_context_length",
+        "config": {
+          "covariates": [
+            "policy_rate",
+            "fx_usd",
+            "house_prices",
+            "credit"
+          ],
+          "transforms": {
+            "fx_usd": "log_diff",
+            "house_prices": "pct_change_12",
+            "credit": "pct_change_12"
+          },
+          "context_length": null,
+          "fine_tune": false,
+          "fine_tune_steps": 1000,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 0.9738569278170308,
+        "degradation_pct": 6.629462550218319,
+        "runtime_seconds": 93.02085614204407
+      },
+      {
+        "name": "drop_all_covariates",
+        "config": {
+          "covariates": [],
+          "transforms": {},
+          "context_length": 48,
+          "fine_tune": false,
+          "fine_tune_steps": 1000,
+          "fine_tune_lr": 1e-05,
+          "grouping": "univariate",
+          "num_samples": 20
+        },
+        "score": 0.9689357767808735,
+        "degradation_pct": 6.09063628618984,
+        "runtime_seconds": 88.91346883773804
+      }
+    ]
+  }
+}

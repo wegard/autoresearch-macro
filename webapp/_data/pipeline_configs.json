@@ -1,0 +1,66 @@
+{
+  "norway": {
+    "display_name": "Norway",
+    "best_score": 0.9745498574440841,
+    "best_config": {
+      "covariates": [
+        "sp500",
+        "policy_rate",
+        "fed_funds",
+        "nok_usd"
+      ],
+      "transforms": {},
+      "context_length": null,
+      "fine_tune": true,
+      "fine_tune_steps": 500,
+      "fine_tune_lr": 1e-05,
+      "grouping": "univariate",
+      "num_samples": 20
+    },
+    "iterations": 50
+  },
+  "canada": {
+    "display_name": "Canada",
+    "best_score": 0.8425042836590703,
+    "best_config": {
+      "covariates": [
+        "policy_rate",
+        "euro_area_gdp"
+      ],
+      "transforms": {
+        "euro_area_gdp": "log_diff"
+      },
+      "context_length": null,
+      "fine_tune": true,
+      "fine_tune_steps": 500,
+      "fine_tune_lr": 1e-05,
+      "grouping": "univariate",
+      "num_samples": 20
+    },
+    "iterations": 50
+  },
+  "sweden": {
+    "display_name": "Sweden",
+    "best_score": 0.9133094217354628,
+    "best_config": {
+      "covariates": [
+        "policy_rate",
+        "fx_usd",
+        "house_prices",
+        "credit"
+      ],
+      "transforms": {
+        "fx_usd": "log_diff",
+        "house_prices": "pct_change_12",
+        "credit": "pct_change_12"
+      },
+      "context_length": 48,
+      "fine_tune": false,
+      "fine_tune_steps": 1000,
+      "fine_tune_lr": 1e-05,
+      "grouping": "univariate",
+      "num_samples": 20
+    },
+    "iterations": 50
+  }
+}

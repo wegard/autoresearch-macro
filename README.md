@@ -122,6 +122,95 @@ cd webapp && quarto render
 
 Requires [Quarto](https://quarto.org/docs/get-started/) (v1.4+). No npm/node setup needed — D3.js and Observable Plot are loaded via Quarto's built-in OJS engine.
 
+## Publishing to MacroLab
+
+This repo can publish its rendered web dashboard into MacroLab as a versioned static artifact. The integration contract is:
+
+- rendered static site from `webapp/_site/`
+- small manifest file `macrolab-manifest.json`
+
+See [`MACROLAB-INTEGRATION.md`](MACROLAB-INTEGRATION.md) for the architecture and expected VPS layout.
+
+### Build a manifest only
+
+```bash
+./.venv/bin/python scripts/build_macrolab_manifest.py \
+  --output /tmp/macrolab-manifest.json
+```
+
+This computes a MacroLab-facing manifest from the current results and includes:
+
+- published app entrypoint
+- source git revision
+- summary stats derived from the current outputs
+
+### Publish a static release
+
+```bash
+bash scripts/publish_to_macrolab.sh \
+  --artifact-root /opt/macrolab/project-artifacts \
+  --macrolab-root /opt/macrolab
+```
+
+What this does:
+
+1. regenerates the webapp data JSON
+2. renders the Quarto site
+3. copies the rendered site into a versioned release directory
+4. writes `macrolab-manifest.json` into that release
+5. updates the public symlink for MacroLab to serve
+6. calls MacroLab's sync script if it exists
+
+Useful flags:
+
+- `--skip-build` to reuse an existing `webapp/_site/`
+- `--skip-sync` to stage artifacts without touching MacroLab metadata
+- `--repo-url` and `--paper-url` to add links in the MacroLab shell
+
+### Deploy on VPS
+
+On the VPS where MacroLab is running, clone this repo and publish:
+
+```bash
+# One-time: clone the repo
+cd /opt
+git clone https://github.com/wegard/autoresearch-macro.git
+cd autoresearch-macro
+
+# Install Quarto if not present (one-time)
+# See https://quarto.org/docs/get-started/
+
+# Build site from committed data + publish to MacroLab
+bash scripts/publish_to_macrolab.sh \
+  --render-only \
+  --macrolab-root /opt/macrolab \
+  --repo-url https://github.com/wegard/autoresearch-macro
+```
+
+To update after new results are pushed:
+
+```bash
+cd /opt/autoresearch-macro
+git pull
+bash scripts/publish_to_macrolab.sh \
+  --render-only \
+  --macrolab-root /opt/macrolab
+```
+
+The `--render-only` flag skips data regeneration (which requires raw `results/`) and only runs `quarto render` using the committed JSON data files.
+
+### Dry-run locally
+
+```bash
+bash scripts/publish_to_macrolab.sh \
+  --artifact-root /tmp/macrolab-artifacts \
+  --macrolab-root /home/vegard/MacroLab \
+  --skip-build \
+  --skip-sync
+```
+
+This is useful for validating the release layout before wiring the project into production MacroLab.
+
 ## Environment variables
 
 Set in `.env`:

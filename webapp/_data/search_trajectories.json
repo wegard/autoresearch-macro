@@ -1,0 +1,6423 @@
+{
+  "norway": [
+    {
+      "iteration": 0,
+      "config": {
+        "covariates": [],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9628478861789407,
+      "full_score": 0.9991352554799859,
+      "status": "accepted",
+      "description": "baseline (zero-shot, univariate)",
+      "runtime_seconds": 0,
+      "timestamp": "2026-04-01T05:43:59.503298"
+    },
+    {
+      "iteration": 1,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "nok_eur",
+          "nok_usd",
+          "policy_rate"
+        ],
+        "transforms": {
+          "brent_crude": "log_diff",
+          "nok_eur": "log_diff",
+          "nok_usd": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.955485785384991,
+      "full_score": 1.0152240609676202,
+      "status": "rejected",
+      "description": "covs=[brent_crude,nok_eur,nok_usd...], transforms=3",
+      "runtime_seconds": 196.5541594028473,
+      "timestamp": "2026-04-01T05:47:16.218794"
+    },
+    {
+      "iteration": 2,
+      "config": {
+        "covariates": [
+          "brent_crude"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9418563775375096,
+      "full_score": 1.0073132147777997,
+      "status": "rejected",
+      "description": "covs=[brent_crude], ft=true",
+      "runtime_seconds": 597.3967440128326,
+      "timestamp": "2026-04-01T05:57:14.458791"
+    },
+    {
+      "iteration": 3,
+      "config": {
+        "covariates": [
+          "brent_crude"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9410881682879739,
+      "full_score": 0.98986483685062,
+      "status": "accepted",
+      "description": "covs=[brent_crude], transforms=1",
+      "runtime_seconds": 192.27690839767456,
+      "timestamp": "2026-04-01T06:00:26.855314"
+    },
+    {
+      "iteration": 4,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "nok_eur"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "nok_eur": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.944349828783126,
+      "full_score": 1.0012291909304554,
+      "status": "rejected",
+      "description": "covs=[brent_crude,nok_eur], transforms=2",
+      "runtime_seconds": 879.6556749343872,
+      "timestamp": "2026-04-01T06:15:06.630549"
+    },
+    {
+      "iteration": 5,
+      "config": {
+        "covariates": [
+          "brent_crude"
+        ],
+        "transforms": {
+          "brent_crude": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.954498475924481,
+      "full_score": 1.0190710315586207,
+      "status": "rejected",
+      "description": "covs=[brent_crude], transforms=1",
+      "runtime_seconds": 192.31322646141052,
+      "timestamp": "2026-04-01T06:18:19.128500"
+    },
+    {
+      "iteration": 6,
+      "config": {
+        "covariates": [
+          "nok_eur"
+        ],
+        "transforms": {
+          "nok_eur": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9632495046238352,
+      "full_score": 1.0110918150410722,
+      "status": "rejected",
+      "description": "covs=[nok_eur], transforms=1",
+      "runtime_seconds": 307.3513231277466,
+      "timestamp": "2026-04-01T06:23:26.607597"
+    },
+    {
+      "iteration": 7,
+      "config": {
+        "covariates": [
+          "brent_crude"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9644619684252482,
+      "full_score": 1.0159713617708137,
+      "status": "rejected",
+      "description": "ctx=48",
+      "runtime_seconds": 637.1614954471588,
+      "timestamp": "2026-04-01T06:34:03.954038"
+    },
+    {
+      "iteration": 8,
+      "config": {
+        "covariates": [
+          "brent_crude"
+        ],
+        "transforms": {
+          "brent_crude": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.954498475924481,
+      "full_score": 1.0190710315586207,
+      "status": "rejected",
+      "description": "transforms=1",
+      "runtime_seconds": 195.86759638786316,
+      "timestamp": "2026-04-01T06:37:20.276860"
+    },
+    {
+      "iteration": 9,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9371575159950638,
+      "full_score": 0.9853500930044673,
+      "status": "accepted",
+      "description": "covs=[brent_crude,policy_rate], transforms=1",
+      "runtime_seconds": 194.22069931030273,
+      "timestamp": "2026-04-01T06:40:34.631699"
+    },
+    {
+      "iteration": 10,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9334562091818508,
+      "full_score": 0.9826992864374642,
+      "status": "accepted",
+      "description": "covs=[brent_crude,policy_rate,nok_usd]",
+      "runtime_seconds": 193.1903862953186,
+      "timestamp": "2026-04-01T06:43:47.941536"
+    },
+    {
+      "iteration": 11,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9266989719988423,
+      "full_score": 0.9870753999042953,
+      "status": "rejected",
+      "description": "ft=true",
+      "runtime_seconds": 362.58654046058655,
+      "timestamp": "2026-04-01T06:49:50.648419"
+    },
+    {
+      "iteration": 12,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "policy_rate": "pct_change_1",
+          "nok_usd": "pct_change_1"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9706746845086989,
+      "full_score": 1.0212946903197073,
+      "status": "rejected",
+      "description": "transforms=3",
+      "runtime_seconds": 195.165691614151,
+      "timestamp": "2026-04-01T06:53:05.933589"
+    },
+    {
+      "iteration": 13,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": 64,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 50
+      },
+      "quick_score": 0.9550675874720453,
+      "full_score": 0.9906493952696683,
+      "status": "rejected",
+      "description": "ctx=64",
+      "runtime_seconds": 192.636070728302,
+      "timestamp": "2026-04-01T06:56:18.690538"
+    },
+    {
+      "iteration": 14,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9372224878855462,
+      "full_score": 0.9815764798348603,
+      "status": "accepted",
+      "description": "covs=[brent_crude,policy_rate,nok_usd...]",
+      "runtime_seconds": 197.69783544540405,
+      "timestamp": "2026-04-01T06:59:36.507703"
+    },
+    {
+      "iteration": 15,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9273666710545683,
+      "full_score": 0.9795637724082723,
+      "status": "accepted",
+      "description": "ft=true",
+      "runtime_seconds": 317.27087688446045,
+      "timestamp": "2026-04-01T07:04:53.897649"
+    },
+    {
+      "iteration": 16,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9185805607113819,
+      "full_score": 0.982129785873218,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 403.44455003738403,
+      "timestamp": "2026-04-01T07:11:37.464475"
+    },
+    {
+      "iteration": 17,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9060032832440926,
+      "full_score": 0.9854063577933706,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 394.30615043640137,
+      "timestamp": "2026-04-01T07:18:11.891029"
+    },
+    {
+      "iteration": 18,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9233184604676559,
+      "full_score": 0.9747244086782725,
+      "status": "accepted",
+      "description": "covs=[brent_crude,policy_rate,nok_usd...]",
+      "runtime_seconds": 320.5340631008148,
+      "timestamp": "2026-04-01T07:23:32.565445"
+    },
+    {
+      "iteration": 19,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9196442245788996,
+      "full_score": 0.9698471431937878,
+      "status": "accepted",
+      "description": "covs=[brent_crude,policy_rate,nok_usd...]",
+      "runtime_seconds": 324.7400896549225,
+      "timestamp": "2026-04-01T07:28:57.544082"
+    },
+    {
+      "iteration": 20,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "imports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "nok_usd": "pct_change_12",
+          "exports": "log_diff",
+          "imports": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9431470339957841,
+      "full_score": 0.9900935582776798,
+      "status": "rejected",
+      "description": "covs=[brent_crude,policy_rate,nok_usd...], transforms=4",
+      "runtime_seconds": 336.7342517375946,
+      "timestamp": "2026-04-01T07:34:34.457533"
+    },
+    {
+      "iteration": 21,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "all_targets",
+        "num_samples": 20
+      },
+      "quick_score": 0.9196442245788996,
+      "full_score": 0.9698471431937878,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 350.54192090034485,
+      "timestamp": "2026-04-01T07:40:25.227953"
+    },
+    {
+      "iteration": 22,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix",
+          "credit"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "exports": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9382965218635955,
+      "full_score": 0.9813281465449053,
+      "status": "rejected",
+      "description": "covs=[brent_crude,policy_rate,nok_usd...], transforms=2",
+      "runtime_seconds": 353.5229036808014,
+      "timestamp": "2026-04-01T07:46:19.037820"
+    },
+    {
+      "iteration": 23,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9397572770811411,
+      "full_score": 0.9908860777835613,
+      "status": "rejected",
+      "description": "ctx=48",
+      "runtime_seconds": 309.73111057281494,
+      "timestamp": "2026-04-01T07:51:29.016947"
+    },
+    {
+      "iteration": 24,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9159549947395786,
+      "full_score": 0.9775751322342732,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 335.94655179977417,
+      "timestamp": "2026-04-01T07:57:05.103821"
+    },
+    {
+      "iteration": 25,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "exports": "log_diff",
+          "policy_rate": "pct_change_1"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.946706733200645,
+      "full_score": 0.9940678453826381,
+      "status": "rejected",
+      "description": "transforms=3",
+      "runtime_seconds": 312.94610619544983,
+      "timestamp": "2026-04-01T08:02:18.215302"
+    },
+    {
+      "iteration": 26,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9159638821931186,
+      "full_score": 0.9783261449608953,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 412.6560711860657,
+      "timestamp": "2026-04-01T08:09:11.081833"
+    },
+    {
+      "iteration": 27,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "all_targets",
+        "num_samples": 20
+      },
+      "quick_score": 0.9196442245788996,
+      "full_score": 0.9698471431937878,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 352.34512281417847,
+      "timestamp": "2026-04-01T08:15:03.708606"
+    },
+    {
+      "iteration": 28,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "all_targets",
+        "num_samples": 20
+      },
+      "quick_score": 0.9196442245788996,
+      "full_score": 0.9698471431937878,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 322.29120111465454,
+      "timestamp": "2026-04-01T08:20:26.147901"
+    },
+    {
+      "iteration": 29,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "all_targets",
+        "num_samples": 20
+      },
+      "quick_score": 0.9196442245788996,
+      "full_score": 0.9698471431937878,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 324.1785683631897,
+      "timestamp": "2026-04-01T08:25:50.510469"
+    },
+    {
+      "iteration": 30,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "nok_usd",
+          "us_cpi"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9275866646609285,
+      "full_score": 0.9875605597983648,
+      "status": "rejected",
+      "description": "covs=[brent_crude,nok_usd,us_cpi]",
+      "runtime_seconds": 396.35599303245544,
+      "timestamp": "2026-04-01T08:32:27.081556"
+    },
+    {
+      "iteration": 31,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 3e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9189074800415689,
+      "full_score": 0.971050524320864,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 401.3106291294098,
+      "timestamp": "2026-04-01T08:39:08.614384"
+    },
+    {
+      "iteration": 32,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9036687317236648,
+      "full_score": 0.9809493125483025,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 405.5775363445282,
+      "timestamp": "2026-04-01T08:45:54.326984"
+    },
+    {
+      "iteration": 33,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "nok_eur",
+          "nok_usd",
+          "fed_funds",
+          "sp500",
+          "global_epu"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9519027723534657,
+      "full_score": 0.9986185578025436,
+      "status": "rejected",
+      "description": "covs=[brent_crude,nok_eur,nok_usd...], transforms=1",
+      "runtime_seconds": 313.7562222480774,
+      "timestamp": "2026-04-01T08:51:08.204505"
+    },
+    {
+      "iteration": 34,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "exports": "log_diff",
+          "us_cpi": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9363032708980161,
+      "full_score": 0.9950665821423067,
+      "status": "rejected",
+      "description": "transforms=3",
+      "runtime_seconds": 316.74116015434265,
+      "timestamp": "2026-04-01T08:56:25.082791"
+    },
+    {
+      "iteration": 35,
+      "config": {
+        "covariates": [
+          "nok_eur",
+          "nok_usd",
+          "brent_crude",
+          "euro_area_gdp",
+          "credit",
+          "house_prices"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "credit": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9633494487114178,
+      "full_score": 1.0139628182102545,
+      "status": "rejected",
+      "description": "covs=[nok_eur,nok_usd,brent_crude...], transforms=3",
+      "runtime_seconds": 317.10970759391785,
+      "timestamp": "2026-04-01T09:01:42.328234"
+    },
+    {
+      "iteration": 36,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9159638821931186,
+      "full_score": 0.9783261449608953,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 406.082088470459,
+      "timestamp": "2026-04-01T09:08:28.546632"
+    },
+    {
+      "iteration": 37,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "nok_eur"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9223537259104381,
+      "full_score": 1.0035422650554024,
+      "status": "rejected",
+      "description": "covs=[brent_crude,policy_rate,nok_usd...]",
+      "runtime_seconds": 411.6889228820801,
+      "timestamp": "2026-04-01T09:15:20.356732"
+    },
+    {
+      "iteration": 38,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9159638821931186,
+      "full_score": 0.9783261449608953,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 400.11497378349304,
+      "timestamp": "2026-04-01T09:22:00.609415"
+    },
+    {
+      "iteration": 39,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "nok_usd": "pct_change_1"
+        },
+        "context_length": 96,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8852107757131025,
+      "full_score": 0.9446383243715656,
+      "status": "accepted",
+      "description": "transforms=2, ctx=96",
+      "runtime_seconds": 313.9203279018402,
+      "timestamp": "2026-04-01T09:27:14.664500"
+    },
+    {
+      "iteration": 40,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "nok_usd": "pct_change_1"
+        },
+        "context_length": 128,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8973173304941371,
+      "full_score": 0.9780365090679137,
+      "status": "rejected",
+      "description": "ctx=128",
+      "runtime_seconds": 426.1879267692566,
+      "timestamp": "2026-04-01T09:34:21.107959"
+    },
+    {
+      "iteration": 41,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "nok_usd": "pct_change_1"
+        },
+        "context_length": 96,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 2e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8731895492024893,
+      "full_score": 0.9551451025759756,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 411.44291496276855,
+      "timestamp": "2026-04-01T09:41:12.842434"
+    },
+    {
+      "iteration": 42,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "nok_usd": "pct_change_1"
+        },
+        "context_length": 96,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 3e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8819002015982198,
+      "full_score": 0.9672318684063816,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 404.35333919525146,
+      "timestamp": "2026-04-01T09:47:57.467858"
+    },
+    {
+      "iteration": 43,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "nok_usd": "pct_change_1"
+        },
+        "context_length": 96,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8788272935546673,
+      "full_score": 0.9545007605064615,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 402.53253507614136,
+      "timestamp": "2026-04-01T09:54:40.162914"
+    },
+    {
+      "iteration": 44,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "nok_eur",
+          "nok_usd",
+          "policy_rate",
+          "us_cpi",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "nok_eur": "pct_change_1",
+          "nok_usd": "pct_change_1"
+        },
+        "context_length": 96,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8879540848304814,
+      "full_score": 0.9474398029229876,
+      "status": "rejected",
+      "description": "covs=[brent_crude,nok_eur,nok_usd...], transforms=3",
+      "runtime_seconds": 328.27278304100037,
+      "timestamp": "2026-04-01T10:00:08.620258"
+    },
+    {
+      "iteration": 45,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "nok_usd": "pct_change_1"
+        },
+        "context_length": 96,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 2e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8731895492024893,
+      "full_score": 0.9551451025759756,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 420.0957155227661,
+      "timestamp": "2026-04-01T10:07:08.870120"
+    },
+    {
+      "iteration": 46,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "nok_usd": "pct_change_1"
+        },
+        "context_length": 96,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8854468378209169,
+      "full_score": 0.945529760578063,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 425.91630458831787,
+      "timestamp": "2026-04-01T10:14:15.034154"
+    },
+    {
+      "iteration": 47,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "nok_eur",
+          "policy_rate",
+          "us_cpi"
+        ],
+        "transforms": {
+          "brent_crude": "log_diff",
+          "nok_eur": "pct_change_1"
+        },
+        "context_length": 96,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8931710806395303,
+      "full_score": 0.9646667623649169,
+      "status": "rejected",
+      "description": "covs=[brent_crude,nok_eur,policy_rate...], transforms=2",
+      "runtime_seconds": 416.507887840271,
+      "timestamp": "2026-04-01T10:21:11.697184"
+    },
+    {
+      "iteration": 48,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "nok_usd": "pct_change_1"
+        },
+        "context_length": 96,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 3e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8819002015982198,
+      "full_score": 0.9672318684063816,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 410.4056568145752,
+      "timestamp": "2026-04-01T10:28:02.280468"
+    },
+    {
+      "iteration": 49,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "nok_usd": "pct_change_1"
+        },
+        "context_length": 96,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "all_targets",
+        "num_samples": 20
+      },
+      "quick_score": 0.8852107757131025,
+      "full_score": 0.9446383243715656,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 323.68151664733887,
+      "timestamp": "2026-04-01T10:33:26.154942"
+    },
+    {
+      "iteration": 50,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "nok_usd",
+          "us_cpi",
+          "exports",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "pct_change_12",
+          "nok_usd": "pct_change_1"
+        },
+        "context_length": 96,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8788272935546673,
+      "full_score": 0.9545007605064615,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 412.59537267684937,
+      "timestamp": "2026-04-01T10:40:18.943718"
+    },
+    {
+      "iteration": 0,
+      "config": {
+        "covariates": [],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9628478861789407,
+      "full_score": 0.9991352554799859,
+      "status": "accepted",
+      "description": "baseline (zero-shot, univariate)",
+      "runtime_seconds": 0,
+      "timestamp": "2026-04-08T09:02:18.734544"
+    },
+    {
+      "iteration": 1,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "sp500"
+        ],
+        "transforms": {
+          "sp500": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[policy_rate,sp500], transforms=1 (run failed)",
+      "runtime_seconds": 47.22686433792114,
+      "timestamp": "2026-04-08T09:03:06.099673"
+    },
+    {
+      "iteration": 2,
+      "config": {
+        "covariates": [
+          "sp500"
+        ],
+        "transforms": {
+          "sp500": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[sp500], transforms=1 (run failed)",
+      "runtime_seconds": 50.60020899772644,
+      "timestamp": "2026-04-08T09:03:56.818861"
+    },
+    {
+      "iteration": 3,
+      "config": {
+        "covariates": [
+          "sp500"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9692648673137627,
+      "full_score": 0.9877077173690539,
+      "status": "accepted",
+      "description": "covs=[sp500]",
+      "runtime_seconds": 510.15551233291626,
+      "timestamp": "2026-04-08T09:12:27.094875"
+    },
+    {
+      "iteration": 4,
+      "config": {
+        "covariates": [
+          "sp500"
+        ],
+        "transforms": {
+          "sp500": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9530525125561818,
+      "full_score": 1.008759434365966,
+      "status": "rejected",
+      "description": "transforms=1",
+      "runtime_seconds": 227.20348691940308,
+      "timestamp": "2026-04-08T09:16:14.417831"
+    },
+    {
+      "iteration": 5,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9528977580635408,
+      "full_score": 0.9835970983413898,
+      "status": "accepted",
+      "description": "covs=[sp500,policy_rate]",
+      "runtime_seconds": 227.7898519039154,
+      "timestamp": "2026-04-08T09:20:02.327820"
+    },
+    {
+      "iteration": 6,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9447022909453564,
+      "full_score": 0.9804759191895959,
+      "status": "accepted",
+      "description": "covs=[sp500,policy_rate,fed_funds]",
+      "runtime_seconds": 228.32375359535217,
+      "timestamp": "2026-04-08T09:23:50.772935"
+    },
+    {
+      "iteration": 7,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9299699204252581,
+      "full_score": 0.979753529952933,
+      "status": "accepted",
+      "description": "ft=true",
+      "runtime_seconds": 340.4163269996643,
+      "timestamp": "2026-04-08T09:29:31.309748"
+    },
+    {
+      "iteration": 8,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds"
+        ],
+        "transforms": {
+          "sp500": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9242551836244639,
+      "full_score": 0.994203721379473,
+      "status": "rejected",
+      "description": "transforms=1",
+      "runtime_seconds": 340.6449899673462,
+      "timestamp": "2026-04-08T09:35:12.079922"
+    },
+    {
+      "iteration": 9,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "vix"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9381770001531496,
+      "full_score": 0.9844785097099538,
+      "status": "rejected",
+      "description": "covs=[sp500,policy_rate,fed_funds...]",
+      "runtime_seconds": 691.7922933101654,
+      "timestamp": "2026-04-08T09:46:43.994065"
+    },
+    {
+      "iteration": 10,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9055098839130138,
+      "full_score": 0.9800450475720069,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 424.6985504627228,
+      "timestamp": "2026-04-08T09:53:48.813306"
+    },
+    {
+      "iteration": 11,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds"
+        ],
+        "transforms": {},
+        "context_length": 64,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9435305981139803,
+      "full_score": 1.016719672194999,
+      "status": "rejected",
+      "description": "ctx=64",
+      "runtime_seconds": 335.61181569099426,
+      "timestamp": "2026-04-08T09:59:24.545298"
+    },
+    {
+      "iteration": 12,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9055098839130138,
+      "full_score": 0.9800450475720069,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 422.8554801940918,
+      "timestamp": "2026-04-08T10:06:27.548292"
+    },
+    {
+      "iteration": 13,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9055098839130138,
+      "full_score": 0.9800450475720069,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 422.81891417503357,
+      "timestamp": "2026-04-08T10:13:30.487546"
+    },
+    {
+      "iteration": 14,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "vix"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9381770001531496,
+      "full_score": 0.9844785097099538,
+      "status": "rejected",
+      "description": "covs=[sp500,policy_rate,fed_funds...]",
+      "runtime_seconds": 341.63251399993896,
+      "timestamp": "2026-04-08T10:19:12.240236"
+    },
+    {
+      "iteration": 15,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds"
+        ],
+        "transforms": {
+          "sp500": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9242551836244639,
+      "full_score": 0.994203721379473,
+      "status": "rejected",
+      "description": "transforms=1",
+      "runtime_seconds": 337.9575412273407,
+      "timestamp": "2026-04-08T10:24:50.318076"
+    },
+    {
+      "iteration": 16,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9055098839130138,
+      "full_score": 0.9800450475720069,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 421.3909487724304,
+      "timestamp": "2026-04-08T10:31:51.834127"
+    },
+    {
+      "iteration": 17,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9055098839130138,
+      "full_score": 0.9800450475720069,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 421.11646842956543,
+      "timestamp": "2026-04-08T10:38:53.073357"
+    },
+    {
+      "iteration": 18,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.920129888783253,
+      "full_score": 0.9745498574440841,
+      "status": "accepted",
+      "description": "covs=[sp500,policy_rate,fed_funds...]",
+      "runtime_seconds": 336.8409061431885,
+      "timestamp": "2026-04-08T10:44:30.034700"
+    },
+    {
+      "iteration": 19,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd"
+        ],
+        "transforms": {
+          "sp500": "log_diff",
+          "nok_usd": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9253789882973946,
+      "full_score": 0.9975437329539172,
+      "status": "rejected",
+      "description": "transforms=2",
+      "runtime_seconds": 340.52364134788513,
+      "timestamp": "2026-04-08T10:50:10.693547"
+    },
+    {
+      "iteration": 20,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd",
+          "nok_eur"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.940211053154576,
+      "full_score": 0.9895404882516012,
+      "status": "rejected",
+      "description": "covs=[sp500,policy_rate,fed_funds...]",
+      "runtime_seconds": 321.2941942214966,
+      "timestamp": "2026-04-08T10:55:32.115626"
+    },
+    {
+      "iteration": 21,
+      "config": {},
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "proposal failed: [Errno 2] No such file or directory",
+      "runtime_seconds": 0.12015700340270996,
+      "timestamp": "2026-04-08T10:55:32.355935"
+    },
+    {
+      "iteration": 22,
+      "config": {},
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "proposal failed: [Errno 2] No such file or directory",
+      "runtime_seconds": 0.060201168060302734,
+      "timestamp": "2026-04-08T10:55:32.521925"
+    },
+    {
+      "iteration": 23,
+      "config": {},
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "proposal failed: [Errno 2] No such file or directory",
+      "runtime_seconds": 30.06086826324463,
+      "timestamp": "2026-04-08T10:56:02.672843"
+    },
+    {
+      "iteration": 24,
+      "config": {},
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "proposal failed: [Errno 2] No such file or directory",
+      "runtime_seconds": 60.12024474143982,
+      "timestamp": "2026-04-08T10:57:02.972150"
+    },
+    {
+      "iteration": 25,
+      "config": {},
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "proposal failed: [Errno 2] No such file or directory",
+      "runtime_seconds": 90.11953115463257,
+      "timestamp": "2026-04-08T10:58:33.267584"
+    },
+    {
+      "iteration": 26,
+      "config": {},
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "proposal failed: [Errno 2] No such file or directory",
+      "runtime_seconds": 120.11970829963684,
+      "timestamp": "2026-04-08T11:00:33.582334"
+    },
+    {
+      "iteration": 27,
+      "config": {},
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "proposal failed: [Errno 2] No such file or directory",
+      "runtime_seconds": 150.1211130619049,
+      "timestamp": "2026-04-08T11:03:03.884682"
+    },
+    {
+      "iteration": 28,
+      "config": {},
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "proposal failed: [Errno 2] No such file or directory",
+      "runtime_seconds": 180.119567155838,
+      "timestamp": "2026-04-08T11:06:04.178778"
+    },
+    {
+      "iteration": 29,
+      "config": {},
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "proposal failed: [Errno 2] No such file or directory",
+      "runtime_seconds": 210.1197063922882,
+      "timestamp": "2026-04-08T11:09:34.462903"
+    },
+    {
+      "iteration": 30,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "baseline (run failed)",
+      "runtime_seconds": 521.4722335338593,
+      "timestamp": "2026-04-08T12:16:11.372074"
+    },
+    {
+      "iteration": 31,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "vix"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[sp500,policy_rate,fed_funds...] (run failed)",
+      "runtime_seconds": 347.49867057800293,
+      "timestamp": "2026-04-08T12:21:59.058211"
+    },
+    {
+      "iteration": 32,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd",
+          "brent_crude"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[sp500,policy_rate,fed_funds...] (run failed)",
+      "runtime_seconds": 607.7590217590332,
+      "timestamp": "2026-04-08T12:32:06.965437"
+    },
+    {
+      "iteration": 33,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd",
+          "vix"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[sp500,policy_rate,fed_funds...] (run failed)",
+      "runtime_seconds": 606.4160132408142,
+      "timestamp": "2026-04-08T12:42:13.503518"
+    },
+    {
+      "iteration": 34,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd",
+          "vix"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[sp500,policy_rate,fed_funds...] (run failed)",
+      "runtime_seconds": 584.1480147838593,
+      "timestamp": "2026-04-08T12:51:57.822184"
+    },
+    {
+      "iteration": 35,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd"
+        ],
+        "transforms": {
+          "sp500": "log_diff",
+          "nok_usd": "log_diff",
+          "policy_rate": "pct_change_1",
+          "fed_funds": "pct_change_1"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "transforms=4 (run failed)",
+      "runtime_seconds": 535.8840918540955,
+      "timestamp": "2026-04-08T13:00:53.863894"
+    },
+    {
+      "iteration": 36,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd"
+        ],
+        "transforms": {
+          "sp500": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "transforms=1 (run failed)",
+      "runtime_seconds": 539.6634075641632,
+      "timestamp": "2026-04-08T13:09:53.664379"
+    },
+    {
+      "iteration": 37,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds"
+        ],
+        "transforms": {
+          "sp500": "log_diff",
+          "policy_rate": "pct_change_1"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[sp500,policy_rate,fed_funds], transforms=2 (run failed)",
+      "runtime_seconds": 556.659764289856,
+      "timestamp": "2026-04-08T13:19:10.445452"
+    },
+    {
+      "iteration": 38,
+      "config": {
+        "covariates": [
+          "sp500",
+          "fed_funds"
+        ],
+        "transforms": {
+          "sp500": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[sp500,fed_funds], transforms=1 (run failed)",
+      "runtime_seconds": 603.8415853977203,
+      "timestamp": "2026-04-08T13:29:14.420595"
+    },
+    {
+      "iteration": 39,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[sp500,policy_rate,fed_funds] (run failed)",
+      "runtime_seconds": 603.9321503639221,
+      "timestamp": "2026-04-08T13:39:18.541530"
+    },
+    {
+      "iteration": 40,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "baseline (run failed)",
+      "runtime_seconds": 555.693110704422,
+      "timestamp": "2026-04-08T13:48:34.372173"
+    },
+    {
+      "iteration": 41,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd",
+          "brent_crude"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[sp500,policy_rate,fed_funds...] (run failed)",
+      "runtime_seconds": 535.6478717327118,
+      "timestamp": "2026-04-08T13:57:30.163114"
+    },
+    {
+      "iteration": 42,
+      "config": {
+        "covariates": [
+          "sp500",
+          "fed_funds"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[sp500,fed_funds] (run failed)",
+      "runtime_seconds": 223.38017749786377,
+      "timestamp": "2026-04-08T14:01:13.665234"
+    },
+    {
+      "iteration": 43,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[sp500,policy_rate,fed_funds...] (run failed)",
+      "runtime_seconds": 224.7114360332489,
+      "timestamp": "2026-04-08T14:04:58.508978"
+    },
+    {
+      "iteration": 44,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds"
+        ],
+        "transforms": {
+          "sp500": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[sp500,policy_rate,fed_funds], transforms=1 (run failed)",
+      "runtime_seconds": 539.2998580932617,
+      "timestamp": "2026-04-08T14:13:57.937038"
+    },
+    {
+      "iteration": 45,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[sp500,policy_rate] (run failed)",
+      "runtime_seconds": 223.19734954833984,
+      "timestamp": "2026-04-08T14:17:41.256065"
+    },
+    {
+      "iteration": 46,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd",
+          "vix"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[sp500,policy_rate,fed_funds...] (run failed)",
+      "runtime_seconds": 536.067236661911,
+      "timestamp": "2026-04-08T14:26:37.466523"
+    },
+    {
+      "iteration": 47,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "baseline (run failed)",
+      "runtime_seconds": 557.503748178482,
+      "timestamp": "2026-04-08T14:35:55.097849"
+    },
+    {
+      "iteration": 48,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd"
+        ],
+        "transforms": {
+          "sp500": "log_diff",
+          "policy_rate": "standardize_60",
+          "fed_funds": "standardize_60"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "transforms=3 (run failed)",
+      "runtime_seconds": 409.26548862457275,
+      "timestamp": "2026-04-08T14:42:44.485871"
+    },
+    {
+      "iteration": 49,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd"
+        ],
+        "transforms": {
+          "sp500": "log_diff",
+          "nok_usd": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "transforms=2 (run failed)",
+      "runtime_seconds": 605.1047658920288,
+      "timestamp": "2026-04-08T14:52:49.768571"
+    },
+    {
+      "iteration": 50,
+      "config": {
+        "covariates": [
+          "sp500",
+          "policy_rate",
+          "fed_funds",
+          "nok_usd",
+          "brent_crude"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": null,
+      "full_score": null,
+      "status": "error",
+      "description": "covs=[sp500,policy_rate,fed_funds...] (run failed)",
+      "runtime_seconds": 584.1101968288422,
+      "timestamp": "2026-04-08T15:02:34.007228"
+    }
+  ],
+  "canada": [
+    {
+      "iteration": 0,
+      "config": {
+        "covariates": [],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8627394398543647,
+      "full_score": 0.8685845952836359,
+      "status": "accepted",
+      "description": "baseline (zero-shot, univariate)",
+      "runtime_seconds": 0,
+      "timestamp": "2026-04-02T08:19:34.118143"
+    },
+    {
+      "iteration": 1,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "partner_activity",
+          "us_cpi"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "partner_activity": "pct_change_1",
+          "us_cpi": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.879565041385134,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,partner_activity...], transforms=3",
+      "runtime_seconds": 23.054752349853516,
+      "timestamp": "2026-04-02T08:19:57.336611"
+    },
+    {
+      "iteration": 2,
+      "config": {
+        "covariates": [
+          "policy_rate"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8627394398543647,
+      "full_score": 0.8685845952836359,
+      "status": "rejected",
+      "description": "covs=[policy_rate]",
+      "runtime_seconds": 113.888028383255,
+      "timestamp": "2026-04-02T08:21:51.344755"
+    },
+    {
+      "iteration": 3,
+      "config": {
+        "covariates": [],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8405523002509351,
+      "full_score": 0.8588181316799928,
+      "status": "accepted",
+      "description": "ft=true",
+      "runtime_seconds": 265.6659450531006,
+      "timestamp": "2026-04-02T08:26:17.128907"
+    },
+    {
+      "iteration": 4,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8192390949118059,
+      "full_score": 0.851804984919019,
+      "status": "accepted",
+      "description": "covs=[fed_funds,fx_usd,brent_crude], transforms=2",
+      "runtime_seconds": 271.592942237854,
+      "timestamp": "2026-04-02T08:30:48.842794"
+    },
+    {
+      "iteration": 5,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.812561569616177,
+      "full_score": 0.8462188146837648,
+      "status": "accepted",
+      "description": "covs=[fed_funds,fx_usd,brent_crude...]",
+      "runtime_seconds": 263.70459508895874,
+      "timestamp": "2026-04-02T08:35:12.668258"
+    },
+    {
+      "iteration": 6,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "policy_rate"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff"
+        },
+        "context_length": 64,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8511254359357718,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[fed_funds,fx_usd,brent_crude...], ctx=64",
+      "runtime_seconds": 73.69581747055054,
+      "timestamp": "2026-04-02T08:36:26.484408"
+    },
+    {
+      "iteration": 7,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "policy_rate"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.831823789428326,
+      "full_score": 0.8632298953223706,
+      "status": "rejected",
+      "description": "covs=[fed_funds,fx_usd,brent_crude...]",
+      "runtime_seconds": 344.1547887325287,
+      "timestamp": "2026-04-02T08:42:10.759701"
+    },
+    {
+      "iteration": 8,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "policy_rate"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "policy_rate": "pct_change_1"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.812561569616177,
+      "full_score": 0.8462188146837648,
+      "status": "rejected",
+      "description": "covs=[fed_funds,fx_usd,brent_crude...], transforms=3",
+      "runtime_seconds": 266.36959290504456,
+      "timestamp": "2026-04-02T08:46:37.249276"
+    },
+    {
+      "iteration": 9,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "policy_rate"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.831823789428326,
+      "full_score": 0.8632298953223706,
+      "status": "rejected",
+      "description": "covs=[fed_funds,fx_usd,brent_crude...]",
+      "runtime_seconds": 347.5350818634033,
+      "timestamp": "2026-04-02T08:52:24.905309"
+    },
+    {
+      "iteration": 10,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "policy_rate"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "policy_rate": "pct_change_1"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.812561569616177,
+      "full_score": 0.8462188146837648,
+      "status": "rejected",
+      "description": "covs=[fed_funds,fx_usd,brent_crude...], transforms=3",
+      "runtime_seconds": 263.9459149837494,
+      "timestamp": "2026-04-02T08:56:48.980395"
+    },
+    {
+      "iteration": 11,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.812561569616177,
+      "full_score": 0.8462188146837648,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,fx_usd...], transforms=2",
+      "runtime_seconds": 261.606498003006,
+      "timestamp": "2026-04-02T09:01:10.706869"
+    },
+    {
+      "iteration": 12,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8215592446107831,
+      "full_score": 0.8455532770594029,
+      "status": "accepted",
+      "description": "covs=[fed_funds,fx_usd,brent_crude...], transforms=3",
+      "runtime_seconds": 263.94435262680054,
+      "timestamp": "2026-04-02T09:05:34.772879"
+    },
+    {
+      "iteration": 13,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8215592446107831,
+      "full_score": 0.8455532770594029,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,fx_usd...], transforms=3",
+      "runtime_seconds": 267.3933627605438,
+      "timestamp": "2026-04-02T09:10:02.287431"
+    },
+    {
+      "iteration": 14,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8348586091690602,
+      "full_score": 0.8575072309161305,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 344.3242676258087,
+      "timestamp": "2026-04-02T09:15:46.732066"
+    },
+    {
+      "iteration": 15,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8348586091690602,
+      "full_score": 0.8575072309161305,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 343.97396445274353,
+      "timestamp": "2026-04-02T09:21:30.825201"
+    },
+    {
+      "iteration": 16,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "all_targets",
+        "num_samples": 20
+      },
+      "quick_score": 0.8348586091690602,
+      "full_score": 0.8575072309161305,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 341.29821515083313,
+      "timestamp": "2026-04-02T09:27:12.244474"
+    },
+    {
+      "iteration": 17,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8348586091690602,
+      "full_score": 0.8575072309161305,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 344.18351101875305,
+      "timestamp": "2026-04-02T09:32:56.549206"
+    },
+    {
+      "iteration": 18,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "credit"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "credit": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8288494824664986,
+      "full_score": 0.8586190908947672,
+      "status": "rejected",
+      "description": "covs=[fed_funds,fx_usd,brent_crude...], transforms=3",
+      "runtime_seconds": 264.8010184764862,
+      "timestamp": "2026-04-02T09:37:21.471346"
+    },
+    {
+      "iteration": 19,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8348586091690602,
+      "full_score": 0.8575072309161305,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 344.9428644180298,
+      "timestamp": "2026-04-02T09:43:06.550560"
+    },
+    {
+      "iteration": 20,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8348586091690602,
+      "full_score": 0.8575072309161305,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,fx_usd...], transforms=3",
+      "runtime_seconds": 348.30431723594666,
+      "timestamp": "2026-04-02T09:48:54.989931"
+    },
+    {
+      "iteration": 21,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices",
+          "credit"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff",
+          "credit": "log_diff"
+        },
+        "context_length": 96,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.844857993627585,
+      "full_score": 0.8947967606462384,
+      "status": "rejected",
+      "description": "covs=[fed_funds,fx_usd,brent_crude...], transforms=4, ctx=96",
+      "runtime_seconds": 197.04107904434204,
+      "timestamp": "2026-04-02T09:52:12.166324"
+    },
+    {
+      "iteration": 22,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices",
+          "credit"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff",
+          "credit": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8254421788496669,
+      "full_score": 0.8537566817262012,
+      "status": "rejected",
+      "description": "covs=[fed_funds,fx_usd,brent_crude...], transforms=4",
+      "runtime_seconds": 263.9569847583771,
+      "timestamp": "2026-04-02T09:56:36.245104"
+    },
+    {
+      "iteration": 23,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8348586091690602,
+      "full_score": 0.8575072309161305,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 341.3470070362091,
+      "timestamp": "2026-04-02T10:02:17.712959"
+    },
+    {
+      "iteration": 24,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8348586091690602,
+      "full_score": 0.8575072309161305,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 341.41508960723877,
+      "timestamp": "2026-04-02T10:07:59.295242"
+    },
+    {
+      "iteration": 25,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "us_cpi"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 2e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8452733675507398,
+      "full_score": 0.8739294659082985,
+      "status": "rejected",
+      "description": "covs=[fed_funds,fx_usd,us_cpi], transforms=1",
+      "runtime_seconds": 339.8944272994995,
+      "timestamp": "2026-04-02T10:13:39.311165"
+    },
+    {
+      "iteration": 26,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8348586091690602,
+      "full_score": 0.8575072309161305,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 342.39182305336,
+      "timestamp": "2026-04-02T10:19:21.825752"
+    },
+    {
+      "iteration": 27,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "us_cpi"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff"
+        },
+        "context_length": 48,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8754677453312274,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,us_cpi], transforms=1, ctx=48",
+      "runtime_seconds": 114.11188316345215,
+      "timestamp": "2026-04-02T10:21:16.059427"
+    },
+    {
+      "iteration": 28,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "us_cpi",
+          "partner_activity"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff"
+        },
+        "context_length": 64,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8688778203027072,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,us_cpi...], transforms=1, ctx=64",
+      "runtime_seconds": 116.16393733024597,
+      "timestamp": "2026-04-02T10:23:12.344932"
+    },
+    {
+      "iteration": 29,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "us_cpi"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8328229895898241,
+      "full_score": 0.8628111010440651,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,us_cpi], transforms=1",
+      "runtime_seconds": 259.5824065208435,
+      "timestamp": "2026-04-02T10:27:32.048914"
+    },
+    {
+      "iteration": 30,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "all_targets",
+        "num_samples": 20
+      },
+      "quick_score": 0.8348586091690602,
+      "full_score": 0.8575072309161305,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fed_funds,fx_usd...]",
+      "runtime_seconds": 342.11994338035583,
+      "timestamp": "2026-04-02T10:33:14.289992"
+    },
+    {
+      "iteration": 31,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "us_cpi"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff"
+        },
+        "context_length": 36,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 5e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9458346910133628,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,us_cpi], transforms=1, ctx=36",
+      "runtime_seconds": 75.40047526359558,
+      "timestamp": "2026-04-02T10:34:29.826335"
+    },
+    {
+      "iteration": 32,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8348586091690602,
+      "full_score": 0.8575072309161305,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 344.08003330230713,
+      "timestamp": "2026-04-02T10:40:14.028899"
+    },
+    {
+      "iteration": 33,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 2e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.846407462456443,
+      "full_score": null,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 114.72591280937195,
+      "timestamp": "2026-04-02T10:42:08.891116"
+    },
+    {
+      "iteration": 34,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8193836424843931,
+      "full_score": 0.8460041251107685,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 340.3338348865509,
+      "timestamp": "2026-04-02T10:47:49.347004"
+    },
+    {
+      "iteration": 35,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices",
+          "partner_activity"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff",
+          "partner_activity": "pct_change_1"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 2e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.831851428720898,
+      "full_score": 0.853647822809603,
+      "status": "rejected",
+      "description": "covs=[fed_funds,fx_usd,brent_crude...], transforms=4",
+      "runtime_seconds": 262.0432276725769,
+      "timestamp": "2026-04-02T10:52:11.527299"
+    },
+    {
+      "iteration": 36,
+      "config": {
+        "covariates": [
+          "partner_activity",
+          "policy_rate",
+          "fx_usd",
+          "credit",
+          "exports"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "credit": "pct_change_12",
+          "exports": "log_diff"
+        },
+        "context_length": 64,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8532786280952921,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[partner_activity,policy_rate,fx_usd...], transforms=3, ctx=64",
+      "runtime_seconds": 116.04032588005066,
+      "timestamp": "2026-04-02T10:54:07.716891"
+    },
+    {
+      "iteration": 37,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 2e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.846407462456443,
+      "full_score": null,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 113.33211970329285,
+      "timestamp": "2026-04-02T10:56:01.172275"
+    },
+    {
+      "iteration": 38,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices",
+          "credit"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff",
+          "credit": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.833378003433977,
+      "full_score": 0.8606613284592453,
+      "status": "rejected",
+      "description": "covs=[fed_funds,fx_usd,brent_crude...], transforms=4",
+      "runtime_seconds": 346.5491507053375,
+      "timestamp": "2026-04-02T11:01:47.843680"
+    },
+    {
+      "iteration": 39,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.840917626827132,
+      "full_score": 0.8602503128485779,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 196.98012447357178,
+      "timestamp": "2026-04-02T11:05:04.946069"
+    },
+    {
+      "iteration": 40,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 5e-05,
+        "grouping": "all_targets",
+        "num_samples": 20
+      },
+      "quick_score": 0.8229361738797353,
+      "full_score": 0.8488443528827166,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 203.73060989379883,
+      "timestamp": "2026-04-02T11:08:28.827674"
+    },
+    {
+      "iteration": 41,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8348586091690602,
+      "full_score": 0.8575072309161305,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 343.9229943752289,
+      "timestamp": "2026-04-02T11:14:12.888092"
+    },
+    {
+      "iteration": 42,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8348586091690602,
+      "full_score": 0.8575072309161305,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 341.87464785575867,
+      "timestamp": "2026-04-02T11:19:54.900495"
+    },
+    {
+      "iteration": 43,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices",
+          "credit"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff",
+          "credit": "log_diff"
+        },
+        "context_length": 96,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8234949197228407,
+      "full_score": 0.8858597413276184,
+      "status": "rejected",
+      "description": "covs=[fed_funds,fx_usd,brent_crude...], transforms=4, ctx=96",
+      "runtime_seconds": 258.6629521846771,
+      "timestamp": "2026-04-02T11:24:13.684859"
+    },
+    {
+      "iteration": 44,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 2e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.846407462456443,
+      "full_score": null,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 114.87896299362183,
+      "timestamp": "2026-04-02T11:26:08.701241"
+    },
+    {
+      "iteration": 45,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 2e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.846407462456443,
+      "full_score": null,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 115.42433738708496,
+      "timestamp": "2026-04-02T11:28:04.248665"
+    },
+    {
+      "iteration": 46,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices",
+          "partner_activity"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8155293833566062,
+      "full_score": 0.8403123800356227,
+      "status": "accepted",
+      "description": "covs=[fed_funds,fx_usd,brent_crude...]",
+      "runtime_seconds": 342.57837319374084,
+      "timestamp": "2026-04-02T11:33:46.962485"
+    },
+    {
+      "iteration": 47,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "partner_activity"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff"
+        },
+        "context_length": 48,
+        "fine_tune": true,
+        "fine_tune_steps": 2000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8812172989068755,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[fed_funds,fx_usd,partner_activity], transforms=1, ctx=48",
+      "runtime_seconds": 193.73863077163696,
+      "timestamp": "2026-04-02T11:37:00.823033"
+    },
+    {
+      "iteration": 48,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices",
+          "partner_activity"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": 64,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8630426345748726,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ctx=64",
+      "runtime_seconds": 115.74880528450012,
+      "timestamp": "2026-04-02T11:38:56.696086"
+    },
+    {
+      "iteration": 49,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices",
+          "partner_activity"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 2000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8301562866548672,
+      "full_score": 0.8535559885418575,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 504.69830799102783,
+      "timestamp": "2026-04-02T11:47:21.518026"
+    },
+    {
+      "iteration": 50,
+      "config": {
+        "covariates": [
+          "fed_funds",
+          "fx_usd",
+          "brent_crude",
+          "us_cpi",
+          "house_prices",
+          "policy_rate"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff",
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8348586091690602,
+      "full_score": 0.8575072309161305,
+      "status": "rejected",
+      "description": "covs=[fed_funds,fx_usd,brent_crude...]",
+      "runtime_seconds": 341.84410214424133,
+      "timestamp": "2026-04-02T11:53:03.515101"
+    },
+    {
+      "iteration": 0,
+      "config": {
+        "covariates": [],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8627394398543647,
+      "full_score": 0.8685845952836359,
+      "status": "accepted",
+      "description": "baseline (zero-shot, univariate)",
+      "runtime_seconds": 0,
+      "timestamp": "2026-04-07T20:54:17.264039"
+    },
+    {
+      "iteration": 1,
+      "config": {
+        "covariates": [
+          "sp500"
+        ],
+        "transforms": {
+          "sp500": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8503488237247974,
+      "full_score": 0.8733135928789794,
+      "status": "rejected",
+      "description": "covs=[sp500], transforms=1",
+      "runtime_seconds": 200.01198530197144,
+      "timestamp": "2026-04-07T20:57:37.408514"
+    },
+    {
+      "iteration": 2,
+      "config": {
+        "covariates": [
+          "fed_funds"
+        ],
+        "transforms": {
+          "fed_funds": "none"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8720611244788348,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[fed_funds], transforms=1",
+      "runtime_seconds": 39.4767062664032,
+      "timestamp": "2026-04-07T20:58:17.019903"
+    },
+    {
+      "iteration": 3,
+      "config": {
+        "covariates": [
+          "policy_rate"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8627394398543647,
+      "full_score": 0.8685845952836359,
+      "status": "rejected",
+      "description": "covs=[policy_rate]",
+      "runtime_seconds": 201.6763036251068,
+      "timestamp": "2026-04-07T21:01:38.821174"
+    },
+    {
+      "iteration": 4,
+      "config": {
+        "covariates": [],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8424976797217925,
+      "full_score": 0.8536333288349023,
+      "status": "accepted",
+      "description": "ft=true",
+      "runtime_seconds": 273.1099627017975,
+      "timestamp": "2026-04-07T21:06:12.075433"
+    },
+    {
+      "iteration": 5,
+      "config": {
+        "covariates": [
+          "policy_rate"
+        ],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8424976797217925,
+      "full_score": 0.8536333288349023,
+      "status": "rejected",
+      "description": "covs=[policy_rate]",
+      "runtime_seconds": 297.20952320098877,
+      "timestamp": "2026-04-07T21:11:09.424834"
+    },
+    {
+      "iteration": 6,
+      "config": {
+        "covariates": [
+          "house_prices"
+        ],
+        "transforms": {
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8456904339386987,
+      "full_score": 0.8535734924674623,
+      "status": "accepted",
+      "description": "covs=[house_prices], transforms=1",
+      "runtime_seconds": 251.6630356311798,
+      "timestamp": "2026-04-07T21:15:21.236268"
+    },
+    {
+      "iteration": 7,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "credit"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "credit": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.856098666654912,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[house_prices,credit], transforms=2",
+      "runtime_seconds": 54.31537914276123,
+      "timestamp": "2026-04-07T21:16:15.688329"
+    },
+    {
+      "iteration": 8,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "credit"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "credit": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.856098666654912,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[house_prices,credit], transforms=2",
+      "runtime_seconds": 55.116868019104004,
+      "timestamp": "2026-04-07T21:17:10.926836"
+    },
+    {
+      "iteration": 9,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "exports"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "exports": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8404026920074532,
+      "full_score": 0.8603150626299532,
+      "status": "rejected",
+      "description": "covs=[house_prices,exports], transforms=2",
+      "runtime_seconds": 257.10203742980957,
+      "timestamp": "2026-04-07T21:21:28.168137"
+    },
+    {
+      "iteration": 10,
+      "config": {
+        "covariates": [
+          "credit"
+        ],
+        "transforms": {
+          "credit": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8369420198454991,
+      "full_score": 0.8619001790196978,
+      "status": "rejected",
+      "description": "covs=[credit], transforms=1",
+      "runtime_seconds": 253.82349920272827,
+      "timestamp": "2026-04-07T21:25:42.430441"
+    },
+    {
+      "iteration": 11,
+      "config": {
+        "covariates": [
+          "house_prices"
+        ],
+        "transforms": {
+          "house_prices": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.889858469608212,
+      "full_score": null,
+      "status": "rejected",
+      "description": "transforms=1",
+      "runtime_seconds": 54.05984592437744,
+      "timestamp": "2026-04-07T21:26:36.675717"
+    },
+    {
+      "iteration": 12,
+      "config": {
+        "covariates": [
+          "house_prices"
+        ],
+        "transforms": {
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8304384189461158,
+      "full_score": 0.8481667144232756,
+      "status": "accepted",
+      "description": "baseline",
+      "runtime_seconds": 469.8837447166443,
+      "timestamp": "2026-04-07T21:34:26.678708"
+    },
+    {
+      "iteration": 13,
+      "config": {
+        "covariates": [
+          "brent_crude"
+        ],
+        "transforms": {
+          "brent_crude": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8196509887129851,
+      "full_score": 0.8519158747370809,
+      "status": "rejected",
+      "description": "covs=[brent_crude], transforms=1",
+      "runtime_seconds": 319.94400572776794,
+      "timestamp": "2026-04-07T21:39:46.773128"
+    },
+    {
+      "iteration": 14,
+      "config": {
+        "covariates": [
+          "house_prices"
+        ],
+        "transforms": {
+          "house_prices": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8686773030436958,
+      "full_score": null,
+      "status": "rejected",
+      "description": "transforms=1",
+      "runtime_seconds": 96.66757464408875,
+      "timestamp": "2026-04-07T21:41:23.579589"
+    },
+    {
+      "iteration": 15,
+      "config": {
+        "covariates": [
+          "house_prices"
+        ],
+        "transforms": {
+          "house_prices": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8537870548609342,
+      "full_score": null,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 136.3896839618683,
+      "timestamp": "2026-04-07T21:43:40.305550"
+    },
+    {
+      "iteration": 16,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "fx_usd"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "fx_usd": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8276860521688482,
+      "full_score": 0.8459242142311751,
+      "status": "accepted",
+      "description": "covs=[house_prices,fx_usd], transforms=2",
+      "runtime_seconds": 328.6207494735718,
+      "timestamp": "2026-04-07T21:49:09.079439"
+    },
+    {
+      "iteration": 17,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "fx_usd",
+          "policy_rate"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "fx_usd": "log_diff",
+          "policy_rate": "pct_change_1"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8276860521688482,
+      "full_score": 0.8459242142311751,
+      "status": "rejected",
+      "description": "covs=[house_prices,fx_usd,policy_rate], transforms=3",
+      "runtime_seconds": 384.2680983543396,
+      "timestamp": "2026-04-07T21:55:33.499906"
+    },
+    {
+      "iteration": 18,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "fx_usd",
+          "brent_crude"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "fx_usd": "log_diff",
+          "brent_crude": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8218673594370798,
+      "full_score": 0.8501351565328128,
+      "status": "rejected",
+      "description": "covs=[house_prices,fx_usd,brent_crude], transforms=3",
+      "runtime_seconds": 332.453617811203,
+      "timestamp": "2026-04-07T22:01:06.143769"
+    },
+    {
+      "iteration": 19,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "fx_usd"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "fx_usd": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.853327275281915,
+      "full_score": null,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 144.26786732673645,
+      "timestamp": "2026-04-07T22:03:30.582934"
+    },
+    {
+      "iteration": 20,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "fx_usd",
+          "sp500"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "fx_usd": "log_diff",
+          "sp500": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.819022242259502,
+      "full_score": 0.8502117197792849,
+      "status": "rejected",
+      "description": "covs=[house_prices,fx_usd,sp500], transforms=3",
+      "runtime_seconds": 446.0648555755615,
+      "timestamp": "2026-04-07T22:10:57.024381"
+    },
+    {
+      "iteration": 21,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "credit"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "credit": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.840747808926298,
+      "full_score": 0.8604810754830023,
+      "status": "rejected",
+      "description": "covs=[house_prices,credit], transforms=2",
+      "runtime_seconds": 360.28778100013733,
+      "timestamp": "2026-04-07T22:16:57.479686"
+    },
+    {
+      "iteration": 22,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "fx_usd"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "fx_usd": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 2e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8439546165208704,
+      "full_score": 0.8685947888188844,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 319.22374153137207,
+      "timestamp": "2026-04-07T22:22:16.849017"
+    },
+    {
+      "iteration": 23,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "fx_usd"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "fx_usd": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.853327275281915,
+      "full_score": null,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 128.73591351509094,
+      "timestamp": "2026-04-07T22:24:25.759130"
+    },
+    {
+      "iteration": 24,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "fx_usd"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "fx_usd": "log_diff"
+        },
+        "context_length": 64,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8698930591407708,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ctx=64",
+      "runtime_seconds": 86.11597537994385,
+      "timestamp": "2026-04-07T22:25:52.051279"
+    },
+    {
+      "iteration": 25,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "fx_usd"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "fx_usd": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.853327275281915,
+      "full_score": null,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 129.23531341552734,
+      "timestamp": "2026-04-07T22:28:01.746989"
+    },
+    {
+      "iteration": 26,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "fx_usd"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "fx_usd": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 50
+      },
+      "quick_score": 0.8276860521688482,
+      "full_score": 0.8459242142311751,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 319.2513394355774,
+      "timestamp": "2026-04-07T22:33:21.156552"
+    },
+    {
+      "iteration": 27,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "fx_usd"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "fx_usd": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.853327275281915,
+      "full_score": null,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 164.16449069976807,
+      "timestamp": "2026-04-07T22:36:05.457104"
+    },
+    {
+      "iteration": 28,
+      "config": {
+        "covariates": [
+          "sp500",
+          "vix"
+        ],
+        "transforms": {
+          "sp500": "log_diff",
+          "vix": "pct_change_1"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8220212853717394,
+      "full_score": 0.8523668154965093,
+      "status": "rejected",
+      "description": "covs=[sp500,vix], transforms=2",
+      "runtime_seconds": 397.13409399986267,
+      "timestamp": "2026-04-07T22:42:43.421318"
+    },
+    {
+      "iteration": 29,
+      "config": {
+        "covariates": [
+          "credit",
+          "exports"
+        ],
+        "transforms": {
+          "credit": "log_diff",
+          "exports": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8262882112815698,
+      "full_score": 0.8539156245651962,
+      "status": "rejected",
+      "description": "covs=[credit,exports], transforms=2",
+      "runtime_seconds": 318.1922025680542,
+      "timestamp": "2026-04-07T22:48:01.752200"
+    },
+    {
+      "iteration": 30,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "fx_eur"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "fx_eur": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.834538633268053,
+      "full_score": 0.8520540823741585,
+      "status": "rejected",
+      "description": "covs=[house_prices,fx_eur], transforms=2",
+      "runtime_seconds": 319.2026286125183,
+      "timestamp": "2026-04-07T22:53:21.117107"
+    },
+    {
+      "iteration": 31,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "fx_usd"
+        ],
+        "transforms": {
+          "house_prices": "pct_change_12",
+          "fx_usd": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.846702764677138,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[house_prices,fx_usd], transforms=2",
+      "runtime_seconds": 119.2071008682251,
+      "timestamp": "2026-04-07T22:55:20.461835"
+    },
+    {
+      "iteration": 32,
+      "config": {
+        "covariates": [
+          "house_prices",
+          "fx_usd"
+        ],
+        "transforms": {
+          "house_prices": "log_diff",
+          "fx_usd": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.853327275281915,
+      "full_score": null,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 128.70687818527222,
+      "timestamp": "2026-04-07T22:57:29.399471"
+    },
+    {
+      "iteration": 33,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "euro_area_gdp": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8279296057530128,
+      "full_score": 0.8425042836590703,
+      "status": "accepted",
+      "description": "covs=[policy_rate,euro_area_gdp], transforms=1",
+      "runtime_seconds": 353.79154229164124,
+      "timestamp": "2026-04-07T23:03:23.385936"
+    },
+    {
+      "iteration": 34,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "euro_area_gdp",
+          "sp500"
+        ],
+        "transforms": {
+          "euro_area_gdp": "log_diff",
+          "sp500": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8270474307444751,
+      "full_score": 0.8556027369109775,
+      "status": "rejected",
+      "description": "covs=[policy_rate,euro_area_gdp,sp500], transforms=2",
+      "runtime_seconds": 325.6151616573334,
+      "timestamp": "2026-04-07T23:08:50.512044"
+    },
+    {
+      "iteration": 35,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "euro_area_gdp",
+          "fed_funds"
+        ],
+        "transforms": {
+          "euro_area_gdp": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8275852157426913,
+      "full_score": 0.843137336919722,
+      "status": "rejected",
+      "description": "covs=[policy_rate,euro_area_gdp,fed_funds], transforms=1",
+      "runtime_seconds": 317.66068816185,
+      "timestamp": "2026-04-07T23:14:08.638576"
+    },
+    {
+      "iteration": 36,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "euro_area_gdp": "pct_change_12"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8796494410620161,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,euro_area_gdp], transforms=1",
+      "runtime_seconds": 127.05013346672058,
+      "timestamp": "2026-04-07T23:16:15.830219"
+    },
+    {
+      "iteration": 37,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "euro_area_gdp": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.850416454312356,
+      "full_score": null,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 128.59640431404114,
+      "timestamp": "2026-04-07T23:18:24.547096"
+    },
+    {
+      "iteration": 38,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "policy_rate": "pct_change_1",
+          "euro_area_gdp": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8279296057530128,
+      "full_score": 0.8425042836590703,
+      "status": "rejected",
+      "description": "transforms=2",
+      "runtime_seconds": 316.8730192184448,
+      "timestamp": "2026-04-07T23:23:41.550038"
+    },
+    {
+      "iteration": 39,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "vix"
+        ],
+        "transforms": {
+          "brent_crude": "log_diff",
+          "vix": "pct_change_1"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8220156218335537,
+      "full_score": 0.8494897174267633,
+      "status": "rejected",
+      "description": "covs=[brent_crude,vix], transforms=2",
+      "runtime_seconds": 315.77143692970276,
+      "timestamp": "2026-04-07T23:28:57.605917"
+    },
+    {
+      "iteration": 40,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "euro_area_gdp": "log_diff"
+        },
+        "context_length": 64,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8829604667744952,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ctx=64",
+      "runtime_seconds": 84.42140579223633,
+      "timestamp": "2026-04-07T23:30:22.184701"
+    },
+    {
+      "iteration": 41,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "policy_rate": "log_diff",
+          "euro_area_gdp": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8279296057530128,
+      "full_score": 0.8425042836590703,
+      "status": "rejected",
+      "description": "transforms=2",
+      "runtime_seconds": 316.1157021522522,
+      "timestamp": "2026-04-07T23:35:38.437685"
+    },
+    {
+      "iteration": 42,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "policy_rate": "pct_change_1",
+          "euro_area_gdp": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8279296057530128,
+      "full_score": 0.8425042836590703,
+      "status": "rejected",
+      "description": "transforms=2",
+      "runtime_seconds": 312.97461009025574,
+      "timestamp": "2026-04-07T23:40:51.591101"
+    },
+    {
+      "iteration": 43,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "euro_area_gdp": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.850416454312356,
+      "full_score": null,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 129.222106218338,
+      "timestamp": "2026-04-07T23:43:00.950148"
+    },
+    {
+      "iteration": 44,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "euro_area_gdp": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 2e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.84661357338803,
+      "full_score": null,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 102.41350078582764,
+      "timestamp": "2026-04-07T23:44:43.523143"
+    },
+    {
+      "iteration": 45,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate"
+        ],
+        "transforms": {
+          "brent_crude": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8196509887129851,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[brent_crude,policy_rate], transforms=1",
+      "runtime_seconds": 721.9130945205688,
+      "timestamp": "2026-04-07T23:56:45.594787"
+    },
+    {
+      "iteration": 46,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "brent_crude": "log_diff",
+          "euro_area_gdp": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8249567752962552,
+      "full_score": 0.8498938760604335,
+      "status": "rejected",
+      "description": "covs=[brent_crude,euro_area_gdp], transforms=2",
+      "runtime_seconds": 735.9297180175781,
+      "timestamp": "2026-04-08T00:09:01.713416"
+    },
+    {
+      "iteration": 47,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "brent_crude": "log_diff",
+          "euro_area_gdp": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8249567752962552,
+      "full_score": 0.8498938760604335,
+      "status": "rejected",
+      "description": "covs=[brent_crude,policy_rate,euro_area_gdp], transforms=2",
+      "runtime_seconds": 441.537043094635,
+      "timestamp": "2026-04-08T00:16:23.423123"
+    },
+    {
+      "iteration": 48,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "brent_crude": "log_diff",
+          "euro_area_gdp": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8249567752962552,
+      "full_score": 0.8498938760604335,
+      "status": "rejected",
+      "description": "covs=[brent_crude,policy_rate,euro_area_gdp], transforms=2",
+      "runtime_seconds": 315.0993494987488,
+      "timestamp": "2026-04-08T00:21:38.701901"
+    },
+    {
+      "iteration": 49,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate"
+        ],
+        "transforms": {
+          "brent_crude": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8196509887129851,
+      "full_score": 0.8519158747370809,
+      "status": "rejected",
+      "description": "covs=[brent_crude,policy_rate], transforms=1, ft=true",
+      "runtime_seconds": 316.99865555763245,
+      "timestamp": "2026-04-08T00:26:55.879815"
+    },
+    {
+      "iteration": 50,
+      "config": {
+        "covariates": [
+          "brent_crude",
+          "policy_rate"
+        ],
+        "transforms": {
+          "brent_crude": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.8478632931528325,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[brent_crude,policy_rate], transforms=1",
+      "runtime_seconds": 129.69393587112427,
+      "timestamp": "2026-04-08T00:29:05.726894"
+    }
+  ],
+  "sweden": [
+    {
+      "iteration": 0,
+      "config": {
+        "covariates": [],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0274319750855032,
+      "full_score": 1.0055841632622085,
+      "status": "accepted",
+      "description": "baseline (zero-shot, univariate)",
+      "runtime_seconds": 0,
+      "timestamp": "2026-04-11T22:10:00.031441"
+    },
+    {
+      "iteration": 1,
+      "config": {
+        "covariates": [
+          "fx_eur",
+          "policy_rate",
+          "euro_area_gdp",
+          "vix"
+        ],
+        "transforms": {
+          "fx_eur": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.1038370392709913,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[fx_eur,policy_rate,euro_area_gdp...], transforms=1, ft=true",
+      "runtime_seconds": 710.1803247928619,
+      "timestamp": "2026-04-11T22:21:50.381495"
+    },
+    {
+      "iteration": 2,
+      "config": {
+        "covariates": [
+          "fx_eur"
+        ],
+        "transforms": {
+          "fx_eur": "log_diff"
+        },
+        "context_length": null,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0823073703522272,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[fx_eur], transforms=1",
+      "runtime_seconds": 566.0738906860352,
+      "timestamp": "2026-04-11T22:31:16.599214"
+    },
+    {
+      "iteration": 3,
+      "config": {
+        "covariates": [],
+        "transforms": {},
+        "context_length": null,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0703496841577822,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ft=true",
+      "runtime_seconds": 728.7907516956329,
+      "timestamp": "2026-04-11T22:43:25.528953"
+    },
+    {
+      "iteration": 4,
+      "config": {
+        "covariates": [
+          "policy_rate"
+        ],
+        "transforms": {},
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0107343338897017,
+      "full_score": 0.9698692539273666,
+      "status": "accepted",
+      "description": "covs=[policy_rate], ctx=48",
+      "runtime_seconds": 1195.7063617706299,
+      "timestamp": "2026-04-11T23:03:21.381096"
+    },
+    {
+      "iteration": 5,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_eur"
+        ],
+        "transforms": {},
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0328039671221203,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_eur]",
+      "runtime_seconds": 550.8412160873413,
+      "timestamp": "2026-04-11T23:12:32.390312"
+    },
+    {
+      "iteration": 6,
+      "config": {
+        "covariates": [
+          "policy_rate"
+        ],
+        "transforms": {},
+        "context_length": 48,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.08665228372455,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ft=true",
+      "runtime_seconds": 632.6856830120087,
+      "timestamp": "2026-04-11T23:23:05.207682"
+    },
+    {
+      "iteration": 7,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "euro_area_gdp"
+        ],
+        "transforms": {},
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0156691613316715,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,euro_area_gdp]",
+      "runtime_seconds": 525.4976427555084,
+      "timestamp": "2026-04-11T23:31:50.861843"
+    },
+    {
+      "iteration": 8,
+      "config": {
+        "covariates": [
+          "policy_rate"
+        ],
+        "transforms": {},
+        "context_length": 36,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0743829960732025,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ctx=36",
+      "runtime_seconds": 515.8419580459595,
+      "timestamp": "2026-04-11T23:40:26.857599"
+    },
+    {
+      "iteration": 9,
+      "config": {
+        "covariates": [
+          "fx_eur"
+        ],
+        "transforms": {},
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0892060598531288,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[fx_eur], ctx=48",
+      "runtime_seconds": 506.38166213035583,
+      "timestamp": "2026-04-11T23:48:53.375629"
+    },
+    {
+      "iteration": 10,
+      "config": {
+        "covariates": [
+          "policy_rate"
+        ],
+        "transforms": {},
+        "context_length": 24,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.1219914322458955,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ctx=24",
+      "runtime_seconds": 497.32899808883667,
+      "timestamp": "2026-04-11T23:57:10.967827"
+    },
+    {
+      "iteration": 11,
+      "config": {
+        "covariates": [
+          "euro_area_gdp"
+        ],
+        "transforms": {},
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0356449001156747,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[euro_area_gdp], ctx=48",
+      "runtime_seconds": 516.834903717041,
+      "timestamp": "2026-04-12T00:05:47.928328"
+    },
+    {
+      "iteration": 12,
+      "config": {
+        "covariates": [
+          "policy_rate"
+        ],
+        "transforms": {},
+        "context_length": 64,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0361236458093517,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ctx=64",
+      "runtime_seconds": 504.6961901187897,
+      "timestamp": "2026-04-12T00:14:12.766415"
+    },
+    {
+      "iteration": 13,
+      "config": {
+        "covariates": [
+          "exports"
+        ],
+        "transforms": {},
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0321317217252362,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[exports]",
+      "runtime_seconds": 493.90576577186584,
+      "timestamp": "2026-04-12T00:22:26.860978"
+    },
+    {
+      "iteration": 14,
+      "config": {
+        "covariates": [
+          "policy_rate"
+        ],
+        "transforms": {},
+        "context_length": 48,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 5e-06,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0115081149378815,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ft=true",
+      "runtime_seconds": 542.1832349300385,
+      "timestamp": "2026-04-12T00:31:29.171357"
+    },
+    {
+      "iteration": 15,
+      "config": {
+        "covariates": [
+          "policy_rate"
+        ],
+        "transforms": {},
+        "context_length": 32,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0800467181407378,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ctx=32",
+      "runtime_seconds": 466.39056062698364,
+      "timestamp": "2026-04-12T00:39:15.680187"
+    },
+    {
+      "iteration": 16,
+      "config": {
+        "covariates": [
+          "policy_rate"
+        ],
+        "transforms": {
+          "policy_rate": "standardize_60"
+        },
+        "context_length": 96,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0283997073136426,
+      "full_score": null,
+      "status": "rejected",
+      "description": "transforms=1, ctx=96",
+      "runtime_seconds": 467.46596121788025,
+      "timestamp": "2026-04-12T00:47:03.264698"
+    },
+    {
+      "iteration": 17,
+      "config": {
+        "covariates": [
+          "house_prices"
+        ],
+        "transforms": {},
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.041598046003376,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[house_prices]",
+      "runtime_seconds": 468.49493169784546,
+      "timestamp": "2026-04-12T00:54:51.879356"
+    },
+    {
+      "iteration": 18,
+      "config": {
+        "covariates": [],
+        "transforms": {},
+        "context_length": 96,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0694887166583227,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ctx=96",
+      "runtime_seconds": 477.15261602401733,
+      "timestamp": "2026-04-12T01:02:49.151333"
+    },
+    {
+      "iteration": 19,
+      "config": {
+        "covariates": [
+          "credit"
+        ],
+        "transforms": {},
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0779306767456096,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[credit], ctx=48",
+      "runtime_seconds": 475.0794975757599,
+      "timestamp": "2026-04-12T01:10:44.396804"
+    },
+    {
+      "iteration": 20,
+      "config": {
+        "covariates": [
+          "policy_rate"
+        ],
+        "transforms": {
+          "policy_rate": "pct_change_1"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0453849759915639,
+      "full_score": null,
+      "status": "rejected",
+      "description": "transforms=1",
+      "runtime_seconds": 466.9510614871979,
+      "timestamp": "2026-04-12T01:18:31.466726"
+    },
+    {
+      "iteration": 21,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_eur"
+        ],
+        "transforms": {
+          "fx_eur": "log_diff"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0089728569570433,
+      "full_score": 0.9655527503456616,
+      "status": "accepted",
+      "description": "covs=[policy_rate,fx_eur], transforms=1",
+      "runtime_seconds": 1001.6109154224396,
+      "timestamp": "2026-04-12T01:35:13.195675"
+    },
+    {
+      "iteration": 22,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_eur"
+        ],
+        "transforms": {
+          "fx_eur": "log_diff"
+        },
+        "context_length": 48,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0828670043297566,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ft=true",
+      "runtime_seconds": 552.6065862178802,
+      "timestamp": "2026-04-12T01:44:25.920095"
+    },
+    {
+      "iteration": 23,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_eur",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "fx_eur": "log_diff"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0221208123090353,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_eur,euro_area_gdp], transforms=1",
+      "runtime_seconds": 468.8982045650482,
+      "timestamp": "2026-04-12T01:52:14.936759"
+    },
+    {
+      "iteration": 24,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_eur",
+          "exports"
+        ],
+        "transforms": {
+          "fx_eur": "log_diff",
+          "exports": "log_diff"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0371344305034897,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_eur,exports], transforms=2",
+      "runtime_seconds": 467.57189893722534,
+      "timestamp": "2026-04-12T02:00:02.626095"
+    },
+    {
+      "iteration": 25,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_eur"
+        ],
+        "transforms": {
+          "fx_eur": "log_diff"
+        },
+        "context_length": 36,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.1094015070173877,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ctx=36",
+      "runtime_seconds": 497.8525912761688,
+      "timestamp": "2026-04-12T02:08:20.596766"
+    },
+    {
+      "iteration": 26,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.005634140494911,
+      "full_score": 0.9626307886578438,
+      "status": "accepted",
+      "description": "covs=[policy_rate,fx_usd], transforms=1",
+      "runtime_seconds": 1152.5262877941132,
+      "timestamp": "2026-04-12T02:27:33.306620"
+    },
+    {
+      "iteration": 27,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff"
+        },
+        "context_length": 48,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0177640680865452,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,euro_area_gdp], transforms=1, ft=true",
+      "runtime_seconds": 549.0741484165192,
+      "timestamp": "2026-04-12T02:36:42.545228"
+    },
+    {
+      "iteration": 28,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "euro_area_gdp": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0393042153633187,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,euro_area_gdp], transforms=2",
+      "runtime_seconds": 469.22028255462646,
+      "timestamp": "2026-04-12T02:44:31.887533"
+    },
+    {
+      "iteration": 29,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "exports"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "exports": "log_diff"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0301090972849252,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,exports], transforms=2",
+      "runtime_seconds": 468.6791124343872,
+      "timestamp": "2026-04-12T02:52:20.685894"
+    },
+    {
+      "iteration": 30,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd"
+        ],
+        "transforms": {
+          "fx_usd": "pct_change_1"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0074524128537372,
+      "full_score": null,
+      "status": "rejected",
+      "description": "transforms=1",
+      "runtime_seconds": 468.4428985118866,
+      "timestamp": "2026-04-12T03:00:09.248169"
+    },
+    {
+      "iteration": 31,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff"
+        },
+        "context_length": 48,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.005539387770849,
+      "full_score": 0.9664424421519889,
+      "status": "rejected",
+      "description": "ft=true",
+      "runtime_seconds": 1128.8193814754486,
+      "timestamp": "2026-04-12T03:18:58.186148"
+    },
+    {
+      "iteration": 32,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "brent_crude"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "brent_crude": "pct_change_1"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0085828484726929,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,brent_crude], transforms=2",
+      "runtime_seconds": 468.92641520500183,
+      "timestamp": "2026-04-12T03:26:47.257728"
+    },
+    {
+      "iteration": 33,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "house_prices": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9846125828258474,
+      "full_score": 0.9374414151901506,
+      "status": "accepted",
+      "description": "covs=[policy_rate,fx_usd,house_prices], transforms=2",
+      "runtime_seconds": 1003.2699134349823,
+      "timestamp": "2026-04-12T03:43:30.646349"
+    },
+    {
+      "iteration": 34,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "house_prices"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "house_prices": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": true,
+        "fine_tune_steps": 500,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.062788678437274,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ft=true",
+      "runtime_seconds": 543.6202771663666,
+      "timestamp": "2026-04-12T03:52:34.386121"
+    },
+    {
+      "iteration": 35,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "house_prices",
+          "credit"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "house_prices": "pct_change_12",
+          "credit": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9659605339489574,
+      "full_score": 0.9133094217354628,
+      "status": "accepted",
+      "description": "covs=[policy_rate,fx_usd,house_prices...], transforms=3",
+      "runtime_seconds": 1002.9886021614075,
+      "timestamp": "2026-04-12T04:09:17.498233"
+    },
+    {
+      "iteration": 36,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "house_prices",
+          "credit",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "house_prices": "pct_change_12",
+          "credit": "pct_change_12",
+          "euro_area_gdp": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9810956634035353,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,house_prices...], transforms=4",
+      "runtime_seconds": 469.64249753952026,
+      "timestamp": "2026-04-12T04:17:07.259898"
+    },
+    {
+      "iteration": 37,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "house_prices",
+          "credit"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "house_prices": "pct_change_12",
+          "credit": "pct_change_12"
+        },
+        "context_length": 64,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0296568622199795,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ctx=64",
+      "runtime_seconds": 467.4213740825653,
+      "timestamp": "2026-04-12T04:24:54.799686"
+    },
+    {
+      "iteration": 38,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "house_prices",
+          "credit"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "house_prices": "pct_change_12",
+          "credit": "pct_change_1"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9974105867080739,
+      "full_score": null,
+      "status": "rejected",
+      "description": "transforms=3",
+      "runtime_seconds": 469.77401638031006,
+      "timestamp": "2026-04-12T04:32:44.710248"
+    },
+    {
+      "iteration": 39,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "house_prices",
+          "credit"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "house_prices": "pct_change_12",
+          "credit": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 50
+      },
+      "quick_score": 0.9659605339489574,
+      "full_score": null,
+      "status": "rejected",
+      "description": "baseline",
+      "runtime_seconds": 469.2287414073944,
+      "timestamp": "2026-04-12T04:40:34.056384"
+    },
+    {
+      "iteration": 40,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_eur",
+          "house_prices",
+          "credit"
+        ],
+        "transforms": {
+          "fx_eur": "log_diff",
+          "house_prices": "pct_change_12",
+          "credit": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9682313022548311,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_eur,house_prices...], transforms=3",
+      "runtime_seconds": 471.1686954498291,
+      "timestamp": "2026-04-12T04:48:25.344616"
+    },
+    {
+      "iteration": 41,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "house_prices",
+          "credit",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "house_prices": "pct_change_12",
+          "credit": "pct_change_12",
+          "euro_area_gdp": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9810956634035353,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,house_prices...], transforms=4",
+      "runtime_seconds": 468.03126406669617,
+      "timestamp": "2026-04-12T04:56:13.499158"
+    },
+    {
+      "iteration": 42,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "house_prices",
+          "credit"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "house_prices": "pct_change_12",
+          "credit": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": true,
+        "fine_tune_steps": 100,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9754285616607665,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ft=true",
+      "runtime_seconds": 515.0461413860321,
+      "timestamp": "2026-04-12T05:04:48.664995"
+    },
+    {
+      "iteration": 43,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "house_prices",
+          "credit"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "house_prices": "pct_change_12",
+          "credit": "pct_change_12"
+        },
+        "context_length": 36,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0874116898276625,
+      "full_score": null,
+      "status": "rejected",
+      "description": "ctx=36",
+      "runtime_seconds": 468.7121765613556,
+      "timestamp": "2026-04-12T05:12:37.499190"
+    },
+    {
+      "iteration": 44,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "house_prices",
+          "credit",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "house_prices": "pct_change_12",
+          "credit": "pct_change_12",
+          "euro_area_gdp": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9810956634035353,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,house_prices...], transforms=4",
+      "runtime_seconds": 470.20151376724243,
+      "timestamp": "2026-04-12T05:20:27.824376"
+    },
+    {
+      "iteration": 45,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "house_prices",
+          "credit",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "house_prices": "pct_change_12",
+          "credit": "pct_change_12",
+          "euro_area_gdp": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9810956634035353,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,house_prices...], transforms=4",
+      "runtime_seconds": 468.9242615699768,
+      "timestamp": "2026-04-12T05:28:16.868647"
+    },
+    {
+      "iteration": 46,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "house_prices",
+          "credit",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "house_prices": "pct_change_12",
+          "credit": "pct_change_12",
+          "euro_area_gdp": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9810956634035353,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,house_prices...], transforms=4",
+      "runtime_seconds": 467.7257652282715,
+      "timestamp": "2026-04-12T05:36:04.714118"
+    },
+    {
+      "iteration": 47,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "house_prices",
+          "credit",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "house_prices": "pct_change_12",
+          "credit": "pct_change_12",
+          "euro_area_gdp": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9810956634035353,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,house_prices...], transforms=4",
+      "runtime_seconds": 470.9625418186188,
+      "timestamp": "2026-04-12T05:43:55.813850"
+    },
+    {
+      "iteration": 48,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_usd",
+          "house_prices",
+          "credit",
+          "euro_area_gdp"
+        ],
+        "transforms": {
+          "fx_usd": "log_diff",
+          "house_prices": "pct_change_12",
+          "credit": "pct_change_12",
+          "euro_area_gdp": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 0.9810956634035353,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_usd,house_prices...], transforms=4",
+      "runtime_seconds": 468.2468421459198,
+      "timestamp": "2026-04-12T05:51:44.180909"
+    },
+    {
+      "iteration": 49,
+      "config": {
+        "covariates": [
+          "fx_eur",
+          "euro_area_gdp",
+          "exports",
+          "imports",
+          "brent_crude"
+        ],
+        "transforms": {
+          "fx_eur": "log_diff",
+          "euro_area_gdp": "pct_change_12",
+          "exports": "pct_change_12",
+          "imports": "pct_change_12"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0380689745573788,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[fx_eur,euro_area_gdp,exports...], transforms=4",
+      "runtime_seconds": 468.2213399410248,
+      "timestamp": "2026-04-12T05:59:32.522141"
+    },
+    {
+      "iteration": 50,
+      "config": {
+        "covariates": [
+          "policy_rate",
+          "fx_eur",
+          "euro_area_gdp",
+          "brent_crude"
+        ],
+        "transforms": {
+          "fx_eur": "log_diff",
+          "euro_area_gdp": "pct_change_12",
+          "brent_crude": "log_diff"
+        },
+        "context_length": 48,
+        "fine_tune": false,
+        "fine_tune_steps": 1000,
+        "fine_tune_lr": 1e-05,
+        "grouping": "univariate",
+        "num_samples": 20
+      },
+      "quick_score": 1.0268548941361415,
+      "full_score": null,
+      "status": "rejected",
+      "description": "covs=[policy_rate,fx_eur,euro_area_gdp...], transforms=3",
+      "runtime_seconds": 470.2917377948761,
+      "timestamp": "2026-04-12T06:07:22.953118"
+    }
+  ]
+}

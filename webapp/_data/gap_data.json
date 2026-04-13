@@ -1,0 +1,86 @@
+[
+  {
+    "country": "norway",
+    "config": "Zero-shot",
+    "era": "validation",
+    "avg_mase": 0.999,
+    "h12_mase": 1.012
+  },
+  {
+    "country": "norway",
+    "config": "Zero-shot",
+    "era": "test",
+    "avg_mase": 0.996,
+    "h12_mase": 1.021
+  },
+  {
+    "country": "norway",
+    "config": "Agent-tuned",
+    "era": "validation",
+    "avg_mase": 0.975,
+    "h12_mase": 0.975
+  },
+  {
+    "country": "norway",
+    "config": "Agent-tuned",
+    "era": "test",
+    "avg_mase": 1.081,
+    "h12_mase": 1.205
+  },
+  {
+    "country": "canada",
+    "config": "Zero-shot",
+    "era": "validation",
+    "avg_mase": 0.869,
+    "h12_mase": 0.777
+  },
+  {
+    "country": "canada",
+    "config": "Zero-shot",
+    "era": "test",
+    "avg_mase": 0.888,
+    "h12_mase": 0.779
+  },
+  {
+    "country": "canada",
+    "config": "Agent-tuned",
+    "era": "validation",
+    "avg_mase": 0.843,
+    "h12_mase": 0.771
+  },
+  {
+    "country": "canada",
+    "config": "Agent-tuned",
+    "era": "test",
+    "avg_mase": 0.869,
+    "h12_mase": 0.763
+  },
+  {
+    "country": "sweden",
+    "config": "Zero-shot",
+    "era": "validation",
+    "avg_mase": 1.006,
+    "h12_mase": 1.042
+  },
+  {
+    "country": "sweden",
+    "config": "Zero-shot",
+    "era": "test",
+    "avg_mase": 0.938,
+    "h12_mase": 1.01
+  },
+  {
+    "country": "sweden",
+    "config": "Agent-tuned",
+    "era": "validation",
+    "avg_mase": 0.913,
+    "h12_mase": 0.88
+  },
+  {
+    "country": "sweden",
+    "config": "Agent-tuned",
+    "era": "test",
+    "avg_mase": 0.902,
+    "h12_mase": 0.899
+  }
+]

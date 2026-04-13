@@ -1,0 +1,110 @@
+[
+  {
+    "method": "Informed LLM",
+    "country": "norway",
+    "display_country": "Norway",
+    "val_mase": 0.9745498574440841
+  },
+  {
+    "method": "Informed LLM",
+    "country": "canada",
+    "display_country": "Canada",
+    "val_mase": 0.8425042836590703
+  },
+  {
+    "method": "Informed LLM",
+    "country": "sweden",
+    "display_country": "Sweden",
+    "val_mase": 0.9133094217354628
+  },
+  {
+    "method": "Blind LLM",
+    "country": "norway",
+    "display_country": "Norway",
+    "val_mase": 0.979831296601458
+  },
+  {
+    "method": "Blind LLM",
+    "country": "canada",
+    "display_country": "Canada",
+    "val_mase": 0.8360101551158416
+  },
+  {
+    "method": "Blind LLM",
+    "country": "sweden",
+    "display_country": "Sweden",
+    "val_mase": 0.9245543725651147
+  },
+  {
+    "method": "Random",
+    "country": "norway",
+    "display_country": "Norway",
+    "val_mase": 0.9422627716714583
+  },
+  {
+    "method": "Random",
+    "country": "canada",
+    "display_country": "Canada",
+    "val_mase": 0.8473968408694084
+  },
+  {
+    "method": "Random",
+    "country": "sweden",
+    "display_country": "Sweden",
+    "val_mase": 0.9362578930812809
+  },
+  {
+    "method": "Greedy",
+    "country": "norway",
+    "display_country": "Norway",
+    "val_mase": 0.9221871308417725
+  },
+  {
+    "method": "Greedy",
+    "country": "canada",
+    "display_country": "Canada",
+    "val_mase": 0.8406488081492843
+  },
+  {
+    "method": "Greedy",
+    "country": "sweden",
+    "display_country": "Sweden",
+    "val_mase": 0.9919420278125611
+  },
+  {
+    "method": "Manual economist",
+    "country": "norway",
+    "display_country": "Norway",
+    "val_mase": 0.979
+  },
+  {
+    "method": "Manual economist",
+    "country": "canada",
+    "display_country": "Canada",
+    "val_mase": 0.926
+  },
+  {
+    "method": "Manual economist",
+    "country": "sweden",
+    "display_country": "Sweden",
+    "val_mase": 0.996
+  },
+  {
+    "method": "Zero-shot baseline",
+    "country": "norway",
+    "display_country": "Norway",
+    "val_mase": 0.999
+  },
+  {
+    "method": "Zero-shot baseline",
+    "country": "canada",
+    "display_country": "Canada",
+    "val_mase": 0.869
+  },
+  {
+    "method": "Zero-shot baseline",
+    "country": "sweden",
+    "display_country": "Sweden",
+    "val_mase": 1.006
+  }
+]

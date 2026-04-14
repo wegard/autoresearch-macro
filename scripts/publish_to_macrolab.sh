@@ -19,6 +19,7 @@ PAPER_URL="${PAPER_URL:-}"
 SKIP_BUILD=0
 RENDER_ONLY=0
 SKIP_SYNC=0
+SYNC_MODE="auto"  # auto | docker | host
 
 usage() {
     cat <<EOF
@@ -33,6 +34,10 @@ Options:
   --skip-build           Reuse the existing webapp/_site output
   --render-only          Skip data regeneration, only run quarto render
   --skip-sync            Skip MacroLab metadata sync
+  --sync-mode MODE       'auto' (default), 'docker', or 'host'.
+                         'auto' uses docker compose if both
+                         docker-compose.prod.yml and .env.production
+                         are present under --macrolab-root.
   -h, --help             Show this help text
 EOF
 }
@@ -84,6 +89,14 @@ while [[ $# -gt 0 ]]; do
         --skip-sync)
             SKIP_SYNC=1
             shift
+            ;;
+        --sync-mode)
+            SYNC_MODE="$2"
+            case "${SYNC_MODE}" in
+                auto|docker|host) ;;
+                *) echo "ERROR: --sync-mode must be one of auto|docker|host" >&2; exit 1 ;;
+            esac
+            shift 2
             ;;
         -h|--help)
             usage
@@ -199,32 +212,111 @@ fi
 run mkdir -p "${PUBLIC_LINK}"
 run rsync -a --delete "${RELEASE_DIR}/" "${PUBLIC_LINK}/"
 
-if [[ "${SKIP_SYNC}" -eq 0 ]]; then
-    if [[ -f "${SYNC_SCRIPT}" ]]; then
-        if [[ -x "${MACROLAB_ROOT}/.venv/bin/python" ]]; then
-            sync_cmd=(
-                "${MACROLAB_ROOT}/.venv/bin/python" "${SYNC_SCRIPT}"
-                --manifest "${MANIFEST_PATH}"
-                --slug "${PROJECT_SLUG}"
-                --name "${PROJECT_NAME}"
-                --description "${PROJECT_DESCRIPTION}"
-                --lifecycle-status "${LIFECYCLE_STATUS}"
-            )
-        else
-            require_cmd uv
-            sync_cmd=(
-                uv run --project "${MACROLAB_ROOT}" python "${SYNC_SCRIPT}"
-                --manifest "${MANIFEST_PATH}"
-                --slug "${PROJECT_SLUG}"
-                --name "${PROJECT_NAME}"
-                --description "${PROJECT_DESCRIPTION}"
-                --lifecycle-status "${LIFECYCLE_STATUS}"
-            )
-        fi
-        run "${sync_cmd[@]}"
-    else
-        echo "MacroLab sync script not found at ${SYNC_SCRIPT}; skipping metadata sync."
+# --------------------------------------------------------------------------
+# MacroLab metadata sync
+# --------------------------------------------------------------------------
+#
+# Two delivery modes:
+#   * docker — invoke the bundled sync script inside a one-shot
+#     macrolab-backend container so it can reach postgres on the docker
+#     network. Required on the production VPS where postgres is not exposed
+#     to the host.
+#   * host — invoke the sync script with the host venv / uv. Works for local
+#     dev deploys where MacroLab's own venv has DB access.
+# --------------------------------------------------------------------------
+
+COMPOSE_FILE="${MACROLAB_ROOT}/docker-compose.prod.yml"
+COMPOSE_ENV_FILE="${MACROLAB_ROOT}/.env.production"
+
+resolve_sync_mode() {
+    if [[ "${SYNC_MODE}" != "auto" ]]; then
+        printf '%s' "${SYNC_MODE}"
+        return
     fi
+    if [[ -f "${COMPOSE_FILE}" && -f "${COMPOSE_ENV_FILE}" ]] \
+        && command -v docker >/dev/null 2>&1; then
+        printf 'docker'
+    else
+        printf 'host'
+    fi
+}
+
+# Read the image tag of the currently running backend container so the
+# one-shot sync container matches. Without this, docker compose substitutes
+# `${IMAGE_TAG:-latest}` and may pick a stale build that lacks new manifest
+# fields, silently dropping them during pydantic validation. Returns empty
+# string if discovery fails — caller decides how to handle.
+discover_running_image_tag() {
+    local image
+    image=$(docker compose --env-file "${COMPOSE_ENV_FILE}" -f "${COMPOSE_FILE}" \
+        ps macrolab-backend --format '{{.Image}}' 2>/dev/null | head -1)
+    if [[ -n "${image}" && "${image}" == *":"* ]]; then
+        printf '%s' "${image##*:}"
+    fi
+}
+
+run_sync_docker() {
+    local discovered_tag
+    discovered_tag=$(discover_running_image_tag)
+    if [[ -n "${discovered_tag}" ]]; then
+        echo "Using IMAGE_TAG=${discovered_tag} (from running macrolab-backend container)"
+        export IMAGE_TAG="${discovered_tag}"
+    elif [[ -z "${IMAGE_TAG:-}" ]]; then
+        echo "WARNING: macrolab-backend not running; falling back to IMAGE_TAG=latest. " \
+             "If 'latest' is older than the deployed image, new manifest fields may be dropped."
+    fi
+
+    run docker compose \
+        --env-file "${COMPOSE_ENV_FILE}" \
+        -f "${COMPOSE_FILE}" \
+        run --rm \
+        -v "${MANIFEST_PATH}:/tmp/manifest.json:ro" \
+        macrolab-backend \
+        python /app/scripts/sync_project_publication.py \
+        --manifest /tmp/manifest.json \
+        --slug "${PROJECT_SLUG}" \
+        --name "${PROJECT_NAME}" \
+        --description "${PROJECT_DESCRIPTION}" \
+        --lifecycle-status "${LIFECYCLE_STATUS}"
+}
+
+run_sync_host() {
+    if [[ ! -f "${SYNC_SCRIPT}" ]]; then
+        echo "MacroLab sync script not found at ${SYNC_SCRIPT}; skipping metadata sync."
+        return
+    fi
+    local sync_cmd
+    if [[ -x "${MACROLAB_ROOT}/.venv/bin/python" ]]; then
+        sync_cmd=(
+            "${MACROLAB_ROOT}/.venv/bin/python" "${SYNC_SCRIPT}"
+            --manifest "${MANIFEST_PATH}"
+            --slug "${PROJECT_SLUG}"
+            --name "${PROJECT_NAME}"
+            --description "${PROJECT_DESCRIPTION}"
+            --lifecycle-status "${LIFECYCLE_STATUS}"
+        )
+    else
+        require_cmd uv
+        sync_cmd=(
+            uv run --project "${MACROLAB_ROOT}" python "${SYNC_SCRIPT}"
+            --manifest "${MANIFEST_PATH}"
+            --slug "${PROJECT_SLUG}"
+            --name "${PROJECT_NAME}"
+            --description "${PROJECT_DESCRIPTION}"
+            --lifecycle-status "${LIFECYCLE_STATUS}"
+        )
+    fi
+    run "${sync_cmd[@]}"
+}
+
+if [[ "${SKIP_SYNC}" -eq 0 ]]; then
+    EFFECTIVE_SYNC_MODE=$(resolve_sync_mode)
+    echo "Sync mode: ${EFFECTIVE_SYNC_MODE} (requested: ${SYNC_MODE})"
+    case "${EFFECTIVE_SYNC_MODE}" in
+        docker) run_sync_docker ;;
+        host)   run_sync_host ;;
+        *) echo "ERROR: unsupported sync mode: ${EFFECTIVE_SYNC_MODE}" >&2; exit 1 ;;
+    esac
 fi
 
 echo ""

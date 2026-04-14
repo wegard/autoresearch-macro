@@ -127,13 +127,22 @@ def _default_publication_lags() -> dict[str, int]:
 # to avoid fragile auto-selection of the first value.
 SSB_SERIES_CONFIG: dict[str, dict[str, Any]] = {
     "cpi": {
-        "table_id": "03013",
-        "description": "Consumer price index, 12-month rate of change (%)",
+        "table_id": "14700",
+        "description": "Consumer price index, 12-month rate of change (%), 2025=100 base",
         "selections": {
-            "Konsumgrp": ["TOTAL"],
-            "ContentsCode": ["Tolvmanedersendring"],
+            "VareTjenesteGrp": ["00"],  # Total (all items)
+            "ContentsCode": ["Tolvmanedersendring"],  # 12-month rate
         },
         "frequency": "monthly",
+        # Migrated from table 03013 on 2026-04-14: SSB replaced 03013
+        # (frozen at 2025M12) with 14700, which uses a 2025=100 base and
+        # a new goods/services classification (VareTjenesteGrp instead of
+        # Konsumgrp, "00" instead of "TOTAL" for all items). 12-month
+        # rate (YoY %) is base-invariant, so historical
+        # forecast_errors.parquet remains valid. One caveat: 14700 only
+        # goes back to 2000M01 vs 1979M01 for 03013 — loss of the
+        # 1979-1999 pre-sample, which is outside the paper's 2006+
+        # validation era and therefore harmless for evaluation.
     },
     "industrial_production": {
         "table_id": "07095",

@@ -173,7 +173,17 @@ if [[ -n "${PAPER_URL}" ]]; then
 fi
 
 run "${manifest_cmd[@]}"
-run ln -sfn "${RELEASE_DIR}" "${PUBLIC_LINK}"
+
+# Copy the release into the public directory so Caddy can serve it.
+# Caddy only bind-mounts ${PUBLIC_DIR} in docker-compose.prod.yml, not the
+# parent ${ARTIFACT_ROOT}, so a symlink from public/ -> releases/ would
+# dangle inside the container. Keep the release archive under releases/
+# for history, but put the served files directly under public/.
+if [[ -L "${PUBLIC_LINK}" ]]; then
+    run rm "${PUBLIC_LINK}"
+fi
+run mkdir -p "${PUBLIC_LINK}"
+run rsync -a --delete "${RELEASE_DIR}/" "${PUBLIC_LINK}/"
 
 if [[ "${SKIP_SYNC}" -eq 0 ]]; then
     if [[ -f "${SYNC_SCRIPT}" ]]; then

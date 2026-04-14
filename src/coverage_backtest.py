@@ -32,9 +32,16 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import time
 from pathlib import Path
 from typing import Any
+
+# Skip HuggingFace Hub HEAD checks when the model is already cached.
+# Without this, every AutoGluon predict() call burns ~30s on retries
+# against huggingface.co when the network is slow or HF is rate-
+# limiting. Same flag the publish pipeline uses.
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
 import pandas as pd
 

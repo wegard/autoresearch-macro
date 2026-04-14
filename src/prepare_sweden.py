@@ -58,10 +58,16 @@ DROPPED_VARIABLES: list[str] = ["retail_sales"]
 
 SCB_SERIES_CONFIG: dict[str, dict[str, Any]] = {
     "cpi": {
-        "path": "PR/PR0101/PR0101A/KPItotM",
-        "description": "CPI annual changes (%)",
-        "selections": {"ContentsCode": ["000004VV"]},  # Annual changes
+        "path": "PR/PR0101/PR0101A/KPI2020M",
+        "description": "CPI annual changes (%), 2020=100 base",
+        "selections": {"ContentsCode": ["00000804"]},  # Annual changes
         "frequency": "monthly",
+        # Migrated from KPItotM on 2026-04-14: SCB rebased the CPI from
+        # 1980=100 to 2020=100 with the January 2026 publication; KPItotM
+        # was frozen at 2025M12. KPI2020M is the successor with data
+        # through 2026M03 and full history back to 1980M01. Annual
+        # changes (YoY %) are base-invariant, so historical
+        # forecast_errors.parquet remains valid.
     },
     "industrial_production": {
         "path": "NV/NV0402/NV0402A/IPI2010KedjM",

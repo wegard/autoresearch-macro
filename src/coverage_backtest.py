@@ -20,6 +20,8 @@ Usage:
   uv run python src/coverage_backtest.py                    # all countries
   uv run python src/coverage_backtest.py --country norway
   uv run python src/coverage_backtest.py --max-origins 20   # smoke test
+  uv run python src/coverage_backtest.py --zero-shot        # override
+                                                            # fine_tune=False
 """
 
 from __future__ import annotations
@@ -48,6 +50,7 @@ logger = logging.getLogger(__name__)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 RESULTS_DIR = PROJECT_ROOT / "results"
 COVERAGE_DIR = RESULTS_DIR / "coverage"
+COVERAGE_ZS_DIR = RESULTS_DIR / "coverage_zs"
 
 COUNTRIES = ("norway", "canada", "sweden")
 
@@ -79,13 +82,19 @@ def _reset_config_transforms() -> None:
 
 
 def run_backtest_country(
-    country: str, max_origins: int | None = None,
+    country: str,
+    max_origins: int | None = None,
+    zero_shot: bool = False,
 ) -> pd.DataFrame:
     """Produce per-origin quantile forecasts across the test era.
 
     Returns a DataFrame with one row per (origin, target, horizon) and
     columns [country, target, origin, horizon, actual, q10, q25, q50,
     q75, q90, mean].
+
+    When `zero_shot=True`, overrides the best-config's fine-tune flag
+    and runs Chronos-2 without LoRA adaptation. Used to isolate the
+    effect of fine-tuning on predictive-quantile calibration.
     """
     from autogluon.timeseries import TimeSeriesDataFrame
 
@@ -105,15 +114,18 @@ def run_backtest_country(
         origins = origins[:max_origins]
         logger.info("Truncated to first %d origins for smoke test", max_origins)
 
+    fine_tune = bool(cfg.get("fine_tune", False)) and not zero_shot
+    mode_label = "zero-shot" if zero_shot else ("fine-tuned" if fine_tune else "zero-shot (config)")
+
     logger.info(
-        "=== Coverage backtest: %s — %d origins, targets=%s, covariates=%s ===",
-        country, len(origins), targets, covs,
+        "=== Coverage backtest: %s (%s) — %d origins, targets=%s, covariates=%s ===",
+        country, mode_label, len(origins), targets, covs,
     )
 
     t0 = time.time()
     predictor = _make_predictor_with_quantiles(
         origins[0].available_data, targets, covs,
-        fine_tune=bool(cfg.get("fine_tune", False)),
+        fine_tune=fine_tune,
         fine_tune_steps=int(cfg.get("fine_tune_steps", 1000)),
         fine_tune_lr=float(cfg.get("fine_tune_lr", 1e-5)),
     )
@@ -238,8 +250,20 @@ def main() -> int:
         "--max-origins", type=int, default=None,
         help="Truncate to first N origins (smoke test).",
     )
-    parser.add_argument("--output-dir", type=Path, default=COVERAGE_DIR)
+    parser.add_argument(
+        "--zero-shot", action="store_true",
+        help="Force fine_tune=False even if the best config enables LoRA. "
+             "Used to isolate the effect of fine-tuning on calibration.",
+    )
+    parser.add_argument(
+        "--output-dir", type=Path, default=None,
+        help="Override output directory. Defaults to results/coverage (or "
+             "results/coverage_zs when --zero-shot is set).",
+    )
     args = parser.parse_args()
+
+    if args.output_dir is None:
+        args.output_dir = COVERAGE_ZS_DIR if args.zero_shot else COVERAGE_DIR
 
     logging.basicConfig(
         level=logging.INFO,
@@ -252,7 +276,9 @@ def main() -> int:
 
     for c in countries:
         try:
-            df = run_backtest_country(c, max_origins=args.max_origins)
+            df = run_backtest_country(
+                c, max_origins=args.max_origins, zero_shot=args.zero_shot,
+            )
             per_country[c] = df
         except Exception:
             logger.exception("Coverage backtest failed for %s", c)

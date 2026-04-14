@@ -102,9 +102,11 @@ PUBLIC_DIR="${ARTIFACT_ROOT}/public"
 PUBLIC_LINK="${PUBLIC_DIR}/${PROJECT_SLUG}"
 RELEASE_DIR="${RELEASES_DIR}/${RELEASE_STAMP}"
 SITE_DIR="${PROJECT_ROOT}/webapp/_site"
+LIVE_DATA_PATH="${PROJECT_ROOT}/webapp/_data/live_forecasts.json"
 MANIFEST_PATH="${RELEASE_DIR}/macrolab-manifest.json"
 SYNC_SCRIPT="${MACROLAB_ROOT}/scripts/sync_project_publication.py"
 PUBLISHED_URL="/published/${PROJECT_SLUG}/index.html"
+LIVE_DATA_URL="/published/${PROJECT_SLUG}/live_forecasts.json"
 
 cd "${PROJECT_ROOT}"
 
@@ -156,6 +158,14 @@ fi
 run mkdir -p "${RELEASES_DIR}" "${PUBLIC_DIR}" "${RELEASE_DIR}"
 run rsync -a --delete "${SITE_DIR}/" "${RELEASE_DIR}/"
 
+# Copy the live forecasts JSON alongside the rendered site so MacroLab's
+# frontend can fetch it directly from the published static directory.
+if [[ -f "${LIVE_DATA_PATH}" ]]; then
+    run cp "${LIVE_DATA_PATH}" "${RELEASE_DIR}/live_forecasts.json"
+else
+    echo "Note: no live_forecasts.json at ${LIVE_DATA_PATH}; manifest will omit live_data_url."
+fi
+
 manifest_cmd=(
     "${PYTHON_RUNNER[@]}"
     scripts/build_macrolab_manifest.py
@@ -170,6 +180,10 @@ fi
 
 if [[ -n "${PAPER_URL}" ]]; then
     manifest_cmd+=(--paper-url "${PAPER_URL}")
+fi
+
+if [[ -f "${LIVE_DATA_PATH}" ]]; then
+    manifest_cmd+=(--live-data-url "${LIVE_DATA_URL}")
 fi
 
 run "${manifest_cmd[@]}"

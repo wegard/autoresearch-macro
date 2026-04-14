@@ -16,8 +16,10 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 RESULTS_DIR = PROJECT_ROOT / "results"
 WEBAPP_DATA_DIR = PROJECT_ROOT / "webapp" / "_data"
 FORECAST_ERRORS_PATH = RESULTS_DIR / "forecast_errors.parquet"
+LIVE_FORECASTS_PATH = WEBAPP_DATA_DIR / "live_forecasts.json"
 
 DEFAULT_ENTRYPOINT = "/published/autoresearch-macro/index.html"
+DEFAULT_LIVE_DATA_URL = "/published/autoresearch-macro/live_forecasts.json"
 DEFAULT_HEADLINE = (
     "Agentic search over macro forecasting pipelines across Norway, Canada, and Sweden"
 )
@@ -72,6 +74,15 @@ def _parse_args() -> argparse.Namespace:
         "--embed",
         action="store_true",
         help="Mark the artifact as embeddable inside MacroLab.",
+    )
+    parser.add_argument(
+        "--live-data-url",
+        default=None,
+        help=(
+            "URL where MacroLab can fetch the live forecasts JSON. "
+            "Defaults to the standard published path if a live_forecasts.json "
+            "file is present alongside the webapp data."
+        ),
     )
     return parser.parse_args()
 
@@ -209,8 +220,22 @@ def _build_links(repo_url: str | None, paper_url: str | None) -> list[dict[str, 
     return links
 
 
+def _resolve_live_data_url(explicit: str | None) -> str | None:
+    """Pick the live_data_url to advertise in the manifest.
+
+    Order: explicit CLI override → default path if live_forecasts.json exists
+    next to the webapp data → None (omit the field).
+    """
+    if explicit:
+        explicit = explicit.strip()
+        return explicit or None
+    if LIVE_FORECASTS_PATH.exists():
+        return DEFAULT_LIVE_DATA_URL
+    return None
+
+
 def _build_manifest(args: argparse.Namespace) -> dict[str, Any]:
-    return {
+    manifest: dict[str, Any] = {
         "integration_mode": "artifact_site",
         "entrypoint": args.entrypoint,
         "headline": args.headline,
@@ -220,6 +245,10 @@ def _build_manifest(args: argparse.Namespace) -> dict[str, Any]:
         "links": _build_links(args.repo_url, args.paper_url),
         "embed": args.embed,
     }
+    live_data_url = _resolve_live_data_url(args.live_data_url)
+    if live_data_url is not None:
+        manifest["live_data_url"] = live_data_url
+    return manifest
 
 
 def main() -> int:

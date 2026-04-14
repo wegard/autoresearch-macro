@@ -32,6 +32,8 @@ COUNTRIES="norway,canada,sweden"
 ORIGIN=""
 SKIP_DATA=0
 SKIP_MODELS=0
+RENDER=0
+SKIP_SITE=0
 DRY_RUN=0
 PUBLISH_ARGS=()
 
@@ -55,6 +57,15 @@ Options:
   --origin YYYY-MM-DD         Forecast origin date (default: today UTC)
   --skip-data                 Don't refresh data, reuse cached parquet panels
   --skip-models               Don't re-run forecasts, reuse results/live/*.json
+  --render                    Re-run webapp/_data/prepare_results.py and
+                              \`quarto render\` locally before rsync. Required
+                              when webapp .qmd files or any webapp/_data/*.json
+                              has changed. Skipped by default since the
+                              forecast-only refresh path doesn't need it.
+  --skip-site                 Don't rsync webapp/_site/ to the remote (only
+                              ship live_forecasts.json). Default is to ship
+                              the rendered site so new pages and updated
+                              tables surface on macrolab.no.
   --dry-run                   Print commands but skip rsync + remote ssh
   -h, --help                  Show this help text
 
@@ -84,6 +95,8 @@ while [[ $# -gt 0 ]]; do
         --origin) ORIGIN="$2"; shift 2 ;;
         --skip-data) SKIP_DATA=1; shift ;;
         --skip-models) SKIP_MODELS=1; shift ;;
+        --render) RENDER=1; shift ;;
+        --skip-site) SKIP_SITE=1; shift ;;
         --dry-run) DRY_RUN=1; shift ;;
         --) forwarding=1; shift ;;
         -h|--help) usage; exit 0 ;;
@@ -142,6 +155,21 @@ fi
 run "${PYTHON_RUNNER[@]}" scripts/build_live_forecasts_json.py
 
 # --------------------------------------------------------------------------
+# Step 3b — optional local webapp re-render
+# Without this, only webapp/_data/live_forecasts.json is refreshed; the
+# Quarto-rendered HTML in webapp/_site/ is whatever was last built. Pass
+# --render whenever .qmd files or other JSON inputs changed (e.g., the
+# Calibration page added 2026-04-14 needs a render to land on the VPS).
+# --------------------------------------------------------------------------
+if [[ "${RENDER}" -eq 1 ]]; then
+    run "${PYTHON_RUNNER[@]}" webapp/_data/prepare_results.py
+    (
+        cd "${PROJECT_ROOT}/webapp"
+        run quarto render
+    )
+fi
+
+# --------------------------------------------------------------------------
 # Step 4 — ship JSON to remote
 # --------------------------------------------------------------------------
 LOCAL_JSON="${PROJECT_ROOT}/webapp/_data/live_forecasts.json"
@@ -155,6 +183,25 @@ fi
 remote_dir=$(dirname "${REMOTE_JSON}")
 run ssh "${REMOTE}" "mkdir -p $(printf '%q' "${remote_dir}")"
 run rsync -av "${LOCAL_JSON}" "${REMOTE}:${REMOTE_JSON}"
+
+# --------------------------------------------------------------------------
+# Step 4b — ship the locally-rendered Quarto site to the remote
+# The remote's publish_to_macrolab.sh runs with --skip-build (it has no
+# Quarto installed) and rsyncs from /opt/autoresearch-macro/webapp/_site/
+# into the served artifact dir. We're responsible for putting fresh
+# rendered HTML there.
+# --------------------------------------------------------------------------
+LOCAL_SITE="${PROJECT_ROOT}/webapp/_site"
+if [[ "${SKIP_SITE}" -eq 0 ]]; then
+    if [[ "${DRY_RUN}" -eq 0 && ! -d "${LOCAL_SITE}" ]]; then
+        echo "WARNING: ${LOCAL_SITE} does not exist; skipping site rsync. " \
+             "Run with --render to build it locally." >&2
+    elif [[ -d "${LOCAL_SITE}" || "${DRY_RUN}" -eq 1 ]]; then
+        REMOTE_SITE="${REMOTE_PROJECT_ROOT}/webapp/_site"
+        run ssh "${REMOTE}" "mkdir -p $(printf '%q' "${REMOTE_SITE}")"
+        run rsync -av --delete "${LOCAL_SITE}/" "${REMOTE}:${REMOTE_SITE}/"
+    fi
+fi
 
 # --------------------------------------------------------------------------
 # Step 5 — trigger remote publish (manifest rebuild + DB sync via docker)

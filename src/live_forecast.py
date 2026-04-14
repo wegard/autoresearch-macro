@@ -36,6 +36,17 @@ from train import (
     build_ag_dataset,
 )
 
+try:
+    from calibration import (
+        CALIBRATOR_PATH,
+        apply_calibrator,
+        load_calibrator,
+    )
+except ImportError:  # calibration layer optional at import time
+    CALIBRATOR_PATH = None
+    apply_calibrator = None
+    load_calibrator = None
+
 logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -206,8 +217,16 @@ def chronos2_quantile_forecast(
     panel: MacroPanel,
     origin: ForecastOrigin,
     best_config: BestConfig,
+    calibrator: dict[str, Any] | None = None,
 ) -> dict[str, dict[str, Any]]:
     """Re-fit Chronos-2 with the best informed config and emit quantile forecasts.
+
+    If `calibrator` is supplied, the raw quantile outputs are passed
+    through `calibration.apply_calibrator` per (country, target,
+    horizon) before serialisation, so the dashboard shows bands whose
+    empirical coverage matches their label. Calibrator is fit once on
+    the validation era (src/calibration.py fit) and reused across
+    publishes.
 
     Returns {target: {"last_data_date": "YYYY-MM-DD", "horizons": [
         {"horizon": 1, "date": "YYYY-MM-DD", "q10": ..., "q25": ..., ...},
@@ -275,14 +294,27 @@ def chronos2_quantile_forecast(
         for h_idx in range(len(target_preds)):
             row = target_preds.iloc[h_idx]
             ts = target_preds.index[h_idx]
+            h = h_idx + 1
             entry: dict[str, Any] = {
-                "horizon": h_idx + 1,
+                "horizon": h,
                 "date": pd.Timestamp(ts).date().isoformat(),
                 "mean": float(row["mean"]),
             }
+            raw_quantiles: dict[float, float] = {}
             for q, col in zip(QUANTILE_LEVELS, quantile_cols, strict=True):
                 if col in row:
-                    entry[f"q{int(round(q * 100))}"] = float(row[col])
+                    raw_quantiles[q] = float(row[col])
+            # Apply calibrator if available. Falls back to identity for
+            # (country, target, horizon) triples the calibrator hasn't
+            # been fit on.
+            if calibrator is not None and apply_calibrator is not None and raw_quantiles:
+                cal_quantiles = apply_calibrator(
+                    raw_quantiles, best_config.country, target, h, calibrator,
+                )
+            else:
+                cal_quantiles = raw_quantiles
+            for q, value in cal_quantiles.items():
+                entry[f"q{int(round(q * 100))}"] = float(value)
             horizons.append(entry)
 
         out[target] = {
@@ -359,7 +391,11 @@ def extract_history(
 # ---------------------------------------------------------------------------
 
 
-def run_country(country: str, origin_date: date) -> dict[str, Any]:
+def run_country(
+    country: str,
+    origin_date: date,
+    calibrator: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Run the full live-forecast pipeline for one country."""
     logger.info("=== Live forecast: %s, origin=%s ===", country, origin_date)
     panel = load_country_panel(country)
@@ -368,12 +404,15 @@ def run_country(country: str, origin_date: date) -> dict[str, Any]:
     targets = panel.targets()
     horizons = list(range(1, PREDICTION_LENGTH + 1))
 
-    # Best informed Chronos-2 with quantiles.
+    # Best informed Chronos-2 with quantiles (optionally recalibrated).
     best = load_best_config(country)
     t0 = time.time()
-    chronos2 = chronos2_quantile_forecast(panel, origin, best)
+    chronos2 = chronos2_quantile_forecast(panel, origin, best, calibrator=calibrator)
     chronos2_runtime = time.time() - t0
-    logger.info("Chronos-2 done in %.1fs", chronos2_runtime)
+    logger.info(
+        "Chronos-2 done in %.1fs (calibrator: %s)",
+        chronos2_runtime, "on" if calibrator is not None else "off",
+    )
 
     # BVAR (best multivariate baseline).
     t0 = time.time()
@@ -442,6 +481,17 @@ def main() -> None:
         "--output-dir", type=Path, default=LIVE_DIR,
         help="Where to write per-country JSON files.",
     )
+    parser.add_argument(
+        "--no-calibration", action="store_true",
+        help="Skip quantile recalibration even if a calibrator file is "
+             "present. Useful for publishing raw Chronos-2 quantiles "
+             "(e.g., for debugging or for zero-shot comparisons).",
+    )
+    parser.add_argument(
+        "--calibrator", type=Path, default=None,
+        help="Override path to calibrator JSON. Defaults to "
+             "results/calibration/calibrator.json.",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -457,9 +507,27 @@ def main() -> None:
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
+    # Load calibrator once (small file, ~tens of KB). Default path
+    # applies when not explicitly overridden and calibration is not
+    # disabled. If the file is missing we quietly fall through to
+    # identity calibration — a developer is probably bootstrapping.
+    calibrator: dict[str, Any] | None = None
+    if not args.no_calibration and load_calibrator is not None:
+        cal_path = args.calibrator or CALIBRATOR_PATH
+        if cal_path is not None and cal_path.exists():
+            calibrator = load_calibrator(cal_path)
+            logger.info("Loaded calibrator from %s", cal_path)
+        else:
+            logger.warning(
+                "No calibrator at %s; publishing raw Chronos-2 quantiles. "
+                "Run `uv run python src/calibration.py fit` after a "
+                "validation-era backtest to enable calibration.",
+                cal_path,
+            )
+
     for country in targets_to_run:
         try:
-            payload = run_country(country, origin_date)
+            payload = run_country(country, origin_date, calibrator=calibrator)
         except Exception:
             logger.exception("Live forecast failed for %s", country)
             continue

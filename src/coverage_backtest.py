@@ -23,6 +23,8 @@ Usage:
   uv run python src/coverage_backtest.py --zero-shot        # override
                                                             # fine_tune=False
   uv run python src/coverage_backtest.py --era validation   # for calibration
+  uv run python src/coverage_backtest.py --apply-calibration  # post-calibration
+                                                              # test-era eval
 """
 
 from __future__ import annotations
@@ -37,6 +39,11 @@ from typing import Any
 import pandas as pd
 
 from baselines import load_country_panel
+from calibration import (
+    CALIBRATOR_PATH,
+    apply_calibrator,
+    load_calibrator,
+)
 from live_forecast import (
     PREDICTION_LENGTH,
     QUANTILE_LEVELS,
@@ -53,6 +60,7 @@ RESULTS_DIR = PROJECT_ROOT / "results"
 COVERAGE_DIR = RESULTS_DIR / "coverage"
 COVERAGE_ZS_DIR = RESULTS_DIR / "coverage_zs"
 COVERAGE_VAL_DIR = RESULTS_DIR / "coverage_validation"
+COVERAGE_CAL_DIR = RESULTS_DIR / "coverage_calibrated"
 
 COUNTRIES = ("norway", "canada", "sweden")
 
@@ -88,6 +96,7 @@ def run_backtest_country(
     max_origins: int | None = None,
     zero_shot: bool = False,
     era: str = "test",
+    calibrator: dict[str, Any] | None = None,
 ) -> pd.DataFrame:
     """Produce per-origin quantile forecasts across the specified era.
 
@@ -180,6 +189,20 @@ def run_backtest_country(
                 if pd.isna(actual):
                     continue
                 row = target_preds.iloc[h_idx]
+                raw_quantiles: dict[float, float] = {}
+                for q, col in zip(QUANTILE_LEVELS, quantile_cols, strict=True):
+                    if col in row:
+                        raw_quantiles[q] = float(row[col])
+                # Optionally replace with calibrated quantiles. When
+                # evaluating post-calibration, we overwrite q* values
+                # so downstream coverage stats reflect the calibrated
+                # bands directly.
+                if calibrator is not None and raw_quantiles:
+                    out_quantiles = apply_calibrator(
+                        raw_quantiles, country, target, h, calibrator,
+                    )
+                else:
+                    out_quantiles = raw_quantiles
                 entry: dict[str, Any] = {
                     "country": country,
                     "target": target,
@@ -188,9 +211,8 @@ def run_backtest_country(
                     "actual": float(actual),
                     "mean": float(row["mean"]),
                 }
-                for q, col in zip(QUANTILE_LEVELS, quantile_cols, strict=True):
-                    if col in row:
-                        entry[f"q{int(round(q * 100))}"] = float(row[col])
+                for q, value in out_quantiles.items():
+                    entry[f"q{int(round(q * 100))}"] = float(value)
                 rows.append(entry)
 
     _reset_config_transforms()
@@ -276,16 +298,30 @@ def main() -> int:
              "calibrators without contaminating test-era evaluation.",
     )
     parser.add_argument(
+        "--apply-calibration", action="store_true",
+        help="Pass the raw Chronos-2 quantiles through the isotonic "
+             "calibrator (results/calibration/calibrator.json) before "
+             "storing. Use to evaluate post-calibration coverage on the "
+             "test era.",
+    )
+    parser.add_argument(
+        "--calibrator", type=Path, default=None,
+        help="Override path to calibrator JSON when --apply-calibration.",
+    )
+    parser.add_argument(
         "--output-dir", type=Path, default=None,
         help="Override output directory. Defaults to results/coverage (test "
-             "era, fine-tuned), results/coverage_zs (zero-shot), or "
-             "results/coverage_validation (validation era).",
+             "era, fine-tuned), results/coverage_zs (zero-shot), "
+             "results/coverage_validation (validation era), or "
+             "results/coverage_calibrated (with --apply-calibration).",
     )
     args = parser.parse_args()
 
     if args.output_dir is None:
         if args.era == "validation":
             args.output_dir = COVERAGE_VAL_DIR
+        elif args.apply_calibration:
+            args.output_dir = COVERAGE_CAL_DIR
         elif args.zero_shot:
             args.output_dir = COVERAGE_ZS_DIR
         else:
@@ -300,11 +336,17 @@ def main() -> int:
     countries = [args.country] if args.country else list(COUNTRIES)
     per_country: dict[str, pd.DataFrame] = {}
 
+    calibrator: dict[str, Any] | None = None
+    if args.apply_calibration:
+        cal_path = args.calibrator or CALIBRATOR_PATH
+        calibrator = load_calibrator(cal_path)
+        logger.info("Loaded calibrator from %s", cal_path)
+
     for c in countries:
         try:
             df = run_backtest_country(
                 c, max_origins=args.max_origins, zero_shot=args.zero_shot,
-                era=args.era,
+                era=args.era, calibrator=calibrator,
             )
             per_country[c] = df
         except Exception:

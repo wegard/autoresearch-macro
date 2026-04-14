@@ -32,7 +32,9 @@ from prepare import (
     _parse_jsonstat2,
     daily_to_monthly,
     download_all_fred,
+    ffill_covariates_only,
     quarterly_to_monthly,
+    warn_if_targets_stale,
 )
 
 logger = logging.getLogger(__name__)
@@ -392,8 +394,9 @@ def build_panel_sweden(force: bool = False) -> MacroPanel:
     # Build DataFrame
     data = pd.DataFrame(all_series)
     data = data.sort_index()
-    data = data.ffill()
+    data = ffill_covariates_only(data)
     data.index.name = "date"
+    warn_if_targets_stale(data)
 
     # Drop variables with insufficient validation-era coverage
     for col in DROPPED_VARIABLES:

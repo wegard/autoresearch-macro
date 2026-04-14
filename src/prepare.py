@@ -802,6 +802,63 @@ class MacroPanel:
         return "\n".join(lines)
 
 
+def ffill_covariates_only(data: pd.DataFrame) -> pd.DataFrame:
+    """Forward-fill covariate columns but leave target columns untouched.
+
+    Covariates in this panel include daily series snapped to month-end
+    (FX, policy rates, oil) that may have occasional missing months —
+    ffill is the intended behaviour for those.
+
+    Targets (cpi, industrial_production, retail_sales, unemployment)
+    must only ever contain genuine observations. Forward-filling them
+    is actively harmful: if an upstream source stops publishing — for
+    example SSB table 14208 ending 2023M12, or SCB KPItotM being
+    superseded by KPI2020M — `ffill` silently propagates the last
+    value indefinitely, masking the staleness and feeding fabricated
+    data into model training, the live dashboard, and evaluation
+    metrics. Leave target gaps as NaN so downstream code
+    (build_ag_dataset, available_at, evaluate_forecasts) can do the
+    right thing with real observations.
+    """
+    result = data.copy()
+    cov_cols = [c for c in result.columns if c not in TARGET_VARIABLES]
+    if cov_cols:
+        result[cov_cols] = result[cov_cols].ffill()
+    return result
+
+
+def warn_if_targets_stale(
+    data: pd.DataFrame, stale_threshold_months: int = 3,
+) -> None:
+    """Log a warning for any target whose last real observation is
+    more than `stale_threshold_months` behind the panel's max date.
+
+    Catches cases where a source has gone dormant without explicit
+    notice. The typical cause is a table rebase (e.g., SSB 03013 →
+    14700 CPI) where the old table keeps responding but stops
+    updating.
+    """
+    if data.empty:
+        return
+    panel_end = data.index.max()
+    threshold = panel_end - pd.DateOffset(months=stale_threshold_months)
+    for col in data.columns:
+        if col not in TARGET_VARIABLES:
+            continue
+        last_real = data[col].dropna().index.max() if data[col].notna().any() else None
+        if last_real is None:
+            logger.warning("Target '%s' has no observations at all.", col)
+            continue
+        if last_real < threshold:
+            months_stale = (panel_end - last_real).days // 30
+            logger.warning(
+                "Target '%s' last real observation is %s — ~%d months behind "
+                "panel end (%s). Check whether the upstream source has been "
+                "rebased or discontinued.",
+                col, last_real.date(), months_stale, panel_end.date(),
+            )
+
+
 def build_panel(force: bool = False) -> MacroPanel:
     """Download all data and build the MacroPanel.
 
@@ -838,8 +895,10 @@ def build_panel(force: bool = False) -> MacroPanel:
     data.index.name = "date"
     data = data.sort_index()
 
-    # Forward-fill within each series (last known value, never backfill)
-    data = data.ffill()
+    # Forward-fill covariates but NOT targets — see ffill_covariates_only
+    # for why ffill'ing targets is dangerous.
+    data = ffill_covariates_only(data)
+    warn_if_targets_stale(data)
 
     pub_lags = load_publication_lags()
     first_avail = {

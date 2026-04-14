@@ -1,14 +1,15 @@
 r"""Paper-ready LaTeX tables for the Chronos-2 calibration section.
 
-Emits two \\input{}-able fragments under paper/tables/:
+Emits three \\input{}-able fragments under paper/tables/:
 
   tab_calibration.tex
       Empirical coverage of the 80% (q10-q90) and 50% (q25-q75)
       predictive bands, per country × target, for the fine-tuned
-      informed search (FT) and the zero-shot baseline (ZS).
-      Final row is a pooled mean across all (country × target ×
-      horizon) triples. Values below 0.05 of nominal are bolded
-      to flag the worst miscalibration.
+      informed search (FT), the zero-shot baseline (ZS), and the
+      post-calibration run (Cal) when results/coverage_calibrated/
+      is present. Final row is a pooled mean across all (country
+      × target × horizon) triples. Values more than 15 pp off
+      nominal are bolded.
 
   tab_calibration_bias.tex
       PIT tail fractions on the zero-shot run — fraction of
@@ -18,13 +19,16 @@ Emits two \\input{}-able fragments under paper/tables/:
       foundation-model's directional biases (e.g., Canada retail
       sales with ~42% above q90).
 
-Also emits tab_calibration_macros.tex with \\newcommand{} macros
-for inline references in the paper body (e.g., the
-overall-under-coverage headline numbers).
+  tab_calibration_macros.tex
+      \\newcommand{} macros for inline references in the paper
+      body — pooled FT/ZS/Cal coverage numbers, gaps in percentage
+      points, and the names+fractions of the worst directional
+      biases.
 
 Inputs:
-  results/coverage/<country>.parquet     (fine-tuned, from coverage_backtest.py)
-  results/coverage_zs/<country>.parquet  (zero-shot, --zero-shot run)
+  results/coverage/<country>.parquet              (FT, test era)
+  results/coverage_zs/<country>.parquet           (ZS, test era)
+  results/coverage_calibrated/<country>.parquet   (optional, post-cal)
 
 Usage:
   uv run python src/coverage_tables.py
@@ -54,6 +58,7 @@ logger = logging.getLogger(__name__)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_FT = PROJECT_ROOT / "results" / "coverage"
 DEFAULT_ZS = PROJECT_ROOT / "results" / "coverage_zs"
+DEFAULT_CAL = PROJECT_ROOT / "results" / "coverage_calibrated"
 DEFAULT_OUT = PROJECT_ROOT / "paper" / "tables"
 
 NOMINAL = {"80-90": 0.8, "50-75": 0.5}
@@ -88,15 +93,23 @@ def _format_cov(value: float | None, nominal: float) -> str:
 
 
 def _build_calibration_rows(
-    base: pd.DataFrame, var: pd.DataFrame,
-) -> tuple[list[dict], dict[str, float]]:
-    """Per (country, target) rows for the main calibration table."""
+    base: pd.DataFrame, var: pd.DataFrame, cal: pd.DataFrame | None,
+) -> tuple[list[dict], dict[str, float | None]]:
+    """Per (country, target) rows for the main calibration table.
+
+    `cal` is optional; when None the calibrated columns are skipped.
+    """
     rows: list[dict] = []
     for country in COUNTRIES:
         for target in TARGETS:
             bdf = base[(base["country"] == country) & (base["target"] == target)]
             vdf = var[(var["country"] == country) & (var["target"] == target)]
-            if bdf.empty and vdf.empty:
+            cdf = (
+                cal[(cal["country"] == country) & (cal["target"] == target)]
+                if cal is not None
+                else None
+            )
+            if bdf.empty and vdf.empty and (cdf is None or cdf.empty):
                 continue
             row = {
                 "country": country,
@@ -106,29 +119,50 @@ def _build_calibration_rows(
                 "ft50": _empirical_band_coverage(bdf, 0.25, 0.75),
                 "zs50": _empirical_band_coverage(vdf, 0.25, 0.75),
             }
+            if cdf is not None:
+                row["cal80"] = _empirical_band_coverage(cdf, 0.1, 0.9)
+                row["cal50"] = _empirical_band_coverage(cdf, 0.25, 0.75)
             rows.append(row)
 
-    pooled = {
+    pooled: dict[str, float | None] = {
         "ft80": _empirical_band_coverage(base, 0.1, 0.9),
         "zs80": _empirical_band_coverage(var, 0.1, 0.9),
         "ft50": _empirical_band_coverage(base, 0.25, 0.75),
         "zs50": _empirical_band_coverage(var, 0.25, 0.75),
     }
+    if cal is not None:
+        pooled["cal80"] = _empirical_band_coverage(cal, 0.1, 0.9)
+        pooled["cal50"] = _empirical_band_coverage(cal, 0.25, 0.75)
     return rows, pooled
 
 
 def write_calibration_table(
-    rows: list[dict], pooled: dict[str, float], out_path: Path,
+    rows: list[dict],
+    pooled: dict[str, float | None],
+    out_path: Path,
+    include_cal: bool,
 ) -> None:
     lines: list[str] = []
-    lines.append(r"\begin{tabular}{llcccc}")
-    lines.append(r"\toprule")
-    lines.append(
-        r" & & \multicolumn{2}{c}{80\% band (q10--q90)} "
-        r"& \multicolumn{2}{c}{50\% band (q25--q75)} \\"
-    )
-    lines.append(r"\cmidrule(lr){3-4} \cmidrule(lr){5-6}")
-    lines.append(r"Country & Target & Fine-tuned & Zero-shot & Fine-tuned & Zero-shot \\")
+    if include_cal:
+        lines.append(r"\begin{tabular}{llcccccc}")
+        lines.append(r"\toprule")
+        lines.append(
+            r" & & \multicolumn{3}{c}{80\% band (q10--q90)} "
+            r"& \multicolumn{3}{c}{50\% band (q25--q75)} \\"
+        )
+        lines.append(r"\cmidrule(lr){3-5} \cmidrule(lr){6-8}")
+        lines.append(
+            r"Country & Target & FT & ZS & Cal & FT & ZS & Cal \\"
+        )
+    else:
+        lines.append(r"\begin{tabular}{llcccc}")
+        lines.append(r"\toprule")
+        lines.append(
+            r" & & \multicolumn{2}{c}{80\% band (q10--q90)} "
+            r"& \multicolumn{2}{c}{50\% band (q25--q75)} \\"
+        )
+        lines.append(r"\cmidrule(lr){3-4} \cmidrule(lr){5-6}")
+        lines.append(r"Country & Target & Fine-tuned & Zero-shot & Fine-tuned & Zero-shot \\")
     lines.append(r"\midrule")
 
     current_country: str | None = None
@@ -139,29 +173,34 @@ def write_calibration_table(
         if country != current_country:
             if current_country is not None:
                 lines.append(r"\midrule")
-            # Count how many targets remain for this country from row i onward
             n_remaining = sum(1 for r in rows[i:] if r["country"] == country)
             country_cell = rf"\multirow{{{n_remaining}}}{{*}}{{{COUNTRY_DISPLAY[country]}}}"
             current_country = country
 
-        cells = [
-            country_cell,
-            TARGET_DISPLAY[target],
-            _format_cov(row["ft80"], 0.8),
-            _format_cov(row["zs80"], 0.8),
-            _format_cov(row["ft50"], 0.5),
-            _format_cov(row["zs50"], 0.5),
-        ]
+        cells = [country_cell, TARGET_DISPLAY[target]]
+        cells.append(_format_cov(row["ft80"], 0.8))
+        cells.append(_format_cov(row["zs80"], 0.8))
+        if include_cal:
+            cells.append(_format_cov(row.get("cal80"), 0.8))
+        cells.append(_format_cov(row["ft50"], 0.5))
+        cells.append(_format_cov(row["zs50"], 0.5))
+        if include_cal:
+            cells.append(_format_cov(row.get("cal50"), 0.5))
         lines.append(" & ".join(cells) + r" \\")
 
     lines.append(r"\midrule")
-    lines.append(
-        r"\multicolumn{2}{l}{\emph{Pooled (country$\times$target$\times$horizon)}} & "
-        + _format_cov(pooled["ft80"], 0.8) + " & "
-        + _format_cov(pooled["zs80"], 0.8) + " & "
-        + _format_cov(pooled["ft50"], 0.5) + " & "
-        + _format_cov(pooled["zs50"], 0.5) + r" \\"
-    )
+    pooled_cells = [
+        r"\multicolumn{2}{l}{\emph{Pooled (country$\times$target$\times$horizon)}}",
+        _format_cov(pooled["ft80"], 0.8),
+        _format_cov(pooled["zs80"], 0.8),
+    ]
+    if include_cal:
+        pooled_cells.append(_format_cov(pooled.get("cal80"), 0.8))
+    pooled_cells.append(_format_cov(pooled["ft50"], 0.5))
+    pooled_cells.append(_format_cov(pooled["zs50"], 0.5))
+    if include_cal:
+        pooled_cells.append(_format_cov(pooled.get("cal50"), 0.5))
+    lines.append(" & ".join(pooled_cells) + r" \\")
     lines.append(r"\bottomrule")
     lines.append(r"\end{tabular}")
 
@@ -264,6 +303,13 @@ def write_macros(
     lines.append(_pct("pooledZS80Gap", pooled["zs80"], 0.8))
     lines.append(_pct("pooledFT50Gap", pooled["ft50"], 0.5))
     lines.append(_pct("pooledZS50Gap", pooled["zs50"], 0.5))
+    # Calibrated values — only present when the coverage_calibrated dir
+    # exists. When absent, these macros still appear so \\input{}ing
+    # them from the paper doesn't error out, but expand to "--".
+    lines.append(_cmd("pooledCal80", pooled.get("cal80")))
+    lines.append(_cmd("pooledCal50", pooled.get("cal50")))
+    lines.append(_pct("pooledCal80Gap", pooled.get("cal80"), 0.8))
+    lines.append(_pct("pooledCal50Gap", pooled.get("cal50"), 0.5))
 
     # Flag the two most egregious directional biases for inline cite.
     worst_right = max(rows, key=lambda r: r.get("above_q90", 0) if "above_q90" in r else 0)
@@ -285,6 +331,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ft-dir", type=Path, default=DEFAULT_FT)
     parser.add_argument("--zs-dir", type=Path, default=DEFAULT_ZS)
+    parser.add_argument("--cal-dir", type=Path, default=DEFAULT_CAL,
+                        help="Optional; post-calibration test-era coverage dir")
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUT)
     args = parser.parse_args()
 
@@ -295,13 +343,23 @@ def main() -> int:
 
     base = load_all(args.ft_dir)
     var = load_all(args.zs_dir)
+    cal: pd.DataFrame | None = None
+    if args.cal_dir.exists() and any(args.cal_dir.glob("*.parquet")):
+        cal = load_all(args.cal_dir)
+        logger.info("Loaded %d Cal rows (post-calibration test era)", len(cal))
+    else:
+        logger.info("No calibrated backtest at %s; tables omit Cal column",
+                    args.cal_dir)
     logger.info("Loaded %d FT rows, %d ZS rows", len(base), len(var))
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
-    calib_rows, pooled = _build_calibration_rows(base, var)
-    write_calibration_table(calib_rows, pooled,
-                             args.output_dir / "tab_calibration.tex")
+    calib_rows, pooled = _build_calibration_rows(base, var, cal)
+    write_calibration_table(
+        calib_rows, pooled,
+        args.output_dir / "tab_calibration.tex",
+        include_cal=cal is not None,
+    )
 
     bias_rows = _build_bias_rows(var)
     write_bias_table(bias_rows, args.output_dir / "tab_calibration_bias.tex")
@@ -311,11 +369,15 @@ def main() -> int:
 
     # Pretty-print to stdout for quick review.
     print()
-    print("Calibration table:")
-    print(f"  Pooled FT 80%: {pooled['ft80']:.3f}  (nominal 0.800)")
-    print(f"  Pooled ZS 80%: {pooled['zs80']:.3f}  (nominal 0.800)")
-    print(f"  Pooled FT 50%: {pooled['ft50']:.3f}  (nominal 0.500)")
-    print(f"  Pooled ZS 50%: {pooled['zs50']:.3f}  (nominal 0.500)")
+    print("Calibration table (pooled):")
+    print(f"  FT  80%: {pooled['ft80']:.3f}  (nominal 0.800)")
+    print(f"  ZS  80%: {pooled['zs80']:.3f}  (nominal 0.800)")
+    if pooled.get("cal80") is not None:
+        print(f"  Cal 80%: {pooled['cal80']:.3f}  (nominal 0.800)")
+    print(f"  FT  50%: {pooled['ft50']:.3f}  (nominal 0.500)")
+    print(f"  ZS  50%: {pooled['zs50']:.3f}  (nominal 0.500)")
+    if pooled.get("cal50") is not None:
+        print(f"  Cal 50%: {pooled['cal50']:.3f}  (nominal 0.500)")
     print()
     print("Directional bias (ZS):")
     for r in bias_rows:

@@ -17,6 +17,7 @@ from prepare import (
     build_validation_origins,
     daily_to_monthly,
     evaluate_forecasts,
+    ffill_covariates_only,
     load_publication_lags,
     log_diff,
     ma,
@@ -27,6 +28,7 @@ from prepare import (
     quarterly_to_monthly,
     rmse,
     standardize,
+    warn_if_targets_stale,
 )
 
 
@@ -514,3 +516,57 @@ class TestJsonStat2Parser:
         series = _parse_jsonstat2(data)
         assert pd.isna(series.iloc[1])
         assert series.iloc[2] == 3.0
+
+
+class TestFfillHardening:
+    """ffill_covariates_only + warn_if_targets_stale."""
+
+    def _panel(self) -> pd.DataFrame:
+        idx = pd.date_range("2025-06-30", periods=11, freq="ME")
+        return pd.DataFrame({
+            "cpi": [2.1, 2.3, 2.5, 2.4, 2.6, 2.5, 2.7] + [np.nan] * 4,
+            "policy_rate": [4.5, 4.5, np.nan, 4.25, 4.25, np.nan, np.nan, 4.0, np.nan, np.nan, 3.75],
+            "unemployment": [6.2, 6.1, 6.0, 6.1, 6.0, 6.2, 6.1, 6.0] + [np.nan] * 3,
+        }, index=idx)
+
+    def test_targets_keep_trailing_nan(self) -> None:
+        out = ffill_covariates_only(self._panel())
+        # Last real values for targets are preserved at Dec 2025 / Jan 2026
+        assert out["cpi"].notna().sum() == 7
+        assert out["unemployment"].notna().sum() == 8
+        # Trailing NaN on targets is NOT ffilled away
+        assert out["cpi"].iloc[-1] is np.nan or pd.isna(out["cpi"].iloc[-1])
+        assert pd.isna(out["unemployment"].iloc[-1])
+
+    def test_covariates_are_ffilled(self) -> None:
+        out = ffill_covariates_only(self._panel())
+        # Every covariate cell after the first real obs is non-NaN
+        assert out["policy_rate"].isna().sum() == 0
+        # And values propagate forward, not backward
+        assert out["policy_rate"].iloc[2] == 4.5  # gap filled with prior
+        assert out["policy_rate"].iloc[-1] == 3.75
+
+    def test_no_mutation_of_input(self) -> None:
+        df = self._panel()
+        before = df.copy()
+        ffill_covariates_only(df)
+        pd.testing.assert_frame_equal(df, before)
+
+    def test_warn_fires_for_stale_target(self, caplog) -> None:
+        import logging
+        caplog.set_level(logging.WARNING, logger="prepare")
+        warn_if_targets_stale(ffill_covariates_only(self._panel()), stale_threshold_months=3)
+        messages = [r.getMessage() for r in caplog.records]
+        # cpi is 4 months behind panel_end (2026-04-30); unemployment is 3 → not stale
+        assert any("'cpi'" in m and "behind panel end" in m for m in messages)
+        assert not any("'unemployment'" in m for m in messages)
+
+    def test_warn_silent_when_all_fresh(self, caplog) -> None:
+        import logging
+        caplog.set_level(logging.WARNING, logger="prepare")
+        fresh = self._panel()
+        # Replace trailing NaN with real values so every target is current
+        fresh["cpi"] = fresh["cpi"].ffill()
+        fresh["unemployment"] = fresh["unemployment"].ffill()
+        warn_if_targets_stale(fresh, stale_threshold_months=3)
+        assert not any("behind panel end" in r.getMessage() for r in caplog.records)

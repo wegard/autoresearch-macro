@@ -22,6 +22,7 @@ Usage:
   uv run python src/coverage_backtest.py --max-origins 20   # smoke test
   uv run python src/coverage_backtest.py --zero-shot        # override
                                                             # fine_tune=False
+  uv run python src/coverage_backtest.py --era validation   # for calibration
 """
 
 from __future__ import annotations
@@ -42,7 +43,7 @@ from live_forecast import (
     _make_predictor_with_quantiles,
     load_best_config,
 )
-from prepare import build_test_origins
+from prepare import build_test_origins, build_validation_origins
 from train import TRANSFORM_FUNCTIONS, build_ag_dataset
 
 logger = logging.getLogger(__name__)
@@ -51,6 +52,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 RESULTS_DIR = PROJECT_ROOT / "results"
 COVERAGE_DIR = RESULTS_DIR / "coverage"
 COVERAGE_ZS_DIR = RESULTS_DIR / "coverage_zs"
+COVERAGE_VAL_DIR = RESULTS_DIR / "coverage_validation"
 
 COUNTRIES = ("norway", "canada", "sweden")
 
@@ -85,8 +87,9 @@ def run_backtest_country(
     country: str,
     max_origins: int | None = None,
     zero_shot: bool = False,
+    era: str = "test",
 ) -> pd.DataFrame:
-    """Produce per-origin quantile forecasts across the test era.
+    """Produce per-origin quantile forecasts across the specified era.
 
     Returns a DataFrame with one row per (origin, target, horizon) and
     columns [country, target, origin, horizon, actual, q10, q25, q50,
@@ -95,6 +98,11 @@ def run_backtest_country(
     When `zero_shot=True`, overrides the best-config's fine-tune flag
     and runs Chronos-2 without LoRA adaptation. Used to isolate the
     effect of fine-tuning on predictive-quantile calibration.
+
+    `era` selects the forecast origin range: 'test' (2016-01 onwards,
+    default — paper's frozen evaluation era) or 'validation' (2006-01
+    to 2015-12 — used to fit calibrators without test-era data
+    snooping).
     """
     from autogluon.timeseries import TimeSeriesDataFrame
 
@@ -109,7 +117,12 @@ def run_backtest_country(
     horizons = list(range(1, PREDICTION_LENGTH + 1))
     context_length = cfg.get("context_length")
 
-    origins = build_test_origins(panel, horizons=horizons)
+    if era == "validation":
+        origins = build_validation_origins(panel, horizons=horizons)
+    elif era == "test":
+        origins = build_test_origins(panel, horizons=horizons)
+    else:
+        raise ValueError(f"Unknown era: {era!r}; expected 'test' or 'validation'")
     if max_origins is not None and len(origins) > max_origins:
         origins = origins[:max_origins]
         logger.info("Truncated to first %d origins for smoke test", max_origins)
@@ -118,8 +131,8 @@ def run_backtest_country(
     mode_label = "zero-shot" if zero_shot else ("fine-tuned" if fine_tune else "zero-shot (config)")
 
     logger.info(
-        "=== Coverage backtest: %s (%s) — %d origins, targets=%s, covariates=%s ===",
-        country, mode_label, len(origins), targets, covs,
+        "=== Coverage backtest: %s (%s, %s era) — %d origins, targets=%s, covariates=%s ===",
+        country, mode_label, era, len(origins), targets, covs,
     )
 
     t0 = time.time()
@@ -256,14 +269,27 @@ def main() -> int:
              "Used to isolate the effect of fine-tuning on calibration.",
     )
     parser.add_argument(
+        "--era", choices=["test", "validation"], default="test",
+        help="Which forecast-origin range to sweep. 'test' (default) is "
+             "the paper's frozen evaluation era (2016-01 onwards); "
+             "'validation' (2006-01 to 2015-12) is used to fit "
+             "calibrators without contaminating test-era evaluation.",
+    )
+    parser.add_argument(
         "--output-dir", type=Path, default=None,
-        help="Override output directory. Defaults to results/coverage (or "
-             "results/coverage_zs when --zero-shot is set).",
+        help="Override output directory. Defaults to results/coverage (test "
+             "era, fine-tuned), results/coverage_zs (zero-shot), or "
+             "results/coverage_validation (validation era).",
     )
     args = parser.parse_args()
 
     if args.output_dir is None:
-        args.output_dir = COVERAGE_ZS_DIR if args.zero_shot else COVERAGE_DIR
+        if args.era == "validation":
+            args.output_dir = COVERAGE_VAL_DIR
+        elif args.zero_shot:
+            args.output_dir = COVERAGE_ZS_DIR
+        else:
+            args.output_dir = COVERAGE_DIR
 
     logging.basicConfig(
         level=logging.INFO,
@@ -278,6 +304,7 @@ def main() -> int:
         try:
             df = run_backtest_country(
                 c, max_origins=args.max_origins, zero_shot=args.zero_shot,
+                era=args.era,
             )
             per_country[c] = df
         except Exception:

@@ -1,0 +1,44 @@
+<footer class="macrolab-footer" id="macrolab-footer"></footer>
+
+<script>
+(function() {
+  // MacroLab root — all back-links point here (same origin)
+  var ROOT = "/";
+
+  // Build footer content via JS so Quarto doesn't rewrite the hrefs
+  var footer = document.getElementById("macrolab-footer");
+  if (footer) {
+    var wrap = document.createElement("div");
+    wrap.style.maxWidth = "80rem";
+    wrap.style.margin = "0 auto";
+    wrap.style.padding = "0 1rem";
+
+    var aboutLink = document.createElement("a");
+    aboutLink.href = ROOT + "about";
+    aboutLink.textContent = "About";
+
+    var macroLink = document.createElement("a");
+    macroLink.href = ROOT;
+    macroLink.textContent = "MacroLab";
+
+    wrap.appendChild(aboutLink);
+    wrap.appendChild(document.createTextNode(" \u00b7 "));
+    wrap.appendChild(macroLink);
+    wrap.appendChild(document.createTextNode(" \u00b7 Making the big picture clear"));
+    footer.appendChild(wrap);
+  }
+
+  // Rewrite navbar brand link to MacroLab root
+  var brand = document.querySelector(".navbar-brand");
+  if (brand) {
+    brand.setAttribute("href", ROOT);
+  }
+
+  // Remove data-bs-theme="dark" that Quarto injects on the navbar —
+  // our SCSS styles the navbar as light, but this attribute overrides them
+  var nav = document.querySelector(".navbar[data-bs-theme]");
+  if (nav) {
+    nav.removeAttribute("data-bs-theme");
+  }
+})();
+</script>

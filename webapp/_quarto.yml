@@ -3,10 +3,10 @@ project:
   output-dir: _site
 
 website:
-  title: "Autoresearch Macro"
+  title: "MacroLab"
   description: "Agentic search over forecasting pipelines for macroeconomic data from Norway, Canada, and Sweden"
   navbar:
-    background: dark
+    background: light
     left:
       - href: index.qmd
         text: Home
@@ -28,8 +28,10 @@ website:
 format:
   html:
     theme:
-      light: flatly
+      light: macrolab-theme.scss
     css: styles.css
     toc: true
     code-fold: true
     code-tools: true
+    include-in-header: _includes/header.html
+    include-after-body: _includes/footer.html

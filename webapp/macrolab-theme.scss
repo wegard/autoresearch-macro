@@ -1,0 +1,265 @@
+/*-- scss:defaults --*/
+
+// Typography — match MacroLab's Inter font stack
+$font-family-sans-serif: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+// MacroLab color palette (Tailwind equivalents)
+$white:    #ffffff;
+$gray-50:  #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-800: #1f2937;
+$gray-900: #111827;
+
+$blue-500: #3b82f6;
+$blue-600: #2563eb;
+$blue-700: #1d4ed8;
+
+// Bootstrap variable mappings
+$body-bg: $gray-50;
+$body-color: $gray-900;
+$link-color: $blue-600;
+$link-hover-color: $blue-700;
+$primary: $blue-600;
+
+$border-color: $gray-200;
+$border-radius: 0.75rem;
+$border-radius-sm: 0.5rem;
+$border-radius-lg: 0.75rem;
+
+// Navbar (light)
+$navbar-light-color: $gray-600;
+$navbar-light-hover-color: $gray-900;
+$navbar-light-active-color: $blue-600;
+$navbar-light-brand-color: $gray-900;
+$navbar-light-brand-hover-color: $gray-900;
+
+// Typography scale
+$font-size-base: 1rem;
+$headings-font-weight: 600;
+$headings-color: $gray-900;
+
+// Cards
+$card-border-color: rgba($gray-200, 0.6);
+$card-border-radius: 0.75rem;
+$card-cap-bg: $gray-50;
+
+// Tables
+$table-border-color: $gray-200;
+$table-striped-bg: rgba($gray-50, 0.5);
+
+// Code
+$code-color: $gray-700;
+
+
+/*-- scss:rules --*/
+
+// === NAVBAR ===
+// Match MacroLab: white bg, border-bottom, subtle shadow
+#quarto-header {
+  border-bottom: 1px solid $gray-200;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.navbar {
+  background-color: $white !important;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+// Left-align brand (Quarto defaults to mx-auto centering)
+.navbar-brand-container {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+// Brand: "MacroLab" bold + " / Autoresearch Macro" lighter
+.navbar-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  text-decoration: none !important;
+}
+
+.navbar-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: $gray-900;
+
+  &::after {
+    content: "\00a0/\00a0Autoresearch";
+    font-weight: 400;
+    color: $gray-500;
+    font-size: 0.875rem;
+  }
+}
+
+// Nav links: text-sm, gray-600, blue-600 active
+.navbar-nav .nav-link {
+  font-size: 0.875rem;
+  color: $gray-600 !important;
+  font-weight: 500;
+  padding: 0.375rem 0.75rem;
+  transition: color 0.15s;
+
+  &:hover {
+    color: $blue-600 !important;
+  }
+
+  &.active {
+    color: $blue-600 !important;
+    font-weight: 600;
+  }
+}
+
+// Search icon color for light navbar
+.navbar .quarto-navigation-tool {
+  color: $gray-500;
+
+  &:hover {
+    color: $gray-700;
+  }
+}
+
+// === PAGE LAYOUT ===
+#quarto-content {
+  background-color: $gray-50;
+}
+
+// Constrain content width to match MacroLab's max-w-7xl
+.page-columns,
+#quarto-content > * {
+  max-width: 80rem;
+}
+
+// === HEADINGS ===
+h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid $gray-200;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: $gray-800;
+}
+
+// === CARDS ===
+.card {
+  border: 1px solid rgba($gray-200, 0.6);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  background: $white;
+}
+
+// === TABLES ===
+.table {
+  border-color: $gray-200;
+
+  thead th {
+    background: $gray-50;
+    color: $gray-700;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    border-bottom: 2px solid $gray-200;
+  }
+
+  td {
+    color: $gray-700;
+    font-size: 0.875rem;
+    border-color: $gray-100;
+  }
+}
+
+// === TOC (right sidebar) ===
+#TOC {
+  border-left: 1px solid $gray-200;
+  padding-left: 1rem;
+
+  .active {
+    border-left-color: $blue-600 !important;
+    color: $blue-600 !important;
+    font-weight: 600;
+  }
+
+  a {
+    color: $gray-500;
+    font-size: 0.8125rem;
+
+    &:hover {
+      color: $gray-700;
+    }
+  }
+}
+
+// === CODE BLOCKS ===
+div.sourceCode {
+  border: 1px solid rgba($gray-200, 0.6);
+  border-radius: 0.5rem;
+  background: $white;
+}
+
+pre.sourceCode {
+  background: $white;
+}
+
+// Code fold/tools buttons
+.code-tools-button,
+.code-fold-btn {
+  color: $gray-500;
+  font-size: 0.75rem;
+
+  &:hover {
+    color: $gray-700;
+  }
+}
+
+// === CALLOUT BOXES ===
+.callout {
+  border-radius: 0.75rem;
+}
+
+// === QUARTO TITLE BLOCK ===
+.quarto-title .quarto-title-subtitle {
+  color: $gray-500;
+  font-size: 1.125rem;
+  font-weight: 400;
+}
+
+// === FOOTER ===
+.macrolab-footer {
+  border-top: 1px solid $gray-200;
+  background: $white;
+  padding: 1rem 0;
+  text-align: center;
+  font-size: 0.75rem;
+  color: $gray-400;
+  margin-top: 3rem;
+
+  a {
+    color: $gray-400;
+    text-decoration: none;
+    transition: color 0.15s;
+
+    &:hover {
+      color: $blue-600;
+    }
+  }
+}
+
+// === OBSERVABLE / OJS ===
+// Ensure Observable inputs blend with the theme
+form.oi-a39f3f {
+  font-family: inherit;
+}

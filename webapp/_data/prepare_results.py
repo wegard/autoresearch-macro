@@ -366,6 +366,207 @@ def prepare_search_comparison(df: pd.DataFrame) -> None:
     print(f"Wrote search_comparison.json ({len(records)} records)")
 
 
+def prepare_calibration_data() -> None:
+    """Build calibration.json from the coverage backtests.
+
+    Emits five top-level keys consumed by webapp/calibration.qmd:
+      * pooled          — overall empirical coverage of 80%/50% bands
+                          under FT / ZS / Cal, plus percentage-point gaps
+      * coverage        — per (country, target, horizon, band) empirical
+                          coverage for each variant (denormalized)
+      * calibration_curve — empirical P(actual <= Q(tau)) at each of the
+                          5 nominal tau levels, per (country, target,
+                          horizon); used for the 45-degree calibration plot
+      * pit_bins        — PIT histogram density per (country, target)
+                          using the 5-quantile bin edges [0, 0.1, 0.25,
+                          0.5, 0.75, 0.9, 1.0]; is_tail flag for
+                          highlighting outer bins
+      * directional_bias — per (country, target) tail fractions (below
+                          q10 / within 80% band / above q90) under ZS,
+                          to illustrate asymmetric biases
+    """
+    coverage_dirs = {
+        "ft": RESULTS_DIR / "coverage",
+        "zs": RESULTS_DIR / "coverage_zs",
+        "cal": RESULTS_DIR / "coverage_calibrated",
+    }
+
+    # Required for coverage + calibration curve + pit bins.
+    ft_frames: list[pd.DataFrame] = []
+    for country in COUNTRIES:
+        path = coverage_dirs["ft"] / f"{country}.parquet"
+        if path.exists():
+            ft_frames.append(pd.read_parquet(path))
+    if not ft_frames:
+        print("  [skip] no coverage parquet files found; calibration.json not written")
+        return
+    ft_df = pd.concat(ft_frames, ignore_index=True)
+
+    def _load_variant(variant: str) -> pd.DataFrame | None:
+        frames = []
+        for country in COUNTRIES:
+            p = coverage_dirs[variant] / f"{country}.parquet"
+            if p.exists():
+                frames.append(pd.read_parquet(p))
+        return pd.concat(frames, ignore_index=True) if frames else None
+
+    zs_df = _load_variant("zs")
+    cal_df = _load_variant("cal")
+
+    bands = [(0.1, 0.9, "80"), (0.25, 0.75, "50")]
+
+    # --- pooled headline numbers ---
+    def _pooled(df: pd.DataFrame | None, lo: float, hi: float) -> float | None:
+        if df is None or df.empty:
+            return None
+        lo_col = f"q{int(round(lo * 100))}"
+        hi_col = f"q{int(round(hi * 100))}"
+        if lo_col not in df.columns or hi_col not in df.columns:
+            return None
+        within = (df["actual"] >= df[lo_col]) & (df["actual"] <= df[hi_col])
+        return float(within.mean())
+
+    pooled: dict = {}
+    for variant, df in (("ft", ft_df), ("zs", zs_df), ("cal", cal_df)):
+        for lo, hi, name in bands:
+            emp = _pooled(df, lo, hi)
+            pooled[f"{variant}{name}"] = round(emp, 4) if emp is not None else None
+            nominal = hi - lo
+            if emp is not None:
+                pooled[f"{variant}{name}_gap"] = round((emp - nominal) * 100, 1)
+            else:
+                pooled[f"{variant}{name}_gap"] = None
+
+    # --- per (country, target, horizon, band) coverage: FT/ZS/Cal in one row ---
+    coverage_records: list[dict] = []
+    keys = ft_df[["country", "target", "horizon"]].drop_duplicates().itertuples(index=False)
+    for country, target, horizon in keys:
+        for lo, hi, name in bands:
+            record = {
+                "country": country,
+                "target": target,
+                "horizon": int(horizon),
+                "band": name,
+            }
+            for variant, df in (("ft", ft_df), ("zs", zs_df), ("cal", cal_df)):
+                if df is None:
+                    record[variant] = None
+                    continue
+                g = df[
+                    (df["country"] == country)
+                    & (df["target"] == target)
+                    & (df["horizon"] == horizon)
+                ]
+                emp = _pooled(g, lo, hi)
+                record[variant] = round(emp, 4) if emp is not None else None
+            coverage_records.append(record)
+
+    # --- calibration curve: empirical P(actual <= Q(tau)) at 5 taus per (country, target, horizon) ---
+    curve_records: list[dict] = []
+    nominal_levels = [0.1, 0.25, 0.5, 0.75, 0.9]
+    for country, target, horizon in ft_df[["country", "target", "horizon"]].drop_duplicates().itertuples(index=False):
+        g = ft_df[
+            (ft_df["country"] == country)
+            & (ft_df["target"] == target)
+            & (ft_df["horizon"] == horizon)
+        ]
+        if g.empty:
+            continue
+        for tau in nominal_levels:
+            col = f"q{int(round(tau * 100))}"
+            if col not in g.columns:
+                continue
+            emp = float((g["actual"] <= g[col]).mean())
+            curve_records.append({
+                "country": country,
+                "target": target,
+                "horizon": int(horizon),
+                "nominal": tau,
+                "empirical_ft": round(emp, 4),
+            })
+
+    # --- PIT histogram bins per (country, target), pooled over horizons ---
+    def _pit_bin_index(row) -> int:
+        a = row["actual"]
+        if a <= row["q10"]:
+            return 0
+        if a <= row["q25"]:
+            return 1
+        if a <= row["q50"]:
+            return 2
+        if a <= row["q75"]:
+            return 3
+        if a <= row["q90"]:
+            return 4
+        return 5
+
+    pit_records: list[dict] = []
+    pit_edges = [0.0, 0.1, 0.25, 0.5, 0.75, 0.9, 1.0]
+    bin_widths = [pit_edges[i + 1] - pit_edges[i] for i in range(6)]
+    for country, target in ft_df[["country", "target"]].drop_duplicates().itertuples(index=False):
+        g = ft_df[(ft_df["country"] == country) & (ft_df["target"] == target)].copy()
+        if g.empty:
+            continue
+        g = g.dropna(subset=["actual", "q10", "q25", "q50", "q75", "q90"])
+        if g.empty:
+            continue
+        g["bin_idx"] = g.apply(_pit_bin_index, axis=1)
+        counts = g["bin_idx"].value_counts().sort_index()
+        total = int(counts.sum())
+        for i, (lo, hi, w) in enumerate(zip(pit_edges[:-1], pit_edges[1:], bin_widths, strict=True)):
+            count = int(counts.get(i, 0))
+            density = (count / total / w) if total and w > 0 else 0.0
+            pit_records.append({
+                "country": country,
+                "target": target,
+                "bin_lo": lo,
+                "bin_hi": hi,
+                "bin_mid": (lo + hi) / 2,
+                "count": count,
+                "density": round(density, 4),
+                "is_tail": i == 0 or i == 5,
+            })
+
+    # --- directional bias (ZS): below q10 / within 80% band / above q90 per (country, target) ---
+    bias_records: list[dict] = []
+    if zs_df is not None:
+        for country, target in zs_df[["country", "target"]].drop_duplicates().itertuples(index=False):
+            g = zs_df[(zs_df["country"] == country) & (zs_df["target"] == target)].copy()
+            if g.empty:
+                continue
+            g = g.dropna(subset=["actual", "q10", "q90"])
+            n = int(len(g))
+            if n == 0:
+                continue
+            below = int((g["actual"] < g["q10"]).sum())
+            above = int((g["actual"] > g["q90"]).sum())
+            within = n - below - above
+            bias_records.append({
+                "country": country,
+                "target": target,
+                "below_q10": round(below / n, 4),
+                "within": round(within / n, 4),
+                "above_q90": round(above / n, 4),
+                "n": n,
+            })
+
+    out = {
+        "pooled": pooled,
+        "coverage": coverage_records,
+        "calibration_curve": curve_records,
+        "pit_bins": pit_records,
+        "directional_bias": bias_records,
+    }
+    (OUTPUT_DIR / "calibration.json").write_text(json.dumps(out, indent=2, default=str))
+    print(
+        f"Wrote calibration.json "
+        f"({len(coverage_records)} coverage rows, "
+        f"{len(curve_records)} curve rows, "
+        f"{len(pit_records)} pit bins, "
+        f"{len(bias_records)} bias rows)"
+    )
+
+
 def main() -> None:
     print(f"Preparing data for web dashboard (three-country)...")
     print(f"  Project root: {PROJECT_ROOT}")
@@ -382,6 +583,7 @@ def main() -> None:
     prepare_pipeline_configs()
     prepare_ablation_data()
     prepare_search_comparison(df)
+    prepare_calibration_data()
 
     print("\nDone.")
 

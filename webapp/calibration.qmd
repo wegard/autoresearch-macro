@@ -1,0 +1,317 @@
+---
+title: "Calibration"
+subtitle: "Are the fan bands honest?"
+---
+
+```{ojs}
+//| echo: false
+calibration = FileAttachment("_data/calibration.json").json()
+Plot = import("https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm")
+```
+
+```{ojs}
+//| echo: false
+viewof selectedCountry = Inputs.radio(
+  ["norway", "canada", "sweden"],
+  {label: "Country", value: "norway",
+   format: v => ({"norway": "Norway", "canada": "Canada", "sweden": "Sweden"})[v]}
+)
+
+targetDisplay = ({
+  "cpi": "CPI",
+  "industrial_production": "Industrial production",
+  "retail_sales": "Retail sales",
+  "unemployment": "Unemployment"
+})
+horizonColors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]  // h=1,3,6,12
+```
+
+## Why bands matter
+
+The Results page evaluates **point forecasts** under MASE. But most consumers
+of macro forecasts care just as much about the *fan chart* as about the
+central projection: a central bank does not want a single number, it wants
+to know how likely it is that inflation lands above or below a policy-
+relevant threshold. Chronos-2 emits a discrete predictive distribution at
+each origin as five quantiles — q10, q25, q50, q75, q90 — which form nominal
+**80 %** and **50 %** prediction bands.
+
+Whether those bands are empirically calibrated — *do 80 % of realisations
+actually fall inside the nominal 80 % band?* — is a separate question from
+whether the median is accurate. This page answers it.
+
+## How often do the bands actually cover?
+
+Pooled across all country × target × horizon × test-era origin
+combinations:
+
+```{ojs}
+//| echo: false
+{
+  const p = calibration.pooled;
+  const fmt = v => v == null ? "–" : (v * 100).toFixed(1) + "%";
+  const gap = v => v == null ? "" : ` (${v > 0 ? "+" : ""}${v.toFixed(1)} pp from nominal)`;
+  return html`
+  <table class="table" style="font-variant-numeric: tabular-nums; width:auto;">
+    <thead>
+      <tr>
+        <th></th>
+        <th>80 % band <small>(q10–q90)</small></th>
+        <th>50 % band <small>(q25–q75)</small></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Fine-tuned (raw)</strong></td>
+          <td>${fmt(p.ft80)}${gap(p.ft80_gap)}</td>
+          <td>${fmt(p.ft50)}${gap(p.ft50_gap)}</td></tr>
+      <tr><td>Zero-shot</td>
+          <td>${fmt(p.zs80)}${gap(p.zs80_gap)}</td>
+          <td>${fmt(p.zs50)}${gap(p.zs50_gap)}</td></tr>
+      <tr><td><strong>Fine-tuned + isotonic recalibration</strong></td>
+          <td>${fmt(p.cal80)}${gap(p.cal80_gap)}</td>
+          <td>${fmt(p.cal50)}${gap(p.cal50_gap)}</td></tr>
+    </tbody>
+  </table>
+  `;
+}
+```
+
+Two things jump out. First, the raw 80 % band catches only about 70 % of
+realisations — a roughly ten-percentage-point shortfall. Second, **zero-
+shot and fine-tuned variants are within a percentage point of one another**.
+The variance compression is a property of the pretrained Chronos-2 model;
+LoRA adaptation is not the culprit, and fine-tuning cannot be relied upon
+to fix band calibration either.
+
+### Coverage by target and horizon
+
+Pick a country to inspect the per-target, per-horizon breakdown:
+
+```{ojs}
+//| echo: false
+{
+  const rows = calibration.coverage
+    .filter(r => r.country === selectedCountry);
+  const pairs = [
+    ["cpi", "CPI"],
+    ["industrial_production", "IP"],
+    ["retail_sales", "Retail"],
+    ["unemployment", "Unempl."]
+  ];
+  const fmt = v => v == null ? "" : v.toFixed(3);
+  const targets = Array.from(new Set(rows.map(r => r.target)));
+  const horizons = Array.from(new Set(rows.map(r => r.horizon))).sort((a, b) => a - b);
+
+  // Build one table per band (80% and 50%) to keep columns manageable.
+  const buildTable = (band, nominalText) => {
+    const subset = rows.filter(r => r.band === band);
+    const byKey = new Map();
+    for (const r of subset) byKey.set(`${r.target}|${r.horizon}`, r);
+    return html`
+    <h4>${nominalText}% band</h4>
+    <table class="table" style="font-variant-numeric: tabular-nums; font-size: 0.9em;">
+      <thead>
+        <tr>
+          <th>Target</th>
+          <th>h</th>
+          <th>FT</th>
+          <th>ZS</th>
+          <th>Cal</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${targets.flatMap(t => horizons.filter(h => [1, 3, 6, 12].includes(h)).map(h => {
+          const r = byKey.get(`${t}|${h}`);
+          return html`<tr>
+            <td>${pairs.find(p => p[0] === t)?.[1] || t}</td>
+            <td>${h}</td>
+            <td>${r ? fmt(r.ft) : "–"}</td>
+            <td>${r ? fmt(r.zs) : "–"}</td>
+            <td>${r ? fmt(r.cal) : "–"}</td>
+          </tr>`;
+        }))}
+      </tbody>
+    </table>
+    `;
+  };
+
+  return html`<div style="display:flex; gap: 2em; flex-wrap: wrap;">
+    <div>${buildTable("80", "80")}</div>
+    <div>${buildTable("50", "50")}</div>
+  </div>`;
+}
+```
+
+Notice that the **Cal** column closes most of the gap in the 50 % band — it
+often lands within a few percentage points of the nominal 0.500 — but the
+80 % band improves only modestly. Because the base forecast only emits five
+quantiles, the empirical CDF used to recalibrate saturates at τ = 0.1 and
+τ = 0.9; there is no base-model support beyond those points for the
+calibrator to stretch into. A denser base quantile grid would lift that
+ceiling.
+
+## Where does the mass go?
+
+The PIT (probability-integral-transform) histogram shows which regions of
+the predictive distribution the actuals land in. Under perfect calibration
+the histogram is flat, with density 1. A U-shape means variance compression
+(actuals fall in the tails too often). An **asymmetric** U-shape means the
+model is systematically biased — under-predicting if right-heavy,
+over-predicting if left-heavy.
+
+```{ojs}
+//| echo: false
+{
+  const rows = calibration.pit_bins
+    .filter(r => r.country === selectedCountry);
+  if (rows.length === 0) return html`<em>No data</em>`;
+  return Plot.plot({
+    height: 260,
+    marginLeft: 55,
+    marginRight: 20,
+    marginBottom: 45,
+    marginTop: 25,
+    facet: {data: rows, x: "target", label: null},
+    fx: {tickFormat: t => targetDisplay[t] || t, label: null},
+    x: {label: "PIT value", domain: [0, 1], ticks: [0, 0.25, 0.5, 0.75, 1]},
+    y: {label: "Density", grid: true, domain: [0, 3.5]},
+    marks: [
+      Plot.rectY(rows, {
+        x1: "bin_lo",
+        x2: "bin_hi",
+        y2: "density",
+        fill: d => d.is_tail ? "#d62728" : "#aec7e8",
+        stroke: "#333",
+        strokeWidth: 0.6,
+        opacity: 0.85
+      }),
+      Plot.ruleY([1.0], {stroke: "#555", strokeDasharray: "4,3"}),
+      Plot.frame()
+    ]
+  });
+}
+```
+
+Per-target tail fractions under **zero-shot** Chronos-2 (expected 10 % in
+each tail under perfect calibration):
+
+```{ojs}
+//| echo: false
+{
+  const rows = calibration.directional_bias
+    .filter(r => r.country === selectedCountry);
+  const fmt = v => (v * 100).toFixed(1) + "%";
+  const highlight = v => Math.abs(v - 0.1) > 0.05 ? "font-weight:bold;color:#c0392b;" : "";
+  return html`
+  <table class="table" style="font-variant-numeric: tabular-nums;">
+    <thead>
+      <tr>
+        <th>Target</th>
+        <th>Below q10</th>
+        <th>Inside 80 % band</th>
+        <th>Above q90</th>
+        <th>n</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.map(r => html`<tr>
+        <td>${targetDisplay[r.target] || r.target}</td>
+        <td style="${highlight(r.below_q10)}">${fmt(r.below_q10)}</td>
+        <td>${fmt(r.within)}</td>
+        <td style="${highlight(r.above_q90)}">${fmt(r.above_q90)}</td>
+        <td>${r.n}</td>
+      </tr>`)}
+    </tbody>
+  </table>
+  `;
+}
+```
+
+Three distinct patterns appear across the panel. Canada retail sales places
+a very large share of realisations above q90, consistent with Chronos-2
+under-predicting Canadian retail trade on the 2021–2024 rebound. Canada
+unemployment is the mirror: realisations cluster below q10 because the
+2020 spike in joblessness and subsequent tightening outpaced the model.
+Some series — Norway CPI most cleanly — are nearly symmetric, indicating
+pure variance compression with no directional tilt.
+
+## Empirical versus nominal
+
+A calibration curve plots the empirical fraction of realisations at or
+below the predicted τ-quantile, against the nominal τ. Perfect
+calibration traces the 45-degree diagonal. The fine-tuned Chronos-2
+forecast shows the characteristic S-shape of a too-narrow distribution:
+above the diagonal at low τ (too many actuals land below q10) and below
+the diagonal at high τ (too many land above q90).
+
+```{ojs}
+//| echo: false
+{
+  const rows = calibration.calibration_curve
+    .filter(r => r.country === selectedCountry)
+    .filter(r => [1, 3, 6, 12].includes(r.horizon));
+  if (rows.length === 0) return html`<em>No data</em>`;
+  return Plot.plot({
+    height: 280,
+    marginLeft: 60,
+    marginBottom: 45,
+    marginTop: 25,
+    facet: {data: rows, x: "target", label: null},
+    fx: {tickFormat: t => targetDisplay[t] || t, label: null},
+    x: {label: "Nominal τ", domain: [0, 1], ticks: [0, 0.25, 0.5, 0.75, 1]},
+    y: {label: "Empirical P(Y ≤ Q(τ))", domain: [0, 1], grid: true},
+    color: {
+      domain: [1, 3, 6, 12],
+      range: horizonColors,
+      legend: true,
+      label: "Horizon"
+    },
+    marks: [
+      Plot.ruleY([0], {stroke: "#ddd"}),
+      Plot.link([{}], {x1: 0, y1: 0, x2: 1, y2: 1,
+                      stroke: "#888", strokeDasharray: "4,3"}),
+      Plot.line(rows, {x: "nominal", y: "empirical_ft",
+                       stroke: "horizon", strokeWidth: 1.5, curve: "monotone-x"}),
+      Plot.dot(rows, {x: "nominal", y: "empirical_ft",
+                      fill: "horizon", r: 3.5, tip: true}),
+      Plot.frame()
+    ]
+  });
+}
+```
+
+Curves that deviate more aggressively from the diagonal indicate stronger
+miscalibration. In most targets the departure is largest at the shortest
+horizon (h = 1): the model is most overconfident about its next-month
+prediction.
+
+## Post-hoc isotonic recalibration
+
+We apply a lightweight per-series **isotonic recalibration** of the
+predictive quantiles. For each (country, target, horizon) triple we
+compute PIT values on the validation era (2006–2015) and take their
+empirical CDF `F̂`. At test time the calibrated quantile at level τ is
+`Q_cal(τ) = Q_base(F̂⁻¹(τ))`, where `Q_base` is the linearly interpolated
+base quantile function. The procedure is distribution-free, uses
+validation-era residuals only — so it respects the pseudo-real-time
+discipline — and requires no retraining of the foundation model. It is
+implemented in `src/calibration.py`.
+
+As shown in the table at the top of the page, the aggregate effect of
+recalibration is to move the pooled 80 % band empirical coverage from
+**69.5 %** to **72.5 %** and the pooled 50 % band from **41.6 %** to
+**47.3 %**. Per-series, improvements are largest where validation-era
+and test-era PIT distributions resemble one another; they can even be
+negative under regime change (notably, Canada unemployment loses about
+eight percentage points of 80 % coverage after recalibration because the
+validation era reflects a gradually tightening labour market while the
+test era includes the 2020–2021 shock).
+
+## What's left
+
+Two limits bound how far this recalibration can go. The structural limit
+is the five-knot base quantile function: no post-hoc layer can reach mass
+beyond q10 or q90 that the base model did not emit. The second limit is
+regime stability — a calibrator fit to one era carries a regime-shift
+risk that no method blind to structural breaks can resolve. For the
+deeper methodological discussion, see paper §5.8 and Appendix D.

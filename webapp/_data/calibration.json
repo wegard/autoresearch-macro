@@ -1,0 +1,7768 @@
+{
+  "pooled": {
+    "ft80": 0.6946,
+    "ft80_gap": -10.5,
+    "ft50": 0.4156,
+    "ft50_gap": -8.4,
+    "zs80": 0.6873,
+    "zs80_gap": -11.3,
+    "zs50": 0.409,
+    "zs50_gap": -9.1,
+    "cal80": 0.7252,
+    "cal80_gap": -7.5,
+    "cal50": 0.4733,
+    "cal50_gap": -2.7
+  },
+  "coverage": [
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 1,
+      "band": "80",
+      "ft": 0.6339,
+      "zs": 0.625,
+      "cal": 0.7054
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 1,
+      "band": "50",
+      "ft": 0.375,
+      "zs": 0.375,
+      "cal": 0.5089
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 2,
+      "band": "80",
+      "ft": 0.6696,
+      "zs": 0.6607,
+      "cal": 0.7679
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 2,
+      "band": "50",
+      "ft": 0.375,
+      "zs": 0.3661,
+      "cal": 0.4554
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 3,
+      "band": "80",
+      "ft": 0.6786,
+      "zs": 0.6786,
+      "cal": 0.8214
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 3,
+      "band": "50",
+      "ft": 0.3839,
+      "zs": 0.3839,
+      "cal": 0.4018
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 4,
+      "band": "80",
+      "ft": 0.6696,
+      "zs": 0.6786,
+      "cal": 0.7679
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 4,
+      "band": "50",
+      "ft": 0.3125,
+      "zs": 0.3571,
+      "cal": 0.3036
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 5,
+      "band": "80",
+      "ft": 0.6786,
+      "zs": 0.6875,
+      "cal": 0.7232
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 5,
+      "band": "50",
+      "ft": 0.3304,
+      "zs": 0.3304,
+      "cal": 0.3125
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 6,
+      "band": "80",
+      "ft": 0.6696,
+      "zs": 0.6875,
+      "cal": 0.6429
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 6,
+      "band": "50",
+      "ft": 0.375,
+      "zs": 0.375,
+      "cal": 0.3661
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 7,
+      "band": "80",
+      "ft": 0.6786,
+      "zs": 0.6875,
+      "cal": 0.6161
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 7,
+      "band": "50",
+      "ft": 0.3393,
+      "zs": 0.3214,
+      "cal": 0.3125
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 8,
+      "band": "80",
+      "ft": 0.6964,
+      "zs": 0.7054,
+      "cal": 0.5893
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 8,
+      "band": "50",
+      "ft": 0.3214,
+      "zs": 0.3304,
+      "cal": 0.2857
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 9,
+      "band": "80",
+      "ft": 0.6964,
+      "zs": 0.7143,
+      "cal": 0.5625
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 9,
+      "band": "50",
+      "ft": 0.3482,
+      "zs": 0.3571,
+      "cal": 0.3214
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 10,
+      "band": "80",
+      "ft": 0.7054,
+      "zs": 0.7232,
+      "cal": 0.6161
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 10,
+      "band": "50",
+      "ft": 0.3482,
+      "zs": 0.375,
+      "cal": 0.3214
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 11,
+      "band": "80",
+      "ft": 0.6964,
+      "zs": 0.6964,
+      "cal": 0.6161
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 11,
+      "band": "50",
+      "ft": 0.3482,
+      "zs": 0.3571,
+      "cal": 0.3393
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 12,
+      "band": "80",
+      "ft": 0.7117,
+      "zs": 0.7297,
+      "cal": 0.6757
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 12,
+      "band": "50",
+      "ft": 0.3423,
+      "zs": 0.3514,
+      "cal": 0.3243
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 1,
+      "band": "80",
+      "ft": 0.6696,
+      "zs": 0.6518,
+      "cal": 0.8393
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 1,
+      "band": "50",
+      "ft": 0.375,
+      "zs": 0.375,
+      "cal": 0.5446
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 2,
+      "band": "80",
+      "ft": 0.6696,
+      "zs": 0.6518,
+      "cal": 0.7946
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 2,
+      "band": "50",
+      "ft": 0.4554,
+      "zs": 0.4375,
+      "cal": 0.5893
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 3,
+      "band": "80",
+      "ft": 0.7411,
+      "zs": 0.7143,
+      "cal": 0.8214
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 3,
+      "band": "50",
+      "ft": 0.4554,
+      "zs": 0.4107,
+      "cal": 0.625
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 4,
+      "band": "80",
+      "ft": 0.7232,
+      "zs": 0.6964,
+      "cal": 0.8304
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 4,
+      "band": "50",
+      "ft": 0.4286,
+      "zs": 0.4464,
+      "cal": 0.6071
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 5,
+      "band": "80",
+      "ft": 0.7589,
+      "zs": 0.7679,
+      "cal": 0.8571
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 5,
+      "band": "50",
+      "ft": 0.4821,
+      "zs": 0.4732,
+      "cal": 0.6429
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 6,
+      "band": "80",
+      "ft": 0.7857,
+      "zs": 0.7679,
+      "cal": 0.875
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 6,
+      "band": "50",
+      "ft": 0.4464,
+      "zs": 0.4196,
+      "cal": 0.6429
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 7,
+      "band": "80",
+      "ft": 0.7679,
+      "zs": 0.7589,
+      "cal": 0.8929
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 7,
+      "band": "50",
+      "ft": 0.5089,
+      "zs": 0.4464,
+      "cal": 0.625
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 8,
+      "band": "80",
+      "ft": 0.8214,
+      "zs": 0.7946,
+      "cal": 0.8929
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 8,
+      "band": "50",
+      "ft": 0.5179,
+      "zs": 0.5357,
+      "cal": 0.7321
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 9,
+      "band": "80",
+      "ft": 0.8125,
+      "zs": 0.8036,
+      "cal": 0.9196
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 9,
+      "band": "50",
+      "ft": 0.5268,
+      "zs": 0.5179,
+      "cal": 0.7589
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 10,
+      "band": "80",
+      "ft": 0.8393,
+      "zs": 0.8125,
+      "cal": 0.9196
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 10,
+      "band": "50",
+      "ft": 0.5,
+      "zs": 0.5089,
+      "cal": 0.7321
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 11,
+      "band": "80",
+      "ft": 0.8468,
+      "zs": 0.8288,
+      "cal": 0.9369
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 11,
+      "band": "50",
+      "ft": 0.5225,
+      "zs": 0.5315,
+      "cal": 0.7658
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 12,
+      "band": "80",
+      "ft": 0.8636,
+      "zs": 0.8364,
+      "cal": 0.9455
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 12,
+      "band": "50",
+      "ft": 0.5273,
+      "zs": 0.5364,
+      "cal": 0.7818
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 1,
+      "band": "80",
+      "ft": 0.6607,
+      "zs": 0.6607,
+      "cal": 0.75
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 1,
+      "band": "50",
+      "ft": 0.3304,
+      "zs": 0.3571,
+      "cal": 0.5536
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 2,
+      "band": "80",
+      "ft": 0.7143,
+      "zs": 0.7143,
+      "cal": 0.7946
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 2,
+      "band": "50",
+      "ft": 0.3839,
+      "zs": 0.3661,
+      "cal": 0.5804
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 3,
+      "band": "80",
+      "ft": 0.75,
+      "zs": 0.7232,
+      "cal": 0.8214
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 3,
+      "band": "50",
+      "ft": 0.4732,
+      "zs": 0.4554,
+      "cal": 0.6071
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 4,
+      "band": "80",
+      "ft": 0.7143,
+      "zs": 0.7143,
+      "cal": 0.8393
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 4,
+      "band": "50",
+      "ft": 0.5089,
+      "zs": 0.4643,
+      "cal": 0.6071
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 5,
+      "band": "80",
+      "ft": 0.7411,
+      "zs": 0.7143,
+      "cal": 0.8482
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 5,
+      "band": "50",
+      "ft": 0.4554,
+      "zs": 0.5,
+      "cal": 0.5268
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 6,
+      "band": "80",
+      "ft": 0.7679,
+      "zs": 0.75,
+      "cal": 0.8571
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 6,
+      "band": "50",
+      "ft": 0.4554,
+      "zs": 0.4107,
+      "cal": 0.5625
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 7,
+      "band": "80",
+      "ft": 0.7411,
+      "zs": 0.7232,
+      "cal": 0.8304
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 7,
+      "band": "50",
+      "ft": 0.4286,
+      "zs": 0.4375,
+      "cal": 0.4821
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 8,
+      "band": "80",
+      "ft": 0.7054,
+      "zs": 0.6964,
+      "cal": 0.7679
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 8,
+      "band": "50",
+      "ft": 0.4732,
+      "zs": 0.4375,
+      "cal": 0.5089
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 9,
+      "band": "80",
+      "ft": 0.7232,
+      "zs": 0.7321,
+      "cal": 0.7768
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 9,
+      "band": "50",
+      "ft": 0.4375,
+      "zs": 0.4107,
+      "cal": 0.4821
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 10,
+      "band": "80",
+      "ft": 0.7321,
+      "zs": 0.7143,
+      "cal": 0.7679
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 10,
+      "band": "50",
+      "ft": 0.4554,
+      "zs": 0.4286,
+      "cal": 0.5446
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 11,
+      "band": "80",
+      "ft": 0.7117,
+      "zs": 0.7027,
+      "cal": 0.7748
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 11,
+      "band": "50",
+      "ft": 0.3784,
+      "zs": 0.3604,
+      "cal": 0.3964
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 12,
+      "band": "80",
+      "ft": 0.7,
+      "zs": 0.6818,
+      "cal": 0.7818
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 12,
+      "band": "50",
+      "ft": 0.3818,
+      "zs": 0.4091,
+      "cal": 0.4455
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 1,
+      "band": "80",
+      "ft": 0.6964,
+      "zs": 0.7054,
+      "cal": 0.8125
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 1,
+      "band": "50",
+      "ft": 0.3839,
+      "zs": 0.3929,
+      "cal": 0.4732
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 2,
+      "band": "80",
+      "ft": 0.7143,
+      "zs": 0.7321,
+      "cal": 0.7857
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 2,
+      "band": "50",
+      "ft": 0.4375,
+      "zs": 0.4464,
+      "cal": 0.5446
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 3,
+      "band": "80",
+      "ft": 0.7143,
+      "zs": 0.7143,
+      "cal": 0.7857
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 3,
+      "band": "50",
+      "ft": 0.4821,
+      "zs": 0.4464,
+      "cal": 0.6071
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 4,
+      "band": "80",
+      "ft": 0.7679,
+      "zs": 0.7946,
+      "cal": 0.8125
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 4,
+      "band": "50",
+      "ft": 0.4464,
+      "zs": 0.4732,
+      "cal": 0.5625
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 5,
+      "band": "80",
+      "ft": 0.75,
+      "zs": 0.7411,
+      "cal": 0.7768
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 5,
+      "band": "50",
+      "ft": 0.4821,
+      "zs": 0.5,
+      "cal": 0.5625
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 6,
+      "band": "80",
+      "ft": 0.7589,
+      "zs": 0.7946,
+      "cal": 0.8214
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 6,
+      "band": "50",
+      "ft": 0.4911,
+      "zs": 0.4821,
+      "cal": 0.5536
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 7,
+      "band": "80",
+      "ft": 0.7768,
+      "zs": 0.7768,
+      "cal": 0.7946
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 7,
+      "band": "50",
+      "ft": 0.5,
+      "zs": 0.4732,
+      "cal": 0.5357
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 8,
+      "band": "80",
+      "ft": 0.7768,
+      "zs": 0.7857,
+      "cal": 0.7768
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 8,
+      "band": "50",
+      "ft": 0.4375,
+      "zs": 0.4821,
+      "cal": 0.5536
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 9,
+      "band": "80",
+      "ft": 0.7321,
+      "zs": 0.7589,
+      "cal": 0.7321
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 9,
+      "band": "50",
+      "ft": 0.4821,
+      "zs": 0.5,
+      "cal": 0.4911
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 10,
+      "band": "80",
+      "ft": 0.7679,
+      "zs": 0.7679,
+      "cal": 0.75
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 10,
+      "band": "50",
+      "ft": 0.4375,
+      "zs": 0.4196,
+      "cal": 0.4286
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 11,
+      "band": "80",
+      "ft": 0.7387,
+      "zs": 0.7658,
+      "cal": 0.7387
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 11,
+      "band": "50",
+      "ft": 0.4144,
+      "zs": 0.4414,
+      "cal": 0.3964
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 12,
+      "band": "80",
+      "ft": 0.7455,
+      "zs": 0.7727,
+      "cal": 0.6818
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 12,
+      "band": "50",
+      "ft": 0.4273,
+      "zs": 0.4455,
+      "cal": 0.3636
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 1,
+      "band": "80",
+      "ft": 0.6696,
+      "zs": 0.6875,
+      "cal": 0.7946
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 1,
+      "band": "50",
+      "ft": 0.3393,
+      "zs": 0.3661,
+      "cal": 0.5446
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 2,
+      "band": "80",
+      "ft": 0.6964,
+      "zs": 0.7143,
+      "cal": 0.7232
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 2,
+      "band": "50",
+      "ft": 0.4375,
+      "zs": 0.4643,
+      "cal": 0.4286
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 3,
+      "band": "80",
+      "ft": 0.7679,
+      "zs": 0.7679,
+      "cal": 0.7232
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 3,
+      "band": "50",
+      "ft": 0.4821,
+      "zs": 0.4821,
+      "cal": 0.4554
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 4,
+      "band": "80",
+      "ft": 0.7768,
+      "zs": 0.7589,
+      "cal": 0.7321
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 4,
+      "band": "50",
+      "ft": 0.5,
+      "zs": 0.5179,
+      "cal": 0.4375
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 5,
+      "band": "80",
+      "ft": 0.7589,
+      "zs": 0.75,
+      "cal": 0.7411
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 5,
+      "band": "50",
+      "ft": 0.4554,
+      "zs": 0.4643,
+      "cal": 0.4196
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 6,
+      "band": "80",
+      "ft": 0.7679,
+      "zs": 0.7679,
+      "cal": 0.6696
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 6,
+      "band": "50",
+      "ft": 0.5179,
+      "zs": 0.5268,
+      "cal": 0.5089
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 7,
+      "band": "80",
+      "ft": 0.7411,
+      "zs": 0.7232,
+      "cal": 0.6786
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 7,
+      "band": "50",
+      "ft": 0.5536,
+      "zs": 0.5536,
+      "cal": 0.5
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 8,
+      "band": "80",
+      "ft": 0.7143,
+      "zs": 0.7143,
+      "cal": 0.6786
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 8,
+      "band": "50",
+      "ft": 0.5357,
+      "zs": 0.5446,
+      "cal": 0.5357
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 9,
+      "band": "80",
+      "ft": 0.7054,
+      "zs": 0.6875,
+      "cal": 0.6607
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 9,
+      "band": "50",
+      "ft": 0.5446,
+      "zs": 0.5536,
+      "cal": 0.5268
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 10,
+      "band": "80",
+      "ft": 0.6964,
+      "zs": 0.6964,
+      "cal": 0.6429
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 10,
+      "band": "50",
+      "ft": 0.5714,
+      "zs": 0.5625,
+      "cal": 0.5
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 11,
+      "band": "80",
+      "ft": 0.7117,
+      "zs": 0.7117,
+      "cal": 0.6667
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 11,
+      "band": "50",
+      "ft": 0.5405,
+      "zs": 0.5225,
+      "cal": 0.4685
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 12,
+      "band": "80",
+      "ft": 0.7182,
+      "zs": 0.7182,
+      "cal": 0.6909
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 12,
+      "band": "50",
+      "ft": 0.5727,
+      "zs": 0.5545,
+      "cal": 0.4818
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 1,
+      "band": "80",
+      "ft": 0.5893,
+      "zs": 0.5446,
+      "cal": 0.7054
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 1,
+      "band": "50",
+      "ft": 0.2143,
+      "zs": 0.1786,
+      "cal": 0.5
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 2,
+      "band": "80",
+      "ft": 0.6071,
+      "zs": 0.5446,
+      "cal": 0.7054
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 2,
+      "band": "50",
+      "ft": 0.3839,
+      "zs": 0.3214,
+      "cal": 0.5268
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 3,
+      "band": "80",
+      "ft": 0.6429,
+      "zs": 0.5179,
+      "cal": 0.7054
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 3,
+      "band": "50",
+      "ft": 0.3571,
+      "zs": 0.3036,
+      "cal": 0.4732
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 4,
+      "band": "80",
+      "ft": 0.6518,
+      "zs": 0.5714,
+      "cal": 0.7411
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 4,
+      "band": "50",
+      "ft": 0.3125,
+      "zs": 0.2768,
+      "cal": 0.5089
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 5,
+      "band": "80",
+      "ft": 0.7232,
+      "zs": 0.6607,
+      "cal": 0.75
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 5,
+      "band": "50",
+      "ft": 0.5089,
+      "zs": 0.4196,
+      "cal": 0.5446
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 6,
+      "band": "80",
+      "ft": 0.7589,
+      "zs": 0.6518,
+      "cal": 0.8036
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 6,
+      "band": "50",
+      "ft": 0.4286,
+      "zs": 0.4196,
+      "cal": 0.5446
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 7,
+      "band": "80",
+      "ft": 0.7232,
+      "zs": 0.6607,
+      "cal": 0.7143
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 7,
+      "band": "50",
+      "ft": 0.5357,
+      "zs": 0.4911,
+      "cal": 0.5714
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 8,
+      "band": "80",
+      "ft": 0.7946,
+      "zs": 0.6964,
+      "cal": 0.7232
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 8,
+      "band": "50",
+      "ft": 0.5804,
+      "zs": 0.4643,
+      "cal": 0.5893
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 9,
+      "band": "80",
+      "ft": 0.7857,
+      "zs": 0.7054,
+      "cal": 0.7321
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 9,
+      "band": "50",
+      "ft": 0.5893,
+      "zs": 0.4911,
+      "cal": 0.5714
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 10,
+      "band": "80",
+      "ft": 0.7658,
+      "zs": 0.7207,
+      "cal": 0.7207
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 10,
+      "band": "50",
+      "ft": 0.5495,
+      "zs": 0.4414,
+      "cal": 0.4775
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 11,
+      "band": "80",
+      "ft": 0.7455,
+      "zs": 0.7,
+      "cal": 0.7182
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 11,
+      "band": "50",
+      "ft": 0.5,
+      "zs": 0.4091,
+      "cal": 0.4727
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 12,
+      "band": "80",
+      "ft": 0.7156,
+      "zs": 0.6789,
+      "cal": 0.6789
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 12,
+      "band": "50",
+      "ft": 0.5046,
+      "zs": 0.4037,
+      "cal": 0.3945
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 1,
+      "band": "80",
+      "ft": 0.5357,
+      "zs": 0.5446,
+      "cal": 0.5714
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 1,
+      "band": "50",
+      "ft": 0.3036,
+      "zs": 0.2857,
+      "cal": 0.3839
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 2,
+      "band": "80",
+      "ft": 0.5,
+      "zs": 0.5089,
+      "cal": 0.6429
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 2,
+      "band": "50",
+      "ft": 0.3393,
+      "zs": 0.3482,
+      "cal": 0.4196
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 3,
+      "band": "80",
+      "ft": 0.5804,
+      "zs": 0.5625,
+      "cal": 0.6161
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 3,
+      "band": "50",
+      "ft": 0.375,
+      "zs": 0.3571,
+      "cal": 0.4375
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 4,
+      "band": "80",
+      "ft": 0.5714,
+      "zs": 0.5714,
+      "cal": 0.6429
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 4,
+      "band": "50",
+      "ft": 0.3214,
+      "zs": 0.2857,
+      "cal": 0.4196
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 5,
+      "band": "80",
+      "ft": 0.5893,
+      "zs": 0.5804,
+      "cal": 0.625
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 5,
+      "band": "50",
+      "ft": 0.4018,
+      "zs": 0.3571,
+      "cal": 0.3482
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 6,
+      "band": "80",
+      "ft": 0.5446,
+      "zs": 0.5268,
+      "cal": 0.6518
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 6,
+      "band": "50",
+      "ft": 0.3482,
+      "zs": 0.3304,
+      "cal": 0.3482
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 7,
+      "band": "80",
+      "ft": 0.5357,
+      "zs": 0.5179,
+      "cal": 0.5982
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 7,
+      "band": "50",
+      "ft": 0.3125,
+      "zs": 0.3036,
+      "cal": 0.2857
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 8,
+      "band": "80",
+      "ft": 0.5804,
+      "zs": 0.5357,
+      "cal": 0.6071
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 8,
+      "band": "50",
+      "ft": 0.2679,
+      "zs": 0.2679,
+      "cal": 0.3036
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 9,
+      "band": "80",
+      "ft": 0.5357,
+      "zs": 0.5089,
+      "cal": 0.625
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 9,
+      "band": "50",
+      "ft": 0.2857,
+      "zs": 0.2768,
+      "cal": 0.3214
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 10,
+      "band": "80",
+      "ft": 0.5315,
+      "zs": 0.4955,
+      "cal": 0.5676
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 10,
+      "band": "50",
+      "ft": 0.2793,
+      "zs": 0.2703,
+      "cal": 0.3063
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 11,
+      "band": "80",
+      "ft": 0.4545,
+      "zs": 0.4545,
+      "cal": 0.6
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 11,
+      "band": "50",
+      "ft": 0.3091,
+      "zs": 0.2364,
+      "cal": 0.3364
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 12,
+      "band": "80",
+      "ft": 0.4679,
+      "zs": 0.4404,
+      "cal": 0.5505
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 12,
+      "band": "50",
+      "ft": 0.2752,
+      "zs": 0.2752,
+      "cal": 0.3486
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 1,
+      "band": "80",
+      "ft": 0.6161,
+      "zs": 0.6607,
+      "cal": 0.6071
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 1,
+      "band": "50",
+      "ft": 0.2321,
+      "zs": 0.3125,
+      "cal": 0.4732
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 2,
+      "band": "80",
+      "ft": 0.5982,
+      "zs": 0.5982,
+      "cal": 0.625
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 2,
+      "band": "50",
+      "ft": 0.3393,
+      "zs": 0.3482,
+      "cal": 0.4107
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 3,
+      "band": "80",
+      "ft": 0.6875,
+      "zs": 0.6875,
+      "cal": 0.625
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 3,
+      "band": "50",
+      "ft": 0.3571,
+      "zs": 0.3839,
+      "cal": 0.375
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 4,
+      "band": "80",
+      "ft": 0.6786,
+      "zs": 0.7054,
+      "cal": 0.6071
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 4,
+      "band": "50",
+      "ft": 0.3571,
+      "zs": 0.3571,
+      "cal": 0.3482
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 5,
+      "band": "80",
+      "ft": 0.6875,
+      "zs": 0.7054,
+      "cal": 0.6339
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 5,
+      "band": "50",
+      "ft": 0.3929,
+      "zs": 0.4018,
+      "cal": 0.3839
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 6,
+      "band": "80",
+      "ft": 0.7054,
+      "zs": 0.7054,
+      "cal": 0.5536
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 6,
+      "band": "50",
+      "ft": 0.3661,
+      "zs": 0.375,
+      "cal": 0.3036
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 7,
+      "band": "80",
+      "ft": 0.6786,
+      "zs": 0.7143,
+      "cal": 0.5714
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 7,
+      "band": "50",
+      "ft": 0.3393,
+      "zs": 0.3839,
+      "cal": 0.3214
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 8,
+      "band": "80",
+      "ft": 0.6607,
+      "zs": 0.6607,
+      "cal": 0.5268
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 8,
+      "band": "50",
+      "ft": 0.3482,
+      "zs": 0.375,
+      "cal": 0.3036
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 9,
+      "band": "80",
+      "ft": 0.6339,
+      "zs": 0.6429,
+      "cal": 0.5536
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 9,
+      "band": "50",
+      "ft": 0.3125,
+      "zs": 0.3214,
+      "cal": 0.2679
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 10,
+      "band": "80",
+      "ft": 0.625,
+      "zs": 0.625,
+      "cal": 0.4554
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 10,
+      "band": "50",
+      "ft": 0.3393,
+      "zs": 0.3393,
+      "cal": 0.3214
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 11,
+      "band": "80",
+      "ft": 0.6036,
+      "zs": 0.6396,
+      "cal": 0.5225
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 11,
+      "band": "50",
+      "ft": 0.3153,
+      "zs": 0.3243,
+      "cal": 0.2703
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 12,
+      "band": "80",
+      "ft": 0.5909,
+      "zs": 0.6,
+      "cal": 0.4727
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 12,
+      "band": "50",
+      "ft": 0.2909,
+      "zs": 0.2636,
+      "cal": 0.2273
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 1,
+      "band": "80",
+      "ft": 0.5982,
+      "zs": 0.5982,
+      "cal": 0.7054
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 1,
+      "band": "50",
+      "ft": 0.2857,
+      "zs": 0.2857,
+      "cal": 0.4732
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 2,
+      "band": "80",
+      "ft": 0.6071,
+      "zs": 0.6071,
+      "cal": 0.7589
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 2,
+      "band": "50",
+      "ft": 0.2768,
+      "zs": 0.2768,
+      "cal": 0.3661
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 3,
+      "band": "80",
+      "ft": 0.6607,
+      "zs": 0.6607,
+      "cal": 0.7768
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 3,
+      "band": "50",
+      "ft": 0.3214,
+      "zs": 0.3214,
+      "cal": 0.4732
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 4,
+      "band": "80",
+      "ft": 0.6786,
+      "zs": 0.6786,
+      "cal": 0.7946
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 4,
+      "band": "50",
+      "ft": 0.3214,
+      "zs": 0.3214,
+      "cal": 0.4554
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 5,
+      "band": "80",
+      "ft": 0.6786,
+      "zs": 0.6786,
+      "cal": 0.7411
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 5,
+      "band": "50",
+      "ft": 0.4018,
+      "zs": 0.4018,
+      "cal": 0.4821
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 6,
+      "band": "80",
+      "ft": 0.6518,
+      "zs": 0.6518,
+      "cal": 0.7232
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 6,
+      "band": "50",
+      "ft": 0.3571,
+      "zs": 0.3571,
+      "cal": 0.4911
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 7,
+      "band": "80",
+      "ft": 0.6518,
+      "zs": 0.6518,
+      "cal": 0.7321
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 7,
+      "band": "50",
+      "ft": 0.3214,
+      "zs": 0.3214,
+      "cal": 0.4286
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 8,
+      "band": "80",
+      "ft": 0.625,
+      "zs": 0.625,
+      "cal": 0.75
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 8,
+      "band": "50",
+      "ft": 0.3482,
+      "zs": 0.3482,
+      "cal": 0.4286
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 9,
+      "band": "80",
+      "ft": 0.625,
+      "zs": 0.625,
+      "cal": 0.6964
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 9,
+      "band": "50",
+      "ft": 0.3661,
+      "zs": 0.3661,
+      "cal": 0.4375
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 10,
+      "band": "80",
+      "ft": 0.6429,
+      "zs": 0.6429,
+      "cal": 0.7321
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 10,
+      "band": "50",
+      "ft": 0.3661,
+      "zs": 0.3661,
+      "cal": 0.4464
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 11,
+      "band": "80",
+      "ft": 0.6429,
+      "zs": 0.6429,
+      "cal": 0.7411
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 11,
+      "band": "50",
+      "ft": 0.3929,
+      "zs": 0.3929,
+      "cal": 0.4196
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 12,
+      "band": "80",
+      "ft": 0.6396,
+      "zs": 0.6396,
+      "cal": 0.7568
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 12,
+      "band": "50",
+      "ft": 0.3964,
+      "zs": 0.3964,
+      "cal": 0.4144
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 1,
+      "band": "80",
+      "ft": 0.7232,
+      "zs": 0.7232,
+      "cal": 0.8125
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 1,
+      "band": "50",
+      "ft": 0.375,
+      "zs": 0.375,
+      "cal": 0.5982
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 2,
+      "band": "80",
+      "ft": 0.7054,
+      "zs": 0.7054,
+      "cal": 0.8393
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 2,
+      "band": "50",
+      "ft": 0.375,
+      "zs": 0.375,
+      "cal": 0.6071
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 3,
+      "band": "80",
+      "ft": 0.7143,
+      "zs": 0.7143,
+      "cal": 0.8125
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 3,
+      "band": "50",
+      "ft": 0.3929,
+      "zs": 0.3929,
+      "cal": 0.5
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 4,
+      "band": "80",
+      "ft": 0.6786,
+      "zs": 0.6786,
+      "cal": 0.875
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 4,
+      "band": "50",
+      "ft": 0.375,
+      "zs": 0.375,
+      "cal": 0.5625
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 5,
+      "band": "80",
+      "ft": 0.6875,
+      "zs": 0.6875,
+      "cal": 0.8036
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 5,
+      "band": "50",
+      "ft": 0.3839,
+      "zs": 0.3839,
+      "cal": 0.5089
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 6,
+      "band": "80",
+      "ft": 0.6875,
+      "zs": 0.6875,
+      "cal": 0.7946
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 6,
+      "band": "50",
+      "ft": 0.4018,
+      "zs": 0.4018,
+      "cal": 0.4732
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 7,
+      "band": "80",
+      "ft": 0.6339,
+      "zs": 0.6339,
+      "cal": 0.8125
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 7,
+      "band": "50",
+      "ft": 0.4732,
+      "zs": 0.4732,
+      "cal": 0.5268
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 8,
+      "band": "80",
+      "ft": 0.6786,
+      "zs": 0.6786,
+      "cal": 0.7321
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 8,
+      "band": "50",
+      "ft": 0.4375,
+      "zs": 0.4375,
+      "cal": 0.4554
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 9,
+      "band": "80",
+      "ft": 0.6786,
+      "zs": 0.6786,
+      "cal": 0.7054
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 9,
+      "band": "50",
+      "ft": 0.4286,
+      "zs": 0.4286,
+      "cal": 0.4911
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 10,
+      "band": "80",
+      "ft": 0.6518,
+      "zs": 0.6518,
+      "cal": 0.6786
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 10,
+      "band": "50",
+      "ft": 0.4375,
+      "zs": 0.4375,
+      "cal": 0.5268
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 11,
+      "band": "80",
+      "ft": 0.6216,
+      "zs": 0.6216,
+      "cal": 0.6306
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 11,
+      "band": "50",
+      "ft": 0.4234,
+      "zs": 0.4234,
+      "cal": 0.4955
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 12,
+      "band": "80",
+      "ft": 0.6,
+      "zs": 0.6,
+      "cal": 0.6545
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 12,
+      "band": "50",
+      "ft": 0.4273,
+      "zs": 0.4273,
+      "cal": 0.4545
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 1,
+      "band": "80",
+      "ft": 0.7679,
+      "zs": 0.7679,
+      "cal": 0.7411
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 1,
+      "band": "50",
+      "ft": 0.375,
+      "zs": 0.375,
+      "cal": 0.4375
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 2,
+      "band": "80",
+      "ft": 0.7946,
+      "zs": 0.7946,
+      "cal": 0.7411
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 2,
+      "band": "50",
+      "ft": 0.4375,
+      "zs": 0.4375,
+      "cal": 0.4821
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 3,
+      "band": "80",
+      "ft": 0.8036,
+      "zs": 0.8036,
+      "cal": 0.7143
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 3,
+      "band": "50",
+      "ft": 0.4554,
+      "zs": 0.4554,
+      "cal": 0.5268
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 4,
+      "band": "80",
+      "ft": 0.8214,
+      "zs": 0.8214,
+      "cal": 0.8036
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 4,
+      "band": "50",
+      "ft": 0.5268,
+      "zs": 0.5268,
+      "cal": 0.4911
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 5,
+      "band": "80",
+      "ft": 0.7679,
+      "zs": 0.7679,
+      "cal": 0.7768
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 5,
+      "band": "50",
+      "ft": 0.5625,
+      "zs": 0.5625,
+      "cal": 0.5268
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 6,
+      "band": "80",
+      "ft": 0.7768,
+      "zs": 0.7768,
+      "cal": 0.7679
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 6,
+      "band": "50",
+      "ft": 0.5268,
+      "zs": 0.5268,
+      "cal": 0.4643
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 7,
+      "band": "80",
+      "ft": 0.7946,
+      "zs": 0.7946,
+      "cal": 0.75
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 7,
+      "band": "50",
+      "ft": 0.5357,
+      "zs": 0.5357,
+      "cal": 0.5268
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 8,
+      "band": "80",
+      "ft": 0.7946,
+      "zs": 0.7946,
+      "cal": 0.7321
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 8,
+      "band": "50",
+      "ft": 0.5089,
+      "zs": 0.5089,
+      "cal": 0.4911
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 9,
+      "band": "80",
+      "ft": 0.7768,
+      "zs": 0.7768,
+      "cal": 0.75
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 9,
+      "band": "50",
+      "ft": 0.5268,
+      "zs": 0.5268,
+      "cal": 0.5446
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 10,
+      "band": "80",
+      "ft": 0.7857,
+      "zs": 0.7857,
+      "cal": 0.7321
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 10,
+      "band": "50",
+      "ft": 0.5,
+      "zs": 0.5,
+      "cal": 0.5
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 11,
+      "band": "80",
+      "ft": 0.7658,
+      "zs": 0.7658,
+      "cal": 0.7297
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 11,
+      "band": "50",
+      "ft": 0.4775,
+      "zs": 0.4775,
+      "cal": 0.4865
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 12,
+      "band": "80",
+      "ft": 0.7636,
+      "zs": 0.7636,
+      "cal": 0.7545
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 12,
+      "band": "50",
+      "ft": 0.4909,
+      "zs": 0.4909,
+      "cal": 0.5545
+    }
+  ],
+  "calibration_curve": [
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 1,
+      "nominal": 0.1,
+      "empirical_ft": 0.2321
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 1,
+      "nominal": 0.25,
+      "empirical_ft": 0.375
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 1,
+      "nominal": 0.5,
+      "empirical_ft": 0.5625
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 1,
+      "nominal": 0.75,
+      "empirical_ft": 0.75
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 1,
+      "nominal": 0.9,
+      "empirical_ft": 0.8661
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 2,
+      "nominal": 0.1,
+      "empirical_ft": 0.1875
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 2,
+      "nominal": 0.25,
+      "empirical_ft": 0.3929
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 2,
+      "nominal": 0.5,
+      "empirical_ft": 0.5446
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 2,
+      "nominal": 0.75,
+      "empirical_ft": 0.7679
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 2,
+      "nominal": 0.9,
+      "empirical_ft": 0.8571
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 3,
+      "nominal": 0.1,
+      "empirical_ft": 0.1964
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 3,
+      "nominal": 0.25,
+      "empirical_ft": 0.3571
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 3,
+      "nominal": 0.5,
+      "empirical_ft": 0.5625
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 3,
+      "nominal": 0.75,
+      "empirical_ft": 0.7411
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 3,
+      "nominal": 0.9,
+      "empirical_ft": 0.875
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 4,
+      "nominal": 0.1,
+      "empirical_ft": 0.1964
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 4,
+      "nominal": 0.25,
+      "empirical_ft": 0.4018
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 4,
+      "nominal": 0.5,
+      "empirical_ft": 0.5714
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 4,
+      "nominal": 0.75,
+      "empirical_ft": 0.7143
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 4,
+      "nominal": 0.9,
+      "empirical_ft": 0.8661
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 5,
+      "nominal": 0.1,
+      "empirical_ft": 0.1786
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 5,
+      "nominal": 0.25,
+      "empirical_ft": 0.3839
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 5,
+      "nominal": 0.5,
+      "empirical_ft": 0.5357
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 5,
+      "nominal": 0.75,
+      "empirical_ft": 0.7143
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 5,
+      "nominal": 0.9,
+      "empirical_ft": 0.8571
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 6,
+      "nominal": 0.1,
+      "empirical_ft": 0.1964
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 6,
+      "nominal": 0.25,
+      "empirical_ft": 0.375
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 6,
+      "nominal": 0.5,
+      "empirical_ft": 0.5625
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 6,
+      "nominal": 0.75,
+      "empirical_ft": 0.75
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 6,
+      "nominal": 0.9,
+      "empirical_ft": 0.8661
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 7,
+      "nominal": 0.1,
+      "empirical_ft": 0.1786
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 7,
+      "nominal": 0.25,
+      "empirical_ft": 0.4018
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 7,
+      "nominal": 0.5,
+      "empirical_ft": 0.5893
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 7,
+      "nominal": 0.75,
+      "empirical_ft": 0.7411
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 7,
+      "nominal": 0.9,
+      "empirical_ft": 0.8571
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 8,
+      "nominal": 0.1,
+      "empirical_ft": 0.1696
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 8,
+      "nominal": 0.25,
+      "empirical_ft": 0.4196
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 8,
+      "nominal": 0.5,
+      "empirical_ft": 0.5804
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 8,
+      "nominal": 0.75,
+      "empirical_ft": 0.7411
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 8,
+      "nominal": 0.9,
+      "empirical_ft": 0.8661
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 9,
+      "nominal": 0.1,
+      "empirical_ft": 0.1607
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 9,
+      "nominal": 0.25,
+      "empirical_ft": 0.4018
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 9,
+      "nominal": 0.5,
+      "empirical_ft": 0.5625
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 9,
+      "nominal": 0.75,
+      "empirical_ft": 0.75
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 9,
+      "nominal": 0.9,
+      "empirical_ft": 0.8571
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 10,
+      "nominal": 0.1,
+      "empirical_ft": 0.1607
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 10,
+      "nominal": 0.25,
+      "empirical_ft": 0.4107
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 10,
+      "nominal": 0.5,
+      "empirical_ft": 0.5982
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 10,
+      "nominal": 0.75,
+      "empirical_ft": 0.7589
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 10,
+      "nominal": 0.9,
+      "empirical_ft": 0.8661
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 11,
+      "nominal": 0.1,
+      "empirical_ft": 0.1607
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 11,
+      "nominal": 0.25,
+      "empirical_ft": 0.4018
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 11,
+      "nominal": 0.5,
+      "empirical_ft": 0.5982
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 11,
+      "nominal": 0.75,
+      "empirical_ft": 0.75
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 11,
+      "nominal": 0.9,
+      "empirical_ft": 0.8571
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 12,
+      "nominal": 0.1,
+      "empirical_ft": 0.1351
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 12,
+      "nominal": 0.25,
+      "empirical_ft": 0.4144
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 12,
+      "nominal": 0.5,
+      "empirical_ft": 0.6036
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 12,
+      "nominal": 0.75,
+      "empirical_ft": 0.7568
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "horizon": 12,
+      "nominal": 0.9,
+      "empirical_ft": 0.8468
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 1,
+      "nominal": 0.1,
+      "empirical_ft": 0.1071
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 1,
+      "nominal": 0.25,
+      "empirical_ft": 0.2768
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 1,
+      "nominal": 0.5,
+      "empirical_ft": 0.5357
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 1,
+      "nominal": 0.75,
+      "empirical_ft": 0.6518
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 1,
+      "nominal": 0.9,
+      "empirical_ft": 0.7768
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 2,
+      "nominal": 0.1,
+      "empirical_ft": 0.1161
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 2,
+      "nominal": 0.25,
+      "empirical_ft": 0.2143
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 2,
+      "nominal": 0.5,
+      "empirical_ft": 0.5
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 2,
+      "nominal": 0.75,
+      "empirical_ft": 0.6696
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 2,
+      "nominal": 0.9,
+      "empirical_ft": 0.7857
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 3,
+      "nominal": 0.1,
+      "empirical_ft": 0.0893
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 3,
+      "nominal": 0.25,
+      "empirical_ft": 0.2232
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 3,
+      "nominal": 0.5,
+      "empirical_ft": 0.4107
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 3,
+      "nominal": 0.75,
+      "empirical_ft": 0.6786
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 3,
+      "nominal": 0.9,
+      "empirical_ft": 0.8304
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 4,
+      "nominal": 0.1,
+      "empirical_ft": 0.1071
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 4,
+      "nominal": 0.25,
+      "empirical_ft": 0.2143
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 4,
+      "nominal": 0.5,
+      "empirical_ft": 0.4554
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 4,
+      "nominal": 0.75,
+      "empirical_ft": 0.6429
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 4,
+      "nominal": 0.9,
+      "empirical_ft": 0.8304
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 5,
+      "nominal": 0.1,
+      "empirical_ft": 0.1071
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 5,
+      "nominal": 0.25,
+      "empirical_ft": 0.1875
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 5,
+      "nominal": 0.5,
+      "empirical_ft": 0.4375
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 5,
+      "nominal": 0.75,
+      "empirical_ft": 0.6696
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 5,
+      "nominal": 0.9,
+      "empirical_ft": 0.8661
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 6,
+      "nominal": 0.1,
+      "empirical_ft": 0.0625
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 6,
+      "nominal": 0.25,
+      "empirical_ft": 0.2054
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 6,
+      "nominal": 0.5,
+      "empirical_ft": 0.4554
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 6,
+      "nominal": 0.75,
+      "empirical_ft": 0.6518
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 6,
+      "nominal": 0.9,
+      "empirical_ft": 0.8482
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 7,
+      "nominal": 0.1,
+      "empirical_ft": 0.0804
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 7,
+      "nominal": 0.25,
+      "empirical_ft": 0.1875
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 7,
+      "nominal": 0.5,
+      "empirical_ft": 0.4375
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 7,
+      "nominal": 0.75,
+      "empirical_ft": 0.6964
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 7,
+      "nominal": 0.9,
+      "empirical_ft": 0.8482
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 8,
+      "nominal": 0.1,
+      "empirical_ft": 0.0446
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 8,
+      "nominal": 0.25,
+      "empirical_ft": 0.1875
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 8,
+      "nominal": 0.5,
+      "empirical_ft": 0.4286
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 8,
+      "nominal": 0.75,
+      "empirical_ft": 0.7054
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 8,
+      "nominal": 0.9,
+      "empirical_ft": 0.8661
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 9,
+      "nominal": 0.1,
+      "empirical_ft": 0.0536
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 9,
+      "nominal": 0.25,
+      "empirical_ft": 0.1607
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 9,
+      "nominal": 0.5,
+      "empirical_ft": 0.4286
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 9,
+      "nominal": 0.75,
+      "empirical_ft": 0.6875
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 9,
+      "nominal": 0.9,
+      "empirical_ft": 0.8661
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 10,
+      "nominal": 0.1,
+      "empirical_ft": 0.0446
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 10,
+      "nominal": 0.25,
+      "empirical_ft": 0.1786
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 10,
+      "nominal": 0.5,
+      "empirical_ft": 0.4643
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 10,
+      "nominal": 0.75,
+      "empirical_ft": 0.6786
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 10,
+      "nominal": 0.9,
+      "empirical_ft": 0.8839
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 11,
+      "nominal": 0.1,
+      "empirical_ft": 0.045
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 11,
+      "nominal": 0.25,
+      "empirical_ft": 0.1441
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 11,
+      "nominal": 0.5,
+      "empirical_ft": 0.4414
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 11,
+      "nominal": 0.75,
+      "empirical_ft": 0.6667
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 11,
+      "nominal": 0.9,
+      "empirical_ft": 0.8919
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 12,
+      "nominal": 0.1,
+      "empirical_ft": 0.0545
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 12,
+      "nominal": 0.25,
+      "empirical_ft": 0.1273
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 12,
+      "nominal": 0.5,
+      "empirical_ft": 0.4364
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 12,
+      "nominal": 0.75,
+      "empirical_ft": 0.6545
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "horizon": 12,
+      "nominal": 0.9,
+      "empirical_ft": 0.9182
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 1,
+      "nominal": 0.1,
+      "empirical_ft": 0.1786
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 1,
+      "nominal": 0.25,
+      "empirical_ft": 0.4107
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 1,
+      "nominal": 0.5,
+      "empirical_ft": 0.625
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 1,
+      "nominal": 0.75,
+      "empirical_ft": 0.7411
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 1,
+      "nominal": 0.9,
+      "empirical_ft": 0.8393
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 2,
+      "nominal": 0.1,
+      "empirical_ft": 0.125
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 2,
+      "nominal": 0.25,
+      "empirical_ft": 0.3393
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 2,
+      "nominal": 0.5,
+      "empirical_ft": 0.6071
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 2,
+      "nominal": 0.75,
+      "empirical_ft": 0.7232
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 2,
+      "nominal": 0.9,
+      "empirical_ft": 0.8393
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 3,
+      "nominal": 0.1,
+      "empirical_ft": 0.1161
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 3,
+      "nominal": 0.25,
+      "empirical_ft": 0.25
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 3,
+      "nominal": 0.5,
+      "empirical_ft": 0.5179
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 3,
+      "nominal": 0.75,
+      "empirical_ft": 0.7232
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 3,
+      "nominal": 0.9,
+      "empirical_ft": 0.8661
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 4,
+      "nominal": 0.1,
+      "empirical_ft": 0.1071
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 4,
+      "nominal": 0.25,
+      "empirical_ft": 0.2321
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 4,
+      "nominal": 0.5,
+      "empirical_ft": 0.5089
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 4,
+      "nominal": 0.75,
+      "empirical_ft": 0.7411
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 4,
+      "nominal": 0.9,
+      "empirical_ft": 0.8214
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 5,
+      "nominal": 0.1,
+      "empirical_ft": 0.0893
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 5,
+      "nominal": 0.25,
+      "empirical_ft": 0.2679
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 5,
+      "nominal": 0.5,
+      "empirical_ft": 0.4911
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 5,
+      "nominal": 0.75,
+      "empirical_ft": 0.7232
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 5,
+      "nominal": 0.9,
+      "empirical_ft": 0.8304
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 6,
+      "nominal": 0.1,
+      "empirical_ft": 0.0804
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 6,
+      "nominal": 0.25,
+      "empirical_ft": 0.2321
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 6,
+      "nominal": 0.5,
+      "empirical_ft": 0.4643
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 6,
+      "nominal": 0.75,
+      "empirical_ft": 0.6875
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 6,
+      "nominal": 0.9,
+      "empirical_ft": 0.8482
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 7,
+      "nominal": 0.1,
+      "empirical_ft": 0.1161
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 7,
+      "nominal": 0.25,
+      "empirical_ft": 0.2143
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 7,
+      "nominal": 0.5,
+      "empirical_ft": 0.4732
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 7,
+      "nominal": 0.75,
+      "empirical_ft": 0.6429
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 7,
+      "nominal": 0.9,
+      "empirical_ft": 0.8571
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 8,
+      "nominal": 0.1,
+      "empirical_ft": 0.1339
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 8,
+      "nominal": 0.25,
+      "empirical_ft": 0.2054
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 8,
+      "nominal": 0.5,
+      "empirical_ft": 0.3929
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 8,
+      "nominal": 0.75,
+      "empirical_ft": 0.6786
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 8,
+      "nominal": 0.9,
+      "empirical_ft": 0.8393
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 9,
+      "nominal": 0.1,
+      "empirical_ft": 0.1161
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 9,
+      "nominal": 0.25,
+      "empirical_ft": 0.2321
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 9,
+      "nominal": 0.5,
+      "empirical_ft": 0.4018
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 9,
+      "nominal": 0.75,
+      "empirical_ft": 0.6696
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 9,
+      "nominal": 0.9,
+      "empirical_ft": 0.8393
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 10,
+      "nominal": 0.1,
+      "empirical_ft": 0.0982
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 10,
+      "nominal": 0.25,
+      "empirical_ft": 0.2321
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 10,
+      "nominal": 0.5,
+      "empirical_ft": 0.3839
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 10,
+      "nominal": 0.75,
+      "empirical_ft": 0.6875
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 10,
+      "nominal": 0.9,
+      "empirical_ft": 0.8304
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 11,
+      "nominal": 0.1,
+      "empirical_ft": 0.0811
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 11,
+      "nominal": 0.25,
+      "empirical_ft": 0.2613
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 11,
+      "nominal": 0.5,
+      "empirical_ft": 0.3514
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 11,
+      "nominal": 0.75,
+      "empirical_ft": 0.6396
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 11,
+      "nominal": 0.9,
+      "empirical_ft": 0.7928
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 12,
+      "nominal": 0.1,
+      "empirical_ft": 0.1
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 12,
+      "nominal": 0.25,
+      "empirical_ft": 0.2364
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 12,
+      "nominal": 0.5,
+      "empirical_ft": 0.3909
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 12,
+      "nominal": 0.75,
+      "empirical_ft": 0.6182
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "horizon": 12,
+      "nominal": 0.9,
+      "empirical_ft": 0.8
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 1,
+      "nominal": 0.1,
+      "empirical_ft": 0.1875
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 1,
+      "nominal": 0.25,
+      "empirical_ft": 0.3393
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 1,
+      "nominal": 0.5,
+      "empirical_ft": 0.5625
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 1,
+      "nominal": 0.75,
+      "empirical_ft": 0.7232
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 1,
+      "nominal": 0.9,
+      "empirical_ft": 0.8839
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 2,
+      "nominal": 0.1,
+      "empirical_ft": 0.1875
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 2,
+      "nominal": 0.25,
+      "empirical_ft": 0.3214
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 2,
+      "nominal": 0.5,
+      "empirical_ft": 0.5357
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 2,
+      "nominal": 0.75,
+      "empirical_ft": 0.7589
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 2,
+      "nominal": 0.9,
+      "empirical_ft": 0.9018
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 3,
+      "nominal": 0.1,
+      "empirical_ft": 0.1786
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 3,
+      "nominal": 0.25,
+      "empirical_ft": 0.2946
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 3,
+      "nominal": 0.5,
+      "empirical_ft": 0.5268
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 3,
+      "nominal": 0.75,
+      "empirical_ft": 0.7768
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 3,
+      "nominal": 0.9,
+      "empirical_ft": 0.8929
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 4,
+      "nominal": 0.1,
+      "empirical_ft": 0.1429
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 4,
+      "nominal": 0.25,
+      "empirical_ft": 0.3214
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 4,
+      "nominal": 0.5,
+      "empirical_ft": 0.5179
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 4,
+      "nominal": 0.75,
+      "empirical_ft": 0.7679
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 4,
+      "nominal": 0.9,
+      "empirical_ft": 0.9107
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 5,
+      "nominal": 0.1,
+      "empirical_ft": 0.1518
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 5,
+      "nominal": 0.25,
+      "empirical_ft": 0.2857
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 5,
+      "nominal": 0.5,
+      "empirical_ft": 0.5446
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 5,
+      "nominal": 0.75,
+      "empirical_ft": 0.7679
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 5,
+      "nominal": 0.9,
+      "empirical_ft": 0.9018
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 6,
+      "nominal": 0.1,
+      "empirical_ft": 0.1518
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 6,
+      "nominal": 0.25,
+      "empirical_ft": 0.2768
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 6,
+      "nominal": 0.5,
+      "empirical_ft": 0.5
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 6,
+      "nominal": 0.75,
+      "empirical_ft": 0.7679
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 6,
+      "nominal": 0.9,
+      "empirical_ft": 0.9107
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 7,
+      "nominal": 0.1,
+      "empirical_ft": 0.1429
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 7,
+      "nominal": 0.25,
+      "empirical_ft": 0.2857
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 7,
+      "nominal": 0.5,
+      "empirical_ft": 0.5089
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 7,
+      "nominal": 0.75,
+      "empirical_ft": 0.7857
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 7,
+      "nominal": 0.9,
+      "empirical_ft": 0.9196
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 8,
+      "nominal": 0.1,
+      "empirical_ft": 0.1429
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 8,
+      "nominal": 0.25,
+      "empirical_ft": 0.3125
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 8,
+      "nominal": 0.5,
+      "empirical_ft": 0.5357
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 8,
+      "nominal": 0.75,
+      "empirical_ft": 0.75
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 8,
+      "nominal": 0.9,
+      "empirical_ft": 0.9196
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 9,
+      "nominal": 0.1,
+      "empirical_ft": 0.1607
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 9,
+      "nominal": 0.25,
+      "empirical_ft": 0.3036
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 9,
+      "nominal": 0.5,
+      "empirical_ft": 0.5
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 9,
+      "nominal": 0.75,
+      "empirical_ft": 0.7857
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 9,
+      "nominal": 0.9,
+      "empirical_ft": 0.8929
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 10,
+      "nominal": 0.1,
+      "empirical_ft": 0.1339
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 10,
+      "nominal": 0.25,
+      "empirical_ft": 0.3125
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 10,
+      "nominal": 0.5,
+      "empirical_ft": 0.5
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 10,
+      "nominal": 0.75,
+      "empirical_ft": 0.75
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 10,
+      "nominal": 0.9,
+      "empirical_ft": 0.9018
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 11,
+      "nominal": 0.1,
+      "empirical_ft": 0.1712
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 11,
+      "nominal": 0.25,
+      "empirical_ft": 0.3243
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 11,
+      "nominal": 0.5,
+      "empirical_ft": 0.5045
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 11,
+      "nominal": 0.75,
+      "empirical_ft": 0.7387
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 11,
+      "nominal": 0.9,
+      "empirical_ft": 0.9099
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 12,
+      "nominal": 0.1,
+      "empirical_ft": 0.1545
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 12,
+      "nominal": 0.25,
+      "empirical_ft": 0.3273
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 12,
+      "nominal": 0.5,
+      "empirical_ft": 0.4727
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 12,
+      "nominal": 0.75,
+      "empirical_ft": 0.7545
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "horizon": 12,
+      "nominal": 0.9,
+      "empirical_ft": 0.9
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 1,
+      "nominal": 0.1,
+      "empirical_ft": 0.1696
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 1,
+      "nominal": 0.25,
+      "empirical_ft": 0.3304
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 1,
+      "nominal": 0.5,
+      "empirical_ft": 0.4732
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 1,
+      "nominal": 0.75,
+      "empirical_ft": 0.6696
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 1,
+      "nominal": 0.9,
+      "empirical_ft": 0.8393
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 2,
+      "nominal": 0.1,
+      "empirical_ft": 0.1339
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 2,
+      "nominal": 0.25,
+      "empirical_ft": 0.2679
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 2,
+      "nominal": 0.5,
+      "empirical_ft": 0.4911
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 2,
+      "nominal": 0.75,
+      "empirical_ft": 0.7054
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 2,
+      "nominal": 0.9,
+      "empirical_ft": 0.8304
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 3,
+      "nominal": 0.1,
+      "empirical_ft": 0.0804
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 3,
+      "nominal": 0.25,
+      "empirical_ft": 0.2411
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 3,
+      "nominal": 0.5,
+      "empirical_ft": 0.4375
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 3,
+      "nominal": 0.75,
+      "empirical_ft": 0.7232
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 3,
+      "nominal": 0.9,
+      "empirical_ft": 0.8482
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 4,
+      "nominal": 0.1,
+      "empirical_ft": 0.0714
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 4,
+      "nominal": 0.25,
+      "empirical_ft": 0.2232
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 4,
+      "nominal": 0.5,
+      "empirical_ft": 0.4821
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 4,
+      "nominal": 0.75,
+      "empirical_ft": 0.7232
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 4,
+      "nominal": 0.9,
+      "empirical_ft": 0.8482
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 5,
+      "nominal": 0.1,
+      "empirical_ft": 0.0804
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 5,
+      "nominal": 0.25,
+      "empirical_ft": 0.2232
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 5,
+      "nominal": 0.5,
+      "empirical_ft": 0.4732
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 5,
+      "nominal": 0.75,
+      "empirical_ft": 0.6786
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 5,
+      "nominal": 0.9,
+      "empirical_ft": 0.8393
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 6,
+      "nominal": 0.1,
+      "empirical_ft": 0.0714
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 6,
+      "nominal": 0.25,
+      "empirical_ft": 0.2143
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 6,
+      "nominal": 0.5,
+      "empirical_ft": 0.4821
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 6,
+      "nominal": 0.75,
+      "empirical_ft": 0.7321
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 6,
+      "nominal": 0.9,
+      "empirical_ft": 0.8393
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 7,
+      "nominal": 0.1,
+      "empirical_ft": 0.0804
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 7,
+      "nominal": 0.25,
+      "empirical_ft": 0.1786
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 7,
+      "nominal": 0.5,
+      "empirical_ft": 0.4732
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 7,
+      "nominal": 0.75,
+      "empirical_ft": 0.7321
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 7,
+      "nominal": 0.9,
+      "empirical_ft": 0.8214
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 8,
+      "nominal": 0.1,
+      "empirical_ft": 0.0893
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 8,
+      "nominal": 0.25,
+      "empirical_ft": 0.1875
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 8,
+      "nominal": 0.5,
+      "empirical_ft": 0.5089
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 8,
+      "nominal": 0.75,
+      "empirical_ft": 0.7232
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 8,
+      "nominal": 0.9,
+      "empirical_ft": 0.8036
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 9,
+      "nominal": 0.1,
+      "empirical_ft": 0.0982
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 9,
+      "nominal": 0.25,
+      "empirical_ft": 0.1875
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 9,
+      "nominal": 0.5,
+      "empirical_ft": 0.4821
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 9,
+      "nominal": 0.75,
+      "empirical_ft": 0.7321
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 9,
+      "nominal": 0.9,
+      "empirical_ft": 0.8036
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 10,
+      "nominal": 0.1,
+      "empirical_ft": 0.0982
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 10,
+      "nominal": 0.25,
+      "empirical_ft": 0.1607
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 10,
+      "nominal": 0.5,
+      "empirical_ft": 0.4911
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 10,
+      "nominal": 0.75,
+      "empirical_ft": 0.7321
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 10,
+      "nominal": 0.9,
+      "empirical_ft": 0.7946
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 11,
+      "nominal": 0.1,
+      "empirical_ft": 0.0721
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 11,
+      "nominal": 0.25,
+      "empirical_ft": 0.1892
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 11,
+      "nominal": 0.5,
+      "empirical_ft": 0.4865
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 11,
+      "nominal": 0.75,
+      "empirical_ft": 0.7297
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 11,
+      "nominal": 0.9,
+      "empirical_ft": 0.7838
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 12,
+      "nominal": 0.1,
+      "empirical_ft": 0.0727
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 12,
+      "nominal": 0.25,
+      "empirical_ft": 0.1636
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 12,
+      "nominal": 0.5,
+      "empirical_ft": 0.4455
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 12,
+      "nominal": 0.75,
+      "empirical_ft": 0.7364
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "horizon": 12,
+      "nominal": 0.9,
+      "empirical_ft": 0.7909
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 1,
+      "nominal": 0.1,
+      "empirical_ft": 0.0893
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 1,
+      "nominal": 0.25,
+      "empirical_ft": 0.2054
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 1,
+      "nominal": 0.5,
+      "empirical_ft": 0.375
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 1,
+      "nominal": 0.75,
+      "empirical_ft": 0.4196
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 1,
+      "nominal": 0.9,
+      "empirical_ft": 0.6786
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 2,
+      "nominal": 0.1,
+      "empirical_ft": 0.0714
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 2,
+      "nominal": 0.25,
+      "empirical_ft": 0.1875
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 2,
+      "nominal": 0.5,
+      "empirical_ft": 0.3482
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 2,
+      "nominal": 0.75,
+      "empirical_ft": 0.5714
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 2,
+      "nominal": 0.9,
+      "empirical_ft": 0.6786
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 3,
+      "nominal": 0.1,
+      "empirical_ft": 0.0714
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 3,
+      "nominal": 0.25,
+      "empirical_ft": 0.1696
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 3,
+      "nominal": 0.5,
+      "empirical_ft": 0.3393
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 3,
+      "nominal": 0.75,
+      "empirical_ft": 0.5268
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 3,
+      "nominal": 0.9,
+      "empirical_ft": 0.7143
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 4,
+      "nominal": 0.1,
+      "empirical_ft": 0.0714
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 4,
+      "nominal": 0.25,
+      "empirical_ft": 0.2054
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 4,
+      "nominal": 0.5,
+      "empirical_ft": 0.3125
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 4,
+      "nominal": 0.75,
+      "empirical_ft": 0.5179
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 4,
+      "nominal": 0.9,
+      "empirical_ft": 0.7232
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 5,
+      "nominal": 0.1,
+      "empirical_ft": 0.0625
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 5,
+      "nominal": 0.25,
+      "empirical_ft": 0.1161
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 5,
+      "nominal": 0.5,
+      "empirical_ft": 0.3571
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 5,
+      "nominal": 0.75,
+      "empirical_ft": 0.625
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 5,
+      "nominal": 0.9,
+      "empirical_ft": 0.7857
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 6,
+      "nominal": 0.1,
+      "empirical_ft": 0.0714
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 6,
+      "nominal": 0.25,
+      "empirical_ft": 0.1429
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 6,
+      "nominal": 0.5,
+      "empirical_ft": 0.3125
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 6,
+      "nominal": 0.75,
+      "empirical_ft": 0.5714
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 6,
+      "nominal": 0.9,
+      "empirical_ft": 0.8304
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 7,
+      "nominal": 0.1,
+      "empirical_ft": 0.0804
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 7,
+      "nominal": 0.25,
+      "empirical_ft": 0.1161
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 7,
+      "nominal": 0.5,
+      "empirical_ft": 0.3571
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 7,
+      "nominal": 0.75,
+      "empirical_ft": 0.6518
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 7,
+      "nominal": 0.9,
+      "empirical_ft": 0.8036
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 8,
+      "nominal": 0.1,
+      "empirical_ft": 0.0893
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 8,
+      "nominal": 0.25,
+      "empirical_ft": 0.1071
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 8,
+      "nominal": 0.5,
+      "empirical_ft": 0.3929
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 8,
+      "nominal": 0.75,
+      "empirical_ft": 0.6875
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 8,
+      "nominal": 0.9,
+      "empirical_ft": 0.8839
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 9,
+      "nominal": 0.1,
+      "empirical_ft": 0.0982
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 9,
+      "nominal": 0.25,
+      "empirical_ft": 0.1161
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 9,
+      "nominal": 0.5,
+      "empirical_ft": 0.375
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 9,
+      "nominal": 0.75,
+      "empirical_ft": 0.7054
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 9,
+      "nominal": 0.9,
+      "empirical_ft": 0.8839
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 10,
+      "nominal": 0.1,
+      "empirical_ft": 0.1081
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 10,
+      "nominal": 0.25,
+      "empirical_ft": 0.1081
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 10,
+      "nominal": 0.5,
+      "empirical_ft": 0.3694
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 10,
+      "nominal": 0.75,
+      "empirical_ft": 0.6577
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 10,
+      "nominal": 0.9,
+      "empirical_ft": 0.8739
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 11,
+      "nominal": 0.1,
+      "empirical_ft": 0.1091
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 11,
+      "nominal": 0.25,
+      "empirical_ft": 0.1364
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 11,
+      "nominal": 0.5,
+      "empirical_ft": 0.3727
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 11,
+      "nominal": 0.75,
+      "empirical_ft": 0.6364
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 11,
+      "nominal": 0.9,
+      "empirical_ft": 0.8545
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 12,
+      "nominal": 0.1,
+      "empirical_ft": 0.1284
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 12,
+      "nominal": 0.25,
+      "empirical_ft": 0.1284
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 12,
+      "nominal": 0.5,
+      "empirical_ft": 0.3486
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 12,
+      "nominal": 0.75,
+      "empirical_ft": 0.633
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "horizon": 12,
+      "nominal": 0.9,
+      "empirical_ft": 0.844
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 1,
+      "nominal": 0.1,
+      "empirical_ft": 0.0893
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 1,
+      "nominal": 0.25,
+      "empirical_ft": 0.1696
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 1,
+      "nominal": 0.5,
+      "empirical_ft": 0.3393
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 1,
+      "nominal": 0.75,
+      "empirical_ft": 0.4732
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 1,
+      "nominal": 0.9,
+      "empirical_ft": 0.625
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 2,
+      "nominal": 0.1,
+      "empirical_ft": 0.0625
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 2,
+      "nominal": 0.25,
+      "empirical_ft": 0.1696
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 2,
+      "nominal": 0.5,
+      "empirical_ft": 0.3393
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 2,
+      "nominal": 0.75,
+      "empirical_ft": 0.5089
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 2,
+      "nominal": 0.9,
+      "empirical_ft": 0.5625
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 3,
+      "nominal": 0.1,
+      "empirical_ft": 0.0536
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 3,
+      "nominal": 0.25,
+      "empirical_ft": 0.1518
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 3,
+      "nominal": 0.5,
+      "empirical_ft": 0.2857
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 3,
+      "nominal": 0.75,
+      "empirical_ft": 0.5268
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 3,
+      "nominal": 0.9,
+      "empirical_ft": 0.6339
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 4,
+      "nominal": 0.1,
+      "empirical_ft": 0.0804
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 4,
+      "nominal": 0.25,
+      "empirical_ft": 0.1786
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 4,
+      "nominal": 0.5,
+      "empirical_ft": 0.2679
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 4,
+      "nominal": 0.75,
+      "empirical_ft": 0.5
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 4,
+      "nominal": 0.9,
+      "empirical_ft": 0.6518
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 5,
+      "nominal": 0.1,
+      "empirical_ft": 0.0625
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 5,
+      "nominal": 0.25,
+      "empirical_ft": 0.125
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 5,
+      "nominal": 0.5,
+      "empirical_ft": 0.3393
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 5,
+      "nominal": 0.75,
+      "empirical_ft": 0.5268
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 5,
+      "nominal": 0.9,
+      "empirical_ft": 0.6518
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 6,
+      "nominal": 0.1,
+      "empirical_ft": 0.0446
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 6,
+      "nominal": 0.25,
+      "empirical_ft": 0.1607
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 6,
+      "nominal": 0.5,
+      "empirical_ft": 0.3214
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 6,
+      "nominal": 0.75,
+      "empirical_ft": 0.5089
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 6,
+      "nominal": 0.9,
+      "empirical_ft": 0.5893
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 7,
+      "nominal": 0.1,
+      "empirical_ft": 0.0446
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 7,
+      "nominal": 0.25,
+      "empirical_ft": 0.1786
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 7,
+      "nominal": 0.5,
+      "empirical_ft": 0.3393
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 7,
+      "nominal": 0.75,
+      "empirical_ft": 0.4911
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 7,
+      "nominal": 0.9,
+      "empirical_ft": 0.5804
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 8,
+      "nominal": 0.1,
+      "empirical_ft": 0.0536
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 8,
+      "nominal": 0.25,
+      "empirical_ft": 0.2054
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 8,
+      "nominal": 0.5,
+      "empirical_ft": 0.3393
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 8,
+      "nominal": 0.75,
+      "empirical_ft": 0.4732
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 8,
+      "nominal": 0.9,
+      "empirical_ft": 0.6339
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 9,
+      "nominal": 0.1,
+      "empirical_ft": 0.0804
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 9,
+      "nominal": 0.25,
+      "empirical_ft": 0.2054
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 9,
+      "nominal": 0.5,
+      "empirical_ft": 0.3661
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 9,
+      "nominal": 0.75,
+      "empirical_ft": 0.4911
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 9,
+      "nominal": 0.9,
+      "empirical_ft": 0.6161
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 10,
+      "nominal": 0.1,
+      "empirical_ft": 0.0721
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 10,
+      "nominal": 0.25,
+      "empirical_ft": 0.1802
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 10,
+      "nominal": 0.5,
+      "empirical_ft": 0.3514
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 10,
+      "nominal": 0.75,
+      "empirical_ft": 0.4595
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 10,
+      "nominal": 0.9,
+      "empirical_ft": 0.6036
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 11,
+      "nominal": 0.1,
+      "empirical_ft": 0.1091
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 11,
+      "nominal": 0.25,
+      "empirical_ft": 0.1909
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 11,
+      "nominal": 0.5,
+      "empirical_ft": 0.3455
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 11,
+      "nominal": 0.75,
+      "empirical_ft": 0.5
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 11,
+      "nominal": 0.9,
+      "empirical_ft": 0.5636
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 12,
+      "nominal": 0.1,
+      "empirical_ft": 0.0734
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 12,
+      "nominal": 0.25,
+      "empirical_ft": 0.1743
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 12,
+      "nominal": 0.5,
+      "empirical_ft": 0.3394
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 12,
+      "nominal": 0.75,
+      "empirical_ft": 0.4495
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "horizon": 12,
+      "nominal": 0.9,
+      "empirical_ft": 0.5413
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 1,
+      "nominal": 0.1,
+      "empirical_ft": 0.2768
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 1,
+      "nominal": 0.25,
+      "empirical_ft": 0.5089
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 1,
+      "nominal": 0.5,
+      "empirical_ft": 0.625
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 1,
+      "nominal": 0.75,
+      "empirical_ft": 0.7411
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 1,
+      "nominal": 0.9,
+      "empirical_ft": 0.8929
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 2,
+      "nominal": 0.1,
+      "empirical_ft": 0.2946
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 2,
+      "nominal": 0.25,
+      "empirical_ft": 0.4196
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 2,
+      "nominal": 0.5,
+      "empirical_ft": 0.5714
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 2,
+      "nominal": 0.75,
+      "empirical_ft": 0.7589
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 2,
+      "nominal": 0.9,
+      "empirical_ft": 0.8929
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 3,
+      "nominal": 0.1,
+      "empirical_ft": 0.2321
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 3,
+      "nominal": 0.25,
+      "empirical_ft": 0.4464
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 3,
+      "nominal": 0.5,
+      "empirical_ft": 0.5893
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 3,
+      "nominal": 0.75,
+      "empirical_ft": 0.8036
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 3,
+      "nominal": 0.9,
+      "empirical_ft": 0.9196
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 4,
+      "nominal": 0.1,
+      "empirical_ft": 0.2411
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 4,
+      "nominal": 0.25,
+      "empirical_ft": 0.4375
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 4,
+      "nominal": 0.5,
+      "empirical_ft": 0.5893
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 4,
+      "nominal": 0.75,
+      "empirical_ft": 0.7946
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 4,
+      "nominal": 0.9,
+      "empirical_ft": 0.9196
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 5,
+      "nominal": 0.1,
+      "empirical_ft": 0.2143
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 5,
+      "nominal": 0.25,
+      "empirical_ft": 0.4107
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 5,
+      "nominal": 0.5,
+      "empirical_ft": 0.5625
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 5,
+      "nominal": 0.75,
+      "empirical_ft": 0.8036
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 5,
+      "nominal": 0.9,
+      "empirical_ft": 0.9018
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 6,
+      "nominal": 0.1,
+      "empirical_ft": 0.2054
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 6,
+      "nominal": 0.25,
+      "empirical_ft": 0.4286
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 6,
+      "nominal": 0.5,
+      "empirical_ft": 0.5982
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 6,
+      "nominal": 0.75,
+      "empirical_ft": 0.7946
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 6,
+      "nominal": 0.9,
+      "empirical_ft": 0.9107
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 7,
+      "nominal": 0.1,
+      "empirical_ft": 0.2232
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 7,
+      "nominal": 0.25,
+      "empirical_ft": 0.4375
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 7,
+      "nominal": 0.5,
+      "empirical_ft": 0.5982
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 7,
+      "nominal": 0.75,
+      "empirical_ft": 0.7768
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 7,
+      "nominal": 0.9,
+      "empirical_ft": 0.9018
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 8,
+      "nominal": 0.1,
+      "empirical_ft": 0.2321
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 8,
+      "nominal": 0.25,
+      "empirical_ft": 0.4107
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 8,
+      "nominal": 0.5,
+      "empirical_ft": 0.6071
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 8,
+      "nominal": 0.75,
+      "empirical_ft": 0.7589
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 8,
+      "nominal": 0.9,
+      "empirical_ft": 0.8929
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 9,
+      "nominal": 0.1,
+      "empirical_ft": 0.2411
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 9,
+      "nominal": 0.25,
+      "empirical_ft": 0.4375
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 9,
+      "nominal": 0.5,
+      "empirical_ft": 0.5804
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 9,
+      "nominal": 0.75,
+      "empirical_ft": 0.75
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 9,
+      "nominal": 0.9,
+      "empirical_ft": 0.875
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 10,
+      "nominal": 0.1,
+      "empirical_ft": 0.2589
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 10,
+      "nominal": 0.25,
+      "empirical_ft": 0.4196
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 10,
+      "nominal": 0.5,
+      "empirical_ft": 0.5893
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 10,
+      "nominal": 0.75,
+      "empirical_ft": 0.7589
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 10,
+      "nominal": 0.9,
+      "empirical_ft": 0.8839
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 11,
+      "nominal": 0.1,
+      "empirical_ft": 0.2793
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 11,
+      "nominal": 0.25,
+      "empirical_ft": 0.4234
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 11,
+      "nominal": 0.5,
+      "empirical_ft": 0.5766
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 11,
+      "nominal": 0.75,
+      "empirical_ft": 0.7387
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 11,
+      "nominal": 0.9,
+      "empirical_ft": 0.8829
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 12,
+      "nominal": 0.1,
+      "empirical_ft": 0.2909
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 12,
+      "nominal": 0.25,
+      "empirical_ft": 0.4364
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 12,
+      "nominal": 0.5,
+      "empirical_ft": 0.5909
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 12,
+      "nominal": 0.75,
+      "empirical_ft": 0.7273
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "horizon": 12,
+      "nominal": 0.9,
+      "empirical_ft": 0.8818
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 1,
+      "nominal": 0.1,
+      "empirical_ft": 0.1786
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 1,
+      "nominal": 0.25,
+      "empirical_ft": 0.3571
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 1,
+      "nominal": 0.5,
+      "empirical_ft": 0.4911
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 1,
+      "nominal": 0.75,
+      "empirical_ft": 0.6429
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 1,
+      "nominal": 0.9,
+      "empirical_ft": 0.7768
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 2,
+      "nominal": 0.1,
+      "empirical_ft": 0.125
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 2,
+      "nominal": 0.25,
+      "empirical_ft": 0.3393
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 2,
+      "nominal": 0.5,
+      "empirical_ft": 0.4643
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 2,
+      "nominal": 0.75,
+      "empirical_ft": 0.6161
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 2,
+      "nominal": 0.9,
+      "empirical_ft": 0.7321
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 3,
+      "nominal": 0.1,
+      "empirical_ft": 0.1161
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 3,
+      "nominal": 0.25,
+      "empirical_ft": 0.2857
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 3,
+      "nominal": 0.5,
+      "empirical_ft": 0.4911
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 3,
+      "nominal": 0.75,
+      "empirical_ft": 0.6071
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 3,
+      "nominal": 0.9,
+      "empirical_ft": 0.7768
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 4,
+      "nominal": 0.1,
+      "empirical_ft": 0.0982
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 4,
+      "nominal": 0.25,
+      "empirical_ft": 0.2946
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 4,
+      "nominal": 0.5,
+      "empirical_ft": 0.4286
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 4,
+      "nominal": 0.75,
+      "empirical_ft": 0.6161
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 4,
+      "nominal": 0.9,
+      "empirical_ft": 0.7768
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 5,
+      "nominal": 0.1,
+      "empirical_ft": 0.0804
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 5,
+      "nominal": 0.25,
+      "empirical_ft": 0.2321
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 5,
+      "nominal": 0.5,
+      "empirical_ft": 0.4732
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 5,
+      "nominal": 0.75,
+      "empirical_ft": 0.6339
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 5,
+      "nominal": 0.9,
+      "empirical_ft": 0.7589
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 6,
+      "nominal": 0.1,
+      "empirical_ft": 0.0982
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 6,
+      "nominal": 0.25,
+      "empirical_ft": 0.25
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 6,
+      "nominal": 0.5,
+      "empirical_ft": 0.5089
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 6,
+      "nominal": 0.75,
+      "empirical_ft": 0.6071
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 6,
+      "nominal": 0.9,
+      "empirical_ft": 0.75
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 7,
+      "nominal": 0.1,
+      "empirical_ft": 0.0804
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 7,
+      "nominal": 0.25,
+      "empirical_ft": 0.2857
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 7,
+      "nominal": 0.5,
+      "empirical_ft": 0.4911
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 7,
+      "nominal": 0.75,
+      "empirical_ft": 0.6071
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 7,
+      "nominal": 0.9,
+      "empirical_ft": 0.7321
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 8,
+      "nominal": 0.1,
+      "empirical_ft": 0.0893
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 8,
+      "nominal": 0.25,
+      "empirical_ft": 0.2679
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 8,
+      "nominal": 0.5,
+      "empirical_ft": 0.5
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 8,
+      "nominal": 0.75,
+      "empirical_ft": 0.6161
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 8,
+      "nominal": 0.9,
+      "empirical_ft": 0.7143
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 9,
+      "nominal": 0.1,
+      "empirical_ft": 0.0982
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 9,
+      "nominal": 0.25,
+      "empirical_ft": 0.25
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 9,
+      "nominal": 0.5,
+      "empirical_ft": 0.5089
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 9,
+      "nominal": 0.75,
+      "empirical_ft": 0.6161
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 9,
+      "nominal": 0.9,
+      "empirical_ft": 0.7232
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 10,
+      "nominal": 0.1,
+      "empirical_ft": 0.0893
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 10,
+      "nominal": 0.25,
+      "empirical_ft": 0.2411
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 10,
+      "nominal": 0.5,
+      "empirical_ft": 0.5
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 10,
+      "nominal": 0.75,
+      "empirical_ft": 0.6071
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 10,
+      "nominal": 0.9,
+      "empirical_ft": 0.7321
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 11,
+      "nominal": 0.1,
+      "empirical_ft": 0.0714
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 11,
+      "nominal": 0.25,
+      "empirical_ft": 0.2321
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 11,
+      "nominal": 0.5,
+      "empirical_ft": 0.5089
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 11,
+      "nominal": 0.75,
+      "empirical_ft": 0.625
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 11,
+      "nominal": 0.9,
+      "empirical_ft": 0.7143
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 12,
+      "nominal": 0.1,
+      "empirical_ft": 0.0811
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 12,
+      "nominal": 0.25,
+      "empirical_ft": 0.2342
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 12,
+      "nominal": 0.5,
+      "empirical_ft": 0.5495
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 12,
+      "nominal": 0.75,
+      "empirical_ft": 0.6306
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "horizon": 12,
+      "nominal": 0.9,
+      "empirical_ft": 0.7207
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 1,
+      "nominal": 0.1,
+      "empirical_ft": 0.0804
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 1,
+      "nominal": 0.25,
+      "empirical_ft": 0.2321
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 1,
+      "nominal": 0.5,
+      "empirical_ft": 0.4107
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 1,
+      "nominal": 0.75,
+      "empirical_ft": 0.6071
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 1,
+      "nominal": 0.9,
+      "empirical_ft": 0.8036
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 2,
+      "nominal": 0.1,
+      "empirical_ft": 0.0804
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 2,
+      "nominal": 0.25,
+      "empirical_ft": 0.1964
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 2,
+      "nominal": 0.5,
+      "empirical_ft": 0.375
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 2,
+      "nominal": 0.75,
+      "empirical_ft": 0.5714
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 2,
+      "nominal": 0.9,
+      "empirical_ft": 0.7857
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 3,
+      "nominal": 0.1,
+      "empirical_ft": 0.0536
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 3,
+      "nominal": 0.25,
+      "empirical_ft": 0.1696
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 3,
+      "nominal": 0.5,
+      "empirical_ft": 0.3929
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 3,
+      "nominal": 0.75,
+      "empirical_ft": 0.5625
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 3,
+      "nominal": 0.9,
+      "empirical_ft": 0.7679
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 4,
+      "nominal": 0.1,
+      "empirical_ft": 0.0357
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 4,
+      "nominal": 0.25,
+      "empirical_ft": 0.1875
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 4,
+      "nominal": 0.5,
+      "empirical_ft": 0.3571
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 4,
+      "nominal": 0.75,
+      "empirical_ft": 0.5625
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 4,
+      "nominal": 0.9,
+      "empirical_ft": 0.7143
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 5,
+      "nominal": 0.1,
+      "empirical_ft": 0.0446
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 5,
+      "nominal": 0.25,
+      "empirical_ft": 0.1161
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 5,
+      "nominal": 0.5,
+      "empirical_ft": 0.3304
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 5,
+      "nominal": 0.75,
+      "empirical_ft": 0.5
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 5,
+      "nominal": 0.9,
+      "empirical_ft": 0.7321
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 6,
+      "nominal": 0.1,
+      "empirical_ft": 0.0446
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 6,
+      "nominal": 0.25,
+      "empirical_ft": 0.125
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 6,
+      "nominal": 0.5,
+      "empirical_ft": 0.3125
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 6,
+      "nominal": 0.75,
+      "empirical_ft": 0.5268
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 6,
+      "nominal": 0.9,
+      "empirical_ft": 0.7321
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 7,
+      "nominal": 0.1,
+      "empirical_ft": 0.0446
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 7,
+      "nominal": 0.25,
+      "empirical_ft": 0.0893
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 7,
+      "nominal": 0.5,
+      "empirical_ft": 0.2857
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 7,
+      "nominal": 0.75,
+      "empirical_ft": 0.5625
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 7,
+      "nominal": 0.9,
+      "empirical_ft": 0.6786
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 8,
+      "nominal": 0.1,
+      "empirical_ft": 0.0357
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 8,
+      "nominal": 0.25,
+      "empirical_ft": 0.0714
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 8,
+      "nominal": 0.5,
+      "empirical_ft": 0.2589
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 8,
+      "nominal": 0.75,
+      "empirical_ft": 0.5089
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 8,
+      "nominal": 0.9,
+      "empirical_ft": 0.7143
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 9,
+      "nominal": 0.1,
+      "empirical_ft": 0.0357
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 9,
+      "nominal": 0.25,
+      "empirical_ft": 0.0893
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 9,
+      "nominal": 0.5,
+      "empirical_ft": 0.2679
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 9,
+      "nominal": 0.75,
+      "empirical_ft": 0.5179
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 9,
+      "nominal": 0.9,
+      "empirical_ft": 0.7143
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 10,
+      "nominal": 0.1,
+      "empirical_ft": 0.0357
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 10,
+      "nominal": 0.25,
+      "empirical_ft": 0.0714
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 10,
+      "nominal": 0.5,
+      "empirical_ft": 0.2232
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 10,
+      "nominal": 0.75,
+      "empirical_ft": 0.5089
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 10,
+      "nominal": 0.9,
+      "empirical_ft": 0.6875
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 11,
+      "nominal": 0.1,
+      "empirical_ft": 0.036
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 11,
+      "nominal": 0.25,
+      "empirical_ft": 0.0631
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 11,
+      "nominal": 0.5,
+      "empirical_ft": 0.2523
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 11,
+      "nominal": 0.75,
+      "empirical_ft": 0.4865
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 11,
+      "nominal": 0.9,
+      "empirical_ft": 0.6577
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 12,
+      "nominal": 0.1,
+      "empirical_ft": 0.0364
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 12,
+      "nominal": 0.25,
+      "empirical_ft": 0.0727
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 12,
+      "nominal": 0.5,
+      "empirical_ft": 0.2091
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 12,
+      "nominal": 0.75,
+      "empirical_ft": 0.5
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "horizon": 12,
+      "nominal": 0.9,
+      "empirical_ft": 0.6364
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 1,
+      "nominal": 0.1,
+      "empirical_ft": 0.0714
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 1,
+      "nominal": 0.25,
+      "empirical_ft": 0.3482
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 1,
+      "nominal": 0.5,
+      "empirical_ft": 0.5536
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 1,
+      "nominal": 0.75,
+      "empirical_ft": 0.7232
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 1,
+      "nominal": 0.9,
+      "empirical_ft": 0.8393
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 2,
+      "nominal": 0.1,
+      "empirical_ft": 0.0714
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 2,
+      "nominal": 0.25,
+      "empirical_ft": 0.2768
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 2,
+      "nominal": 0.5,
+      "empirical_ft": 0.5357
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 2,
+      "nominal": 0.75,
+      "empirical_ft": 0.7143
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 2,
+      "nominal": 0.9,
+      "empirical_ft": 0.8661
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 3,
+      "nominal": 0.1,
+      "empirical_ft": 0.0804
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 3,
+      "nominal": 0.25,
+      "empirical_ft": 0.2857
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 3,
+      "nominal": 0.5,
+      "empirical_ft": 0.5
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 3,
+      "nominal": 0.75,
+      "empirical_ft": 0.7411
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 3,
+      "nominal": 0.9,
+      "empirical_ft": 0.8839
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 4,
+      "nominal": 0.1,
+      "empirical_ft": 0.0536
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 4,
+      "nominal": 0.25,
+      "empirical_ft": 0.2143
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 4,
+      "nominal": 0.5,
+      "empirical_ft": 0.5268
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 4,
+      "nominal": 0.75,
+      "empirical_ft": 0.7411
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 4,
+      "nominal": 0.9,
+      "empirical_ft": 0.875
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 5,
+      "nominal": 0.1,
+      "empirical_ft": 0.0893
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 5,
+      "nominal": 0.25,
+      "empirical_ft": 0.2232
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 5,
+      "nominal": 0.5,
+      "empirical_ft": 0.5179
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 5,
+      "nominal": 0.75,
+      "empirical_ft": 0.7857
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 5,
+      "nominal": 0.9,
+      "empirical_ft": 0.8571
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 6,
+      "nominal": 0.1,
+      "empirical_ft": 0.0536
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 6,
+      "nominal": 0.25,
+      "empirical_ft": 0.2589
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 6,
+      "nominal": 0.5,
+      "empirical_ft": 0.5446
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 6,
+      "nominal": 0.75,
+      "empirical_ft": 0.7857
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 6,
+      "nominal": 0.9,
+      "empirical_ft": 0.8304
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 7,
+      "nominal": 0.1,
+      "empirical_ft": 0.0446
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 7,
+      "nominal": 0.25,
+      "empirical_ft": 0.2321
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 7,
+      "nominal": 0.5,
+      "empirical_ft": 0.5089
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 7,
+      "nominal": 0.75,
+      "empirical_ft": 0.7679
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 7,
+      "nominal": 0.9,
+      "empirical_ft": 0.8393
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 8,
+      "nominal": 0.1,
+      "empirical_ft": 0.0536
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 8,
+      "nominal": 0.25,
+      "empirical_ft": 0.2321
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 8,
+      "nominal": 0.5,
+      "empirical_ft": 0.5089
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 8,
+      "nominal": 0.75,
+      "empirical_ft": 0.7411
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 8,
+      "nominal": 0.9,
+      "empirical_ft": 0.8482
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 9,
+      "nominal": 0.1,
+      "empirical_ft": 0.0625
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 9,
+      "nominal": 0.25,
+      "empirical_ft": 0.2143
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 9,
+      "nominal": 0.5,
+      "empirical_ft": 0.5089
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 9,
+      "nominal": 0.75,
+      "empirical_ft": 0.7411
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 9,
+      "nominal": 0.9,
+      "empirical_ft": 0.8393
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 10,
+      "nominal": 0.1,
+      "empirical_ft": 0.0536
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 10,
+      "nominal": 0.25,
+      "empirical_ft": 0.2321
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 10,
+      "nominal": 0.5,
+      "empirical_ft": 0.5268
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 10,
+      "nominal": 0.75,
+      "empirical_ft": 0.7321
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 10,
+      "nominal": 0.9,
+      "empirical_ft": 0.8393
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 11,
+      "nominal": 0.1,
+      "empirical_ft": 0.045
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 11,
+      "nominal": 0.25,
+      "empirical_ft": 0.2342
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 11,
+      "nominal": 0.5,
+      "empirical_ft": 0.5405
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 11,
+      "nominal": 0.75,
+      "empirical_ft": 0.7117
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 11,
+      "nominal": 0.9,
+      "empirical_ft": 0.8108
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 12,
+      "nominal": 0.1,
+      "empirical_ft": 0.0364
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 12,
+      "nominal": 0.25,
+      "empirical_ft": 0.2182
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 12,
+      "nominal": 0.5,
+      "empirical_ft": 0.5091
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 12,
+      "nominal": 0.75,
+      "empirical_ft": 0.7091
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "horizon": 12,
+      "nominal": 0.9,
+      "empirical_ft": 0.8
+    }
+  ],
+  "pit_bins": [
+    {
+      "country": "norway",
+      "target": "cpi",
+      "bin_lo": 0.0,
+      "bin_hi": 0.1,
+      "bin_mid": 0.05,
+      "count": 241,
+      "density": 1.7945,
+      "is_tail": true
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "bin_lo": 0.1,
+      "bin_hi": 0.25,
+      "bin_mid": 0.175,
+      "count": 289,
+      "density": 1.4346,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "bin_lo": 0.25,
+      "bin_hi": 0.5,
+      "bin_mid": 0.375,
+      "count": 239,
+      "density": 0.7118,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "bin_lo": 0.5,
+      "bin_hi": 0.75,
+      "bin_mid": 0.625,
+      "count": 231,
+      "density": 0.688,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "bin_lo": 0.75,
+      "bin_hi": 0.9,
+      "bin_mid": 0.825,
+      "count": 157,
+      "density": 0.7793,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "cpi",
+      "bin_lo": 0.9,
+      "bin_hi": 1.0,
+      "bin_mid": 0.95,
+      "count": 186,
+      "density": 1.385,
+      "is_tail": true
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "bin_lo": 0.0,
+      "bin_hi": 0.1,
+      "bin_mid": 0.05,
+      "count": 102,
+      "density": 0.7606,
+      "is_tail": true
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "bin_lo": 0.1,
+      "bin_hi": 0.25,
+      "bin_mid": 0.175,
+      "count": 156,
+      "density": 0.7755,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "bin_lo": 0.25,
+      "bin_hi": 0.5,
+      "bin_mid": 0.375,
+      "count": 349,
+      "density": 1.041,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "bin_lo": 0.5,
+      "bin_hi": 0.75,
+      "bin_mid": 0.625,
+      "count": 293,
+      "density": 0.874,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "bin_lo": 0.75,
+      "bin_hi": 0.9,
+      "bin_mid": 0.825,
+      "count": 241,
+      "density": 1.1981,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "bin_lo": 0.9,
+      "bin_hi": 1.0,
+      "bin_mid": 0.95,
+      "count": 200,
+      "density": 1.4914,
+      "is_tail": true
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "bin_lo": 0.0,
+      "bin_hi": 0.1,
+      "bin_mid": 0.05,
+      "count": 150,
+      "density": 1.1186,
+      "is_tail": true
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "bin_lo": 0.1,
+      "bin_hi": 0.25,
+      "bin_mid": 0.175,
+      "count": 198,
+      "density": 0.9843,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "bin_lo": 0.25,
+      "bin_hi": 0.5,
+      "bin_mid": 0.375,
+      "count": 279,
+      "density": 0.8322,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "bin_lo": 0.5,
+      "bin_hi": 0.75,
+      "bin_mid": 0.625,
+      "count": 298,
+      "density": 0.8889,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "bin_lo": 0.75,
+      "bin_hi": 0.9,
+      "bin_mid": 0.825,
+      "count": 193,
+      "density": 0.9595,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "bin_lo": 0.9,
+      "bin_hi": 1.0,
+      "bin_mid": 0.95,
+      "count": 223,
+      "density": 1.6629,
+      "is_tail": true
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "bin_lo": 0.0,
+      "bin_hi": 0.1,
+      "bin_mid": 0.05,
+      "count": 213,
+      "density": 1.5884,
+      "is_tail": true
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "bin_lo": 0.1,
+      "bin_hi": 0.25,
+      "bin_mid": 0.175,
+      "count": 201,
+      "density": 0.9993,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "bin_lo": 0.25,
+      "bin_hi": 0.5,
+      "bin_mid": 0.375,
+      "count": 280,
+      "density": 0.8352,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "bin_lo": 0.5,
+      "bin_hi": 0.75,
+      "bin_mid": 0.625,
+      "count": 326,
+      "density": 0.9724,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "bin_lo": 0.75,
+      "bin_hi": 0.9,
+      "bin_mid": 0.825,
+      "count": 192,
+      "density": 0.9545,
+      "is_tail": false
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "bin_lo": 0.9,
+      "bin_hi": 1.0,
+      "bin_mid": 0.95,
+      "count": 129,
+      "density": 0.962,
+      "is_tail": true
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "bin_lo": 0.0,
+      "bin_hi": 0.1,
+      "bin_mid": 0.05,
+      "count": 125,
+      "density": 0.9321,
+      "is_tail": true
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "bin_lo": 0.1,
+      "bin_hi": 0.25,
+      "bin_mid": 0.175,
+      "count": 162,
+      "density": 0.8054,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "bin_lo": 0.25,
+      "bin_hi": 0.5,
+      "bin_mid": 0.375,
+      "count": 353,
+      "density": 1.0529,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "bin_lo": 0.5,
+      "bin_hi": 0.75,
+      "bin_mid": 0.625,
+      "count": 323,
+      "density": 0.9635,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "bin_lo": 0.75,
+      "bin_hi": 0.9,
+      "bin_mid": 0.825,
+      "count": 137,
+      "density": 0.6811,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "bin_lo": 0.9,
+      "bin_hi": 1.0,
+      "bin_mid": 0.95,
+      "count": 241,
+      "density": 1.7972,
+      "is_tail": true
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "bin_lo": 0.0,
+      "bin_hi": 0.1,
+      "bin_mid": 0.05,
+      "count": 117,
+      "density": 0.8744,
+      "is_tail": true
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "bin_lo": 0.1,
+      "bin_hi": 0.25,
+      "bin_mid": 0.175,
+      "count": 77,
+      "density": 0.3837,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "bin_lo": 0.25,
+      "bin_hi": 0.5,
+      "bin_mid": 0.375,
+      "count": 281,
+      "density": 0.8401,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "bin_lo": 0.5,
+      "bin_hi": 0.75,
+      "bin_mid": 0.625,
+      "count": 328,
+      "density": 0.9806,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "bin_lo": 0.75,
+      "bin_hi": 0.9,
+      "bin_mid": 0.825,
+      "count": 262,
+      "density": 1.3054,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "bin_lo": 0.9,
+      "bin_hi": 1.0,
+      "bin_mid": 0.95,
+      "count": 273,
+      "density": 2.0404,
+      "is_tail": true
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "bin_lo": 0.0,
+      "bin_hi": 0.1,
+      "bin_mid": 0.05,
+      "count": 92,
+      "density": 0.6876,
+      "is_tail": true
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "bin_lo": 0.1,
+      "bin_hi": 0.25,
+      "bin_mid": 0.175,
+      "count": 141,
+      "density": 0.7025,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "bin_lo": 0.25,
+      "bin_hi": 0.5,
+      "bin_mid": 0.375,
+      "count": 210,
+      "density": 0.6278,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "bin_lo": 0.5,
+      "bin_hi": 0.75,
+      "bin_mid": 0.625,
+      "count": 216,
+      "density": 0.6457,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "bin_lo": 0.75,
+      "bin_hi": 0.9,
+      "bin_mid": 0.825,
+      "count": 150,
+      "density": 0.7474,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "bin_lo": 0.9,
+      "bin_hi": 1.0,
+      "bin_mid": 0.95,
+      "count": 529,
+      "density": 3.9537,
+      "is_tail": true
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "bin_lo": 0.0,
+      "bin_hi": 0.1,
+      "bin_mid": 0.05,
+      "count": 334,
+      "density": 2.4907,
+      "is_tail": true
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "bin_lo": 0.1,
+      "bin_hi": 0.25,
+      "bin_mid": 0.175,
+      "count": 249,
+      "density": 1.2379,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "bin_lo": 0.25,
+      "bin_hi": 0.5,
+      "bin_mid": 0.375,
+      "count": 208,
+      "density": 0.6204,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "bin_lo": 0.5,
+      "bin_hi": 0.75,
+      "bin_mid": 0.625,
+      "count": 238,
+      "density": 0.7099,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "bin_lo": 0.75,
+      "bin_hi": 0.9,
+      "bin_mid": 0.825,
+      "count": 173,
+      "density": 0.8601,
+      "is_tail": false
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "bin_lo": 0.9,
+      "bin_hi": 1.0,
+      "bin_mid": 0.95,
+      "count": 139,
+      "density": 1.0365,
+      "is_tail": true
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "bin_lo": 0.0,
+      "bin_hi": 0.1,
+      "bin_mid": 0.05,
+      "count": 135,
+      "density": 1.0052,
+      "is_tail": true
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "bin_lo": 0.1,
+      "bin_hi": 0.25,
+      "bin_mid": 0.175,
+      "count": 231,
+      "density": 1.1467,
+      "is_tail": false
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "bin_lo": 0.25,
+      "bin_hi": 0.5,
+      "bin_mid": 0.375,
+      "count": 296,
+      "density": 0.8816,
+      "is_tail": false
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "bin_lo": 0.5,
+      "bin_hi": 0.75,
+      "bin_mid": 0.625,
+      "count": 169,
+      "density": 0.5034,
+      "is_tail": false
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "bin_lo": 0.75,
+      "bin_hi": 0.9,
+      "bin_mid": 0.825,
+      "count": 166,
+      "density": 0.824,
+      "is_tail": false
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "bin_lo": 0.9,
+      "bin_hi": 1.0,
+      "bin_mid": 0.95,
+      "count": 346,
+      "density": 2.5763,
+      "is_tail": true
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "bin_lo": 0.0,
+      "bin_hi": 0.1,
+      "bin_mid": 0.05,
+      "count": 63,
+      "density": 0.4698,
+      "is_tail": true
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "bin_lo": 0.1,
+      "bin_hi": 0.25,
+      "bin_mid": 0.175,
+      "count": 103,
+      "density": 0.5121,
+      "is_tail": false
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "bin_lo": 0.25,
+      "bin_hi": 0.5,
+      "bin_mid": 0.375,
+      "count": 245,
+      "density": 0.7308,
+      "is_tail": false
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "bin_lo": 0.5,
+      "bin_hi": 0.75,
+      "bin_mid": 0.625,
+      "count": 306,
+      "density": 0.9128,
+      "is_tail": false
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "bin_lo": 0.75,
+      "bin_hi": 0.9,
+      "bin_mid": 0.825,
+      "count": 247,
+      "density": 1.2279,
+      "is_tail": false
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "bin_lo": 0.9,
+      "bin_hi": 1.0,
+      "bin_mid": 0.95,
+      "count": 377,
+      "density": 2.8113,
+      "is_tail": true
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "bin_lo": 0.0,
+      "bin_hi": 0.1,
+      "bin_mid": 0.05,
+      "count": 80,
+      "density": 0.5966,
+      "is_tail": true
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "bin_lo": 0.1,
+      "bin_hi": 0.25,
+      "bin_mid": 0.175,
+      "count": 252,
+      "density": 1.2528,
+      "is_tail": false
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "bin_lo": 0.25,
+      "bin_hi": 0.5,
+      "bin_mid": 0.375,
+      "count": 370,
+      "density": 1.1037,
+      "is_tail": false
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "bin_lo": 0.5,
+      "bin_hi": 0.75,
+      "bin_mid": 0.625,
+      "count": 292,
+      "density": 0.871,
+      "is_tail": false
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "bin_lo": 0.75,
+      "bin_hi": 0.9,
+      "bin_mid": 0.825,
+      "count": 138,
+      "density": 0.6861,
+      "is_tail": false
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "bin_lo": 0.9,
+      "bin_hi": 1.0,
+      "bin_mid": 0.95,
+      "count": 209,
+      "density": 1.5585,
+      "is_tail": true
+    }
+  ],
+  "directional_bias": [
+    {
+      "country": "norway",
+      "target": "cpi",
+      "below_q10": 0.1668,
+      "within": 0.6895,
+      "above_q90": 0.1437,
+      "n": 1343
+    },
+    {
+      "country": "norway",
+      "target": "industrial_production",
+      "below_q10": 0.0723,
+      "within": 0.7569,
+      "above_q90": 0.1708,
+      "n": 1341
+    },
+    {
+      "country": "norway",
+      "target": "retail_sales",
+      "below_q10": 0.0925,
+      "within": 0.7107,
+      "above_q90": 0.1969,
+      "n": 1341
+    },
+    {
+      "country": "norway",
+      "target": "unemployment",
+      "below_q10": 0.1432,
+      "within": 0.7591,
+      "above_q90": 0.0977,
+      "n": 1341
+    },
+    {
+      "country": "canada",
+      "target": "cpi",
+      "below_q10": 0.0925,
+      "within": 0.7248,
+      "above_q90": 0.1827,
+      "n": 1341
+    },
+    {
+      "country": "canada",
+      "target": "industrial_production",
+      "below_q10": 0.0822,
+      "within": 0.6375,
+      "above_q90": 0.2803,
+      "n": 1338
+    },
+    {
+      "country": "canada",
+      "target": "retail_sales",
+      "below_q10": 0.0575,
+      "within": 0.5209,
+      "above_q90": 0.4215,
+      "n": 1338
+    },
+    {
+      "country": "canada",
+      "target": "unemployment",
+      "below_q10": 0.2282,
+      "within": 0.6622,
+      "above_q90": 0.1096,
+      "n": 1341
+    },
+    {
+      "country": "sweden",
+      "target": "cpi",
+      "below_q10": 0.1005,
+      "within": 0.6418,
+      "above_q90": 0.2576,
+      "n": 1343
+    },
+    {
+      "country": "sweden",
+      "target": "industrial_production",
+      "below_q10": 0.047,
+      "within": 0.6719,
+      "above_q90": 0.2811,
+      "n": 1341
+    },
+    {
+      "country": "sweden",
+      "target": "unemployment",
+      "below_q10": 0.0597,
+      "within": 0.7845,
+      "above_q90": 0.1559,
+      "n": 1341
+    }
+  ]
+}

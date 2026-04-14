@@ -24,6 +24,8 @@ website:
         text: Forecasts
       - href: results.qmd
         text: Results
+      - href: calibration.qmd
+        text: Calibration
 
 format:
   html:

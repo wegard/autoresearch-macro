@@ -84,6 +84,14 @@ def _parse_args() -> argparse.Namespace:
             "file is present alongside the webapp data."
         ),
     )
+    parser.add_argument(
+        "--app-label",
+        default=None,
+        help=(
+            "Override the 'Open published app' button label on the MacroLab "
+            "project shell. Falls back to MacroLab's default if omitted."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -172,43 +180,11 @@ def _load_summary_stats() -> list[dict[str, str]]:
                 }
             )
 
-    best_score = _load_best_informed_validation_score()
-    if best_score is not None:
-        stats.append(
-            {
-                "label": "Best informed val MASE",
-                "value": f"{best_score:.3f}",
-            }
-        )
+    # Note: per-country val MASE is now shown in the live forecast panel's
+    # best-model strip, so the cross-country aggregate stat is redundant
+    # and was removed.
 
     return stats
-
-
-def _load_best_informed_validation_score() -> float | None:
-    pipeline_configs_path = WEBAPP_DATA_DIR / "pipeline_configs.json"
-    if pipeline_configs_path.exists():
-        payload = json.loads(pipeline_configs_path.read_text())
-        scores = [
-            float(entry["best_score"])
-            for entry in payload.values()
-            if isinstance(entry, dict) and entry.get("best_score") is not None
-        ]
-        if scores:
-            return min(scores)
-
-    scores: list[float] = []
-    for country, filename in SEARCH_STATE_FILES.items():
-        path = RESULTS_DIR / country / filename
-        if not path.exists():
-            continue
-        payload = json.loads(path.read_text())
-        score = payload.get("best_score")
-        if score is None:
-            continue
-        scores.append(float(score))
-    if scores:
-        return min(scores)
-    return None
 
 
 def _build_links(repo_url: str | None, paper_url: str | None) -> list[dict[str, str]]:
@@ -248,6 +224,8 @@ def _build_manifest(args: argparse.Namespace) -> dict[str, Any]:
     live_data_url = _resolve_live_data_url(args.live_data_url)
     if live_data_url is not None:
         manifest["live_data_url"] = live_data_url
+    if args.app_label:
+        manifest["app_label"] = args.app_label.strip()
     return manifest
 
 

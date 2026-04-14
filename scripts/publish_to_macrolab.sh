@@ -8,6 +8,7 @@ PROJECT_SLUG="${PROJECT_SLUG:-autoresearch-macro}"
 PROJECT_NAME="${PROJECT_NAME:-Autoresearch Macro}"
 PROJECT_DESCRIPTION="${PROJECT_DESCRIPTION:-Interactive research dashboard for agentic macro forecasting experiments.}"
 PROJECT_HEADLINE="${PROJECT_HEADLINE:-Agentic search over macro forecasting pipelines across Norway, Canada, and Sweden}"
+APP_LABEL="${APP_LABEL:-Open Autoresearch Analysis}"
 LIFECYCLE_STATUS="${LIFECYCLE_STATUS:-preview}"
 
 MACROLAB_ROOT="${MACROLAB_ROOT:-/opt/macrolab}"
@@ -197,6 +198,10 @@ fi
 
 if [[ -f "${LIVE_DATA_PATH}" ]]; then
     manifest_cmd+=(--live-data-url "${LIVE_DATA_URL}")
+fi
+
+if [[ -n "${APP_LABEL}" ]]; then
+    manifest_cmd+=(--app-label "${APP_LABEL}")
 fi
 
 run "${manifest_cmd[@]}"
